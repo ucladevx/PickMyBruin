@@ -1,4 +1,7 @@
-# django-docker
+# Pick My Bruin
+
+I copy pasted https://github.com/morninj/django-docker for the framework.
+
 
 This is a production-ready setup for running Django on Docker. It has sensible defaults for security, scaling, and workflow. It's a robust and simple way to run Django projects on production servers.
 
