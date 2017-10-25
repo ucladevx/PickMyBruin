@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-from keys import *
+from .keys import *
 
 
 # Quick-start development settings - unsuitable for production
@@ -55,14 +55,13 @@ WSGI_APPLICATION = 'django_docker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'devdb',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.postgresql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'postgres',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'devuser',
-        'PASSWORD': 'devpass', # Entered via fab command; leave blank if using SQLite
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
+        'USER': 'postgres',
+        'HOST': 'db',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '5432',                      # Set to empty string for default.
+    },
 }
 
 
@@ -121,10 +120,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
 }
 
 # Import production settings if the environment variable DJANGO_PRODUCTION is true
 # (It's set to True by default in the Dockerfile, but you can override it with `docker run` for development)
 if os.environ['DJANGO_PRODUCTION'] == 'true':
-    from settings_production import *
+    from .settings_production import *
