@@ -4,3 +4,5 @@
 config.ini
 supervisord.log
 supervisord.pid
+fabfile.py
+Makefile

@@ -18,8 +18,8 @@ def deploy_production():
     start_time = time.time();
     print 'Building Docker image...'
     local('docker build -t %s .' % parser.get('general', 'DOCKER_IMAGE_NAME'))
-    print 'Pushing image to Docker Hub...'
-    local('docker push %s' % parser.get('general', 'DOCKER_IMAGE_NAME'))
+    #print 'Pushing image to Docker Hub...'
+    #local('docker push %s' % parser.get('general', 'DOCKER_IMAGE_NAME'))
     print 'Removing any existing Docker containers on the production host...'
     run('if [ "$(docker ps -qa)" != "" ]; then docker rm --force `docker ps -qa`; fi')
     run('docker ps')
