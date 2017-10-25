@@ -4,8 +4,8 @@
 
 # If we're not in production, create a temporary dev database
 # Initialize Django project
-python /code/django_docker/manage.py collectstatic --noinput
-python /code/django_docker/manage.py makemigrations
-python /code/django_docker/manage.py migrate --noinput
+python /code/src/manage.py collectstatic --noinput
+python /code/src/manage.py makemigrations
+python /code/src/manage.py migrate --noinput
 
-python3 /code/django_docker/manage.py runserver 0.0.0.0:8000
+python3 /code/src/manage.py runserver 0.0.0.0:8000
