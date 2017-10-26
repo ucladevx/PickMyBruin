@@ -159,3 +159,6 @@ else:
         filemode = 'a'
     )
 
+SHELL_PLUS_PRE_IMPORTS = [
+    ('pprint', 'pprint'),
+]
