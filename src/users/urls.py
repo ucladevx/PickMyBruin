@@ -12,5 +12,6 @@ router.register(r'majors', views.MajorViewSet)
 router.register(r'mentors', views.MentorViewSet)
 
 urlpatterns = [
-    url(r'^create/$', views.NewUserView.as_view()),
+    url(r'create/$', views.NewUserView.as_view()),
+    url(r'me/$', views.OwnProfileView.as_view()),
 ]

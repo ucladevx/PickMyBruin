@@ -66,7 +66,6 @@ class NewUserView(APIView):
     permission_classes = tuple()
 
     def post(self, request):
-
         new_user = User.objects.create_user(
             username=request.data['email'],
             email=request.data['email'],
@@ -82,3 +81,7 @@ class NewUserView(APIView):
         new_profile.save()
         return Response(ProfileSerializer(new_profile).data)
 
+class OwnProfileView(APIView):
+    def get(self, request):
+        profile = Profile.objects.get(user=request.user)
+        return Response(ProfileSerializer(profile).data)
