@@ -1,4 +1,5 @@
 default: build
+
 clean:
 
 build: 
@@ -13,3 +14,10 @@ restart:
 
 ssh: 
 	docker exec -i -t `docker ps -q -l --filter ancestor=pickmybruin/backend:latest` /bin/bash
+
+# usage: make run_command cmd="echo hi"
+run_command:
+	docker exec -i -t `docker ps -q -l --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "$(cmd)"
+
+shell:
+	docker exec -i -t `docker ps -q -l --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "/code/src/manage.py shell_plus"
