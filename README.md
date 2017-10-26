@@ -10,18 +10,15 @@
 Simplified tree diagram
 ``` /usr/bin/tree
 .  # Contains docker setup and Makefile
-├── docker-compose.yml
-├── Dockerfile
-├── initialize.sh
-├── LICENSE
-├── Makefile
+├── docker-compose.yml  # defines setup of PostgreSQL and Django
+├── Dockerfile  # defines pickmybruin/backend Docker image
+├── initialize.sh  # sets up Django container (runs migrations and then boots server)
+├── Makefile  # contains very useful helper commands
 └── src  # Contains all Django code
     ├── pickmybruin  # Contains code relating to the entire website
     │   ├── keys.py  # put confidential info in here
-    │   ├── middleware.py
     │   ├── settings.py  # global settings (please keep confidential info out of here)
     │   ├── urls.py  # global URLs (usually imports app URLs too)
-    │   └── wsgi.py
     └── users  # One app for just users
         ├── admin.py  # sets up /admin pages
         ├── models.py  # contains class declarations and methods
