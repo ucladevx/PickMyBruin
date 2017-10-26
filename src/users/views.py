@@ -85,3 +85,4 @@ class OwnProfileView(APIView):
     def get(self, request):
         profile = Profile.objects.get(user=request.user)
         return Response(ProfileSerializer(profile).data)
+
