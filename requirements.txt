@@ -6,3 +6,4 @@ django-filter
 psycopg2
 django-oauth-toolkit
 django-cors-middleware
+drf-writable-nested

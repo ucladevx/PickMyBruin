@@ -21,8 +21,8 @@ class Major(models.Model):
         return self.name
 
 class Mentor(models.Model):
-    major = models.OneToOneField(Major, null=True, on_delete=models.SET_NULL)
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
     bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
     active = models.BooleanField(default=True)
 
