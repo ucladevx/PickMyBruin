@@ -43,9 +43,9 @@ Simplified tree diagram
 
 ## How to add a new app
 1. Run `make run_command cmd="src/manage.py startapp $APPNAME`
-  - This creates a new skeleton folder for your new app
+    - This creates a new skeleton folder for your new app
 2. YOU MUST ADD THIS APP TO `src/pickmybruin/settings.py` `INSTALLED_APPS` FOR THE APP TO BE DISCOVEREDR
-  - `'users',` adds the `users` app to the Django project.  Big surprise.
+    - `'users',` adds the `users` app to the Django project.  Big surprise.
 3. Add your code
 4. Add tests to `tests.py`
 5. Add your models to `admin.py`
