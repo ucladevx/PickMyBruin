@@ -3,4 +3,28 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+
+from django.contrib.auth.models import User
+
 # Create your models here.
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
+    
+    def __str__(self):
+        return str(self.user)
+
+class Major(models.Model):
+    name = models.CharField(max_length=100, null=False)
+
+    def __str__(self):
+        return self.name
+
+class Mentor(models.Model):
+    major = models.OneToOneField(Major, null=True, on_delete=models.SET_NULL)
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return '%s (%s)' % (self.profile, self.major)

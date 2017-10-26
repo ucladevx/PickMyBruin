@@ -8,4 +8,5 @@ python /code/src/manage.py collectstatic --noinput
 python /code/src/manage.py makemigrations
 python /code/src/manage.py migrate --noinput
 
+echo "Starting up server on 0.0.0.0:8000"
 python3 /code/src/manage.py runserver 0.0.0.0:8000

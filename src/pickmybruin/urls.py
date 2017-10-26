@@ -5,12 +5,17 @@ from users import views as users_views
 from django.contrib import admin
 admin.autodiscover()
 
+from users.urls import router as users_router
+
+
 router = routers.DefaultRouter()
-router.register(r'users', users_views.UserViewSet)
-router.register(r'groups', users_views.GroupViewSet)
+
+router.registry.extend(users_router.registry)
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    url(r'^drf/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^users/', include('users.urls', namespace='users')),
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
