@@ -51,3 +51,38 @@ Simplified tree diagram
 8. Submit a PR
 
 
+## Current Database Schema (Will probably be outdated soon)
+
+### NOTE: you don't really need to understand this, but this is how Django will create tables for the models
+
+
+#### User Table
+
+id | email | first_name | last_name | (salted and hashed) password 
+--- | --- | --- | --- | --- 
+1 | me@marktai.com | Mark | Tai | verysecurepassword 
+2 | you@marktai.com | John | Doe | corgisarecute 
+
+
+#### Profile Table
+
+id | user_id | bio 
+--- | --- | --- 
+1 | 1 | Let me know if these examples suck 
+2 | 2 | [marktai.com/#corgis](https://www.marktai.com/#corgis) for all your corgi needs 
+
+
+#### Major Table
+
+id | name 
+--- | --- 
+1 | CS 
+
+
+#### Mentor Table
+
+id | profile_id | major_id | bio 
+--- | --- | --- | --- 
+1 | 2 | 1 | I will teach you the ways of corgis 
+
+
