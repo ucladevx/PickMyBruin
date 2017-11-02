@@ -12,7 +12,6 @@ fi
 
 #echo "from django.contrib.auth.models import User; if not User.objects.all().exists(): User.create_superuser('root', 'root@localhost', password='password')" | python3 src/manage.py shell
 
-python3 src/manage.py collectstatic --noinput
 python3 src/manage.py makemigrations
 python3 src/manage.py migrate --noinput
 
