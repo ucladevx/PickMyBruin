@@ -866,7 +866,7 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2017-11-01 02:37:44.072+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
-6		\N	f	test@marktai.com	Test	Test	test@marktai.com	f	t	2017-10-26 04:02:47+00
+6	pbkdf2_sha256$36000$CLcBM5r1VHc5$O8Abg2na5IPfLfPcDy233Yw9p4zxFI024qbk63HKZjw=	\N	f	test@marktai.com	Test	Test	test@marktai.com	f	t	2017-10-26 04:02:47+00
 \.
 
 
@@ -899,29 +899,6 @@ COPY corsheaders_corsmodel (id, cors) FROM stdin;
 --
 
 COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
-13	2017-11-01 04:26:31.537808+00	9	jdfrcY7xuD2nldu2JN9MnVNvqS266n	3		11	1
-14	2017-11-01 04:26:40.62859+00	8	a@marktai.com	3		4	1
-15	2017-11-01 04:26:40.631402+00	10	b@marktai.com	3		4	1
-16	2017-11-01 04:26:58.065294+00	1	test@marktai.com	2	[{"changed": {"fields": ["user", "bio"]}}]	8	1
-17	2017-11-01 04:27:19.790367+00	6	test@marktai.com	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	4	1
-1	2017-10-26 00:12:04.08+00	1	root	1	[{"added": {}}]	8	1
-2	2017-10-26 00:12:13.851+00	1	CS	1	[{"added": {}}]	7	1
-3	2017-10-26 00:12:44.945+00	2	root (CS)	1	[{"added": {}}]	9	1
-4	2017-10-26 00:16:28.899+00	1	pickmybruin	1	[{"added": {}}]	10	1
-5	2017-10-26 00:16:57.989+00	1	root	2	[{"changed": {"fields": ["password"]}}]	4	1
-6	2017-10-26 02:35:35.508+00	1	pickmybruin	2	[{"changed": {"fields": ["client_id"]}}]	10	1
-7	2017-11-01 02:38:07.063+00	5		3		4	1
-8	2017-11-01 02:38:07.08+00	4	me2@marktai.com	3		4	1
-9	2017-11-01 02:38:07.082+00	2	me@marktai.com	3		4	1
-10	2017-11-01 02:38:22.467+00	11	alex@marktai.com	3		4	1
-11	2017-11-01 03:08:47.485+00	2	9jqlggJSAVXN9j86uZIHg0clAwLWOB	3		11	1
-12	2017-11-01 03:08:47.514+00	1	d6BpFwKrejMMzPtIXSpeolDURzcGXu	3		11	1
-18	2017-11-01 04:30:56.057065+00	8	a@marktai.com	3		4	1
-19	2017-11-01 04:30:56.059432+00	10	b@marktai.com	3		4	1
-20	2017-11-01 04:31:06.042005+00	6	test@marktai.com	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	4	1
-21	2017-11-01 04:31:23.348852+00	1	test@marktai.com	2	[{"changed": {"fields": ["user", "bio"]}}]	8	1
-22	2017-11-02 05:33:03.184294+00	11	hfXfbpFjeWx5pvu8OZ8CSrKZJ9QI8q	3		11	1
-23	2017-11-02 05:33:03.193859+00	10	fBcmPvajdEzdtvFajFWc8Ev0zrKXjZ	3		11	1
 \.
 
 
@@ -984,8 +961,8 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 0stomv2iy38s1c214i83kovwmj80wfjr	Y2IwYWI4ZGQxNjJjNzI2YmJlMmU4ZDI5YmMwMzU5MTUxOWM3YjMyNDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJjODI2NWIxM2Y3NGRlZTdmZWIzNDNmMDBlYmMzYjVmYmM2YjYxZjUzIn0=	2017-11-09 04:27:25.642+00
 76chuz4m0m1jmiasur86p7gxphbiwsh3	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2017-11-15 02:37:44.077+00
-8hq23hqmikef6v6qpapvaoii4pkx115z	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2017-11-09 09:19:09.053+00
 z4iwiuyuz64qj5tzdxacsaya2h8rcbvw	Y2IwYWI4ZGQxNjJjNzI2YmJlMmU4ZDI5YmMwMzU5MTUxOWM3YjMyNDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiJjODI2NWIxM2Y3NGRlZTdmZWIzNDNmMDBlYmMzYjVmYmM2YjYxZjUzIn0=	2017-11-09 04:55:50.53+00
+8g73wu8505on5e059fl639e0ei8dkk5r	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2017-11-16 08:00:40.971391+00
 \.
 
 
@@ -1002,7 +979,7 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 --
 
 COPY oauth2_provider_application (id, client_id, redirect_uris, client_type, authorization_grant_type, client_secret, name, user_id, skip_authorization, created, updated) FROM stdin;
-1	web		confidential	password	sMXrq4RV2muu07ERhrllW1uCfH12U4ZNeqyM0L8bmaF9P59prjkIe5mhJJAt47Kod14yhRdg96gEf1m183sblRzyC175eLd7NzsyWS9w6QTyVPdczvTmeHiGBJJPjhGf	pickmybruin	\N	f	2017-10-26 00:16:28.897+00	2017-10-26 02:35:35.507+00
+1	web		confidential	password	sMXrq4RV2muu07ERhrllW1uCfH12U4ZNeqyM0L8bmaF9P59prjkIe5mhJJAt47Kod14yhRdg96gEf1m183sblRzyC175eLd7NzsyWS9w6QTyVPdczvTmeHiGBJJPjhGf	pickmybruin web access	\N	f	2017-10-26 00:16:28.897+00	2017-11-02 07:56:52.99572+00
 \.
 
 
@@ -1102,7 +1079,7 @@ SELECT pg_catalog.setval('corsheaders_corsmodel_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 23, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 28, true);
 
 
 --
@@ -1123,7 +1100,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 22, true);
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 11, true);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 13, true);
 
 
 --
@@ -1144,7 +1121,7 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 11, true);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 13, true);
 
 
 --

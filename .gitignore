@@ -5,3 +5,5 @@ config.ini
 supervisord.log
 supervisord.pid
 keys.py
+
+pickmybruin*.sql
