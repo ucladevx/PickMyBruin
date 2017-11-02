@@ -6,6 +6,8 @@ services:
   web:
     image: pickmybruin/backend:latest
     command: bash initialize.sh
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - .:/code
     ports:
