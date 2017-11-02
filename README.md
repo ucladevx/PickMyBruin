@@ -3,6 +3,7 @@
 ## Setup
 1. Install `docker` and `docker-compose`. 
 2. run `make build && make run` in the root directory (this one)
+3. In another window, run `make init_db` to set up some default values for everything
 
 
 ## Project Organization
