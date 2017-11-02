@@ -50,6 +50,16 @@ Simplified tree diagram
 7. Run the tests
 8. Submit a PR
 
+## How to do authorized requests
+1. Login
+  - Only the `username` and `password` fields in the input should ever change
+  - Only the `access_token` field in the output really matters
+  ![Login Postman Screenshot](https://i.gyazo.com/df9680b972598d00748dc1244df3e35a.png)
+2. Use the `access_token` to do requests
+  - MUST BE `Authorization: Bearer <ACCESS_TOKEN>`
+  - Django will automatically identify the user with the token
+  ![Authorization Postman Screenshot](https://i.gyazo.com/5ee6d2a1348bbdbf7e479d534a25ba82.png)
+
 
 ## API
 ### Create new user
