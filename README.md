@@ -51,6 +51,162 @@ Simplified tree diagram
 8. Submit a PR
 
 
+## API
+### Create new user
+  POST /users/
+  ```
+      {
+          "email": "<EMAIL>",
+          "password": "<PASSWORD>"
+      }
+  ```
+  returns 
+  ```
+      {
+          "user_id": <PROFILE_ID>
+      }
+  ```
+  send a verification email with a link: "https://pickmybruin.com/verify_user?user_id=<PROFILE_ID>&code=<VERIFICATION_CODE>"
+
+### Verify user
+  POST /users/<USER_ID>/verify
+  ```
+      {
+          "code": "<VERIFICATION_CODE>"
+      }
+  ```
+  returns  
+  ```
+      {
+          "user_id": <PROFILE_ID>
+      }
+  ```
+
+### Login
+  POST /o/token (login)
+  ```x-www-form-urlencoded
+      grant_type:password
+      username:<USER_EMAIL>
+      password:<USER_PASSWORD>
+      client_id:web
+      client_secret:<CLIENT_SECRET> // Note: the CLIENT_SECRET is a hardcoded field you need to get from your backend
+  ```
+  returns 
+  ```
+      {
+          "access_token": "<ACCESS_TOKEN>",
+          "expires_in": 36000,
+          "token_type": "Bearer",
+          "scope": "read write groups",
+          "refresh_token": "<REFRESH_TOKEN>"
+      }
+  ```
+
+### Authorization
+  Authorization done over headers  
+  Authorization: "Bearer <ACCESS_TOKEN>"
+
+### Get own user
+  GET /users/me/  
+  returns
+  ```
+      {
+          "id": <PROFILE_ID>,
+          "user": {
+              "id": <USER_ID>,
+              "first_name": "<USER_FIRST_NAME>",
+              "last_name": "<USER_LAST_NAME>",
+              "email": "<USER_EMAIL>"
+          },
+          "year": "<YEAR>",
+          "verified": "<VERIFIED>",
+          "date_created": "<DATE_CREATED_ISO8601>"
+      }
+  ```
+
+### Get specific user (not sure if needed)
+  GET /users/<PROFILE_ID>/  
+  return is same as /users/me/  
+
+### Update own user
+  PATCH /users/me/  
+  schema is same as /users/me/, but will update subfields (don't change the id please)  
+  return is same as /users/me/  
+
+### Get own mentor
+  GET /mentors/me/  
+  returns  
+  ```
+      {
+          "major": "<MAJOR>",
+          "classes_taken": [
+              <CLASSES_TAKEN> ...
+          ],
+          "date_created": "<DATE_CREATED_ISO8601>"
+      }
+  ```
+
+### Activate own mentor
+  POST /mentors/me/
+    - create mentor it doesn't exist
+    - activate mentor if it does exist
+  returns same as /mentors/me/  
+
+### Update own mentor
+  PATCH /mentors/me/  
+  schema is same as /mentors/me/, but will update subfields (don't change the id please)  
+  return is same as /mentors/me/  
+
+### Get possible majors
+  GET /majors/  
+  returns  
+  ```
+      {
+          "majors": [
+              <MAJORS>...
+          ]
+      }
+  ```
+
+### Get possible years
+  GET /years/  
+  returns  
+  ```
+      {
+          "years": [
+              <YEARS>...
+          ]
+      }
+  ```
+
+### Search for mentors
+  GET /mentors/?major=<MAJOR_ID>  
+    - only returns active mentors
+    - excludes yourself
+    - sort by year decreasing for now
+    - no pagination for now
+  returns   
+  ```
+      {
+          "mentors": [
+              <MENTORS>... // same as /mentor/me/ format
+          ]
+      }
+  ```
+
+### Get specific mentor
+  GET /mentors/<MENTOR_ID>/  
+  return is same as /mentors/me/  
+
+
+### Send mentor a request
+  POST /requests/<MENTOR_ID>/  
+  ```
+      {
+          "message": "<EMAIL_BODY>"
+      }
+  ```
+
 ## Current Database Schema (Will probably be outdated soon)
 
 ### NOTE: you don't really need to understand this, but this is how Django will create tables for the models
