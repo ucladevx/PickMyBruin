@@ -41,6 +41,6 @@ class MajorSerializer(serializers.ModelSerializer):
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
     class Meta:
-        model = Profile
+        model = Mentor
         fields = ('id', 'profile', 'active', 'major', 'bio')
         read_only_fields = ('id',)
