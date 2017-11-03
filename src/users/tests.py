@@ -7,6 +7,7 @@ from rest_framework.test import APIClient, APITestCase
 
 from django.contrib.auth.models import User
 from .models import Profile, Mentor, Major
+from . import factories
 
 # Create your tests here.
 
@@ -56,58 +57,23 @@ class CreateUserTest(APITestCase):
 class OwnProfileViewTest(APITestCase):
     own_profile_url = reverse('users:me')
     def setUp(self):
-        self.user_params = {
-            'email': 'test3@test.com',
-            'password': 'password',
-            'first_name': 'first',
-            'last_name': 'last',
-        }
-
-        resp = self.client.post(
-            CreateUserTest.create_url,
-            data=self.user_params,
-        )
-
-        self.profile = Profile.objects.get(user__email=self.user_params['email'])
+        self.profile = factories.ProfileFactory()
+        self.client.force_authenticate(user=self.profile.user)
 
     def tearDown(self):
         User.objects.all().delete()
         Profile.objects.all().delete()
 
     def test_own_profile_returns_own_profile(self):
-        self.client.force_authenticate(user=self.profile.user)
         resp = self.client.get(self.own_profile_url)
-        self.assertEqual(self.user_params['email'], resp.data['user']['email'])
+        self.assertEqual(self.profile.user.email, resp.data['user']['email'])
 
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
-        self.user_params = {
-            'email': 'test3@test.com',
-            'password': 'password',
-            'first_name': 'first',
-            'last_name': 'last',
-        }
-
-        resp = self.client.post(
-            CreateUserTest.create_url,
-            data=self.user_params,
-        )
-
-        self.profile = Profile.objects.get(user__email=self.user_params['email'])
-
-        self.major = Major(name='Test Major')
-        self.major.save()
-
-        self.mentor = Mentor(
-            profile = self.profile,
-            bio = 'this is a test bio',
-            active = True,
-            major = self.major,
-        )
-        self.mentor.save()
-
-        self.client.force_authenticate(user=self.profile.user)
+        self.major = factories.MajorFactory(name='Test Major')
+        self.mentor = factories.MentorFactory(major=self.major)
+        self.client.force_authenticate(user=self.mentor.profile.user)
 
     def tearDown(self):
         User.objects.all().delete()
@@ -117,7 +83,7 @@ class MentorsSearchTest(APITestCase):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.mentor.major.name,
+                'major': self.major.name,
             },
         )
 
@@ -133,10 +99,4 @@ class MentorsSearchTest(APITestCase):
         )
 
         self.assertEqual(resp.data['count'], 0)
-
-
-
-
-
-
 
