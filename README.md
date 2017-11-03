@@ -94,7 +94,7 @@ Simplified tree diagram
   ```
 
 ### Login
-  POST /o/token (login)
+  POST /o/token/ (login)
   ```x-www-form-urlencoded
       grant_type:password
       username:<USER_EMAIL>
