@@ -23,7 +23,6 @@ class CreateUserTest(APITestCase):
             'password': 'password',
             'first_name': 'first',
             'last_name': 'last',
-            'bio': 'sample bio',
         }
 
         resp = self.client.post(
@@ -37,7 +36,6 @@ class CreateUserTest(APITestCase):
         self.assertEqual(user.email, user_params['email'])
         self.assertEqual(user.first_name, user_params['first_name'])
         self.assertEqual(user.last_name, user_params['last_name'])
-        self.assertEqual(profile.bio, user_params['bio'])
 
     def test_user_username_and_email_equal(self):
         user_params = {
@@ -45,7 +43,6 @@ class CreateUserTest(APITestCase):
             'password': 'password',
             'first_name': 'first',
             'last_name': 'last',
-            'bio': 'sample bio',
         }
 
         resp = self.client.post(
@@ -64,7 +61,6 @@ class OwnProfileViewTest(APITestCase):
             'password': 'password',
             'first_name': 'first',
             'last_name': 'last',
-            'bio': 'sample bio',
         }
 
         resp = self.client.post(
@@ -82,4 +78,65 @@ class OwnProfileViewTest(APITestCase):
         self.client.force_authenticate(user=self.profile.user)
         resp = self.client.get(self.own_profile_url)
         self.assertEqual(self.user_params['email'], resp.data['user']['email'])
+
+class MentorsSearchTest(APITestCase):
+    mentors_search_url = reverse('users:mentors_search')
+    def setUp(self):
+        self.user_params = {
+            'email': 'test3@test.com',
+            'password': 'password',
+            'first_name': 'first',
+            'last_name': 'last',
+        }
+
+        resp = self.client.post(
+            CreateUserTest.create_url,
+            data=self.user_params,
+        )
+
+        self.profile = Profile.objects.get(user__email=self.user_params['email'])
+
+        self.major = Major(name='Test Major')
+        self.major.save()
+
+        self.mentor = Mentor(
+            profile = self.profile,
+            bio = 'this is a test bio',
+            active = True,
+            major = self.major,
+        )
+        self.mentor.save()
+
+        self.client.force_authenticate(user=self.profile.user)
+
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+
+    def test_correct_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.mentor.major.name,
+            },
+        )
+
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor.major.name)
+
+    def test_incorrect_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.mentor.major.name + 'wonrg',
+            },
+        )
+
+        self.assertEqual(resp.data['count'], 0)
+
+
+
+
+
+
 

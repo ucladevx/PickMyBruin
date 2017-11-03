@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
     
     def __str__(self):
         return str(self.user)
@@ -28,3 +27,5 @@ class Mentor(models.Model):
 
     def __str__(self):
         return '%s (%s)' % (self.profile, self.major)
+
+
