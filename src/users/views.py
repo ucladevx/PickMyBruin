@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics
 
 from django.contrib.auth.models import User, Group
 
@@ -76,13 +77,32 @@ class NewUserView(APIView):
 
         new_profile = Profile(
             user=new_user,
-            bio=request.data.get('bio', ''),
         )
         new_profile.save()
         return Response(ProfileSerializer(new_profile).data)
 
-class OwnProfileView(APIView):
-    def get(self, request):
-        profile = Profile.objects.get(user=request.user)
-        return Response(ProfileSerializer(profile).data)
+# class OwnProfileView(APIView):
+#     def get(self, request):
+#         profile = Profile.objects.get(user=request.user)
+#         return Response(ProfileSerializer(profile).data)
+# 
+class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProfileSerializer
+    def get_object(self):
+        return get_object_or_404(Profile, user=self.request.user)
+
+    def post(self, *args, **kwargs):
+        super().post(*args, **kwargs)
+
+
+
+class MentorsSearchView(generics.ListAPIView):
+    queryset = Mentor.objects.all()
+    serializer_class = MentorSerializer
+
+    def filter_queryset(self, queryset):
+        major = self.request.query_params['major']
+        return queryset.filter(major__name=major)
+
+    
 
