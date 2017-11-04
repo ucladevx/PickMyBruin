@@ -168,3 +168,6 @@ else:
 SHELL_PLUS_PRE_IMPORTS = [
     ('pprint', 'pprint'),
 ]
+
+logging.getLogger('factory').setLevel(logging.WARN)
+

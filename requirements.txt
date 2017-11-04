@@ -10,3 +10,4 @@ drf-writable-nested
 django-extensions
 ipython
 pprint
+factory_boy
