@@ -64,6 +64,9 @@ class MentorViewSet(viewsets.ModelViewSet):
     serializer_class = MentorSerializer
 
 class CreateUser(generics.CreateAPIView):
+    """
+    API endpoint that allows a user to be created.
+    """
     permission_classes = tuple()
     def post(self, request):
         new_user = User.objects.create_user(
@@ -78,7 +81,8 @@ class CreateUser(generics.CreateAPIView):
             verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=10)),
         )
         new_profile.save()
-
+        #TODO(David & Sanyam): transactions
+        #TODO(David & Sanyam): implement sendgrid
         # from_email =  Email("test.marktai.com")
         # to_email = Email(new_user.email)
         # subject = "Pick a Brain with PickMyBruin!"
@@ -88,9 +92,13 @@ class CreateUser(generics.CreateAPIView):
         #     "&code=" + new_profile.verification_code)
         # mail = Mail(from_email, subject, to_email, content)
         # response = sg.client.mail.send.post(request_body=mail.get())
+
         return Response(ProfileSerializer(new_profile).data)
-        #How
+        
 class VerifyUser(APIView):
+    """
+    API endpoint that verifies a user based on profile_id and associated verification code.
+    """
     permission_classes = tuple()
     def patch(self, request, profile_id):
         #self.request.query_params
@@ -100,36 +108,7 @@ class VerifyUser(APIView):
             profile.save()
         return  Response({'profile_id': profile_id})
 
-# class NewUserView(APIView):
-#     """
-#     View to create a new user
 
-#     * Currently doesn't do any checking on authentic requests or captcha
-#     """
-#     permission_classes = tuple()
-
-#     def post(self, request):
-#         new_user = User.objects.create_user(
-#             username=request.data['email'],
-#             email=request.data['email'],
-#             password=request.data['password'],
-#             first_name=request.data.get('first_name', ''),
-#             last_name=request.data.get('last_name', ''),
-#         )
-
-        # new_profile = Profile(
-        #   user=new_user,
-        #   )
-
-
-#         new_profile.save()
-#         return Response(ProfileSerializer(new_profile).data)
-
-# class OwnProfileView(APIView):
-#     def get(self, request):
-#         profile = Profile.objects.get(user=request.user)
-#         return Response(ProfileSerializer(profile).data)
-# 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileSerializer
     def get_object(self):
@@ -139,7 +118,6 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
         super().post(*args, **kwargs)
 
 
-
 class MentorsSearchView(generics.ListAPIView):
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
@@ -147,6 +125,3 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
-
-    
-
