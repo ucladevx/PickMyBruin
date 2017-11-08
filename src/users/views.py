@@ -101,7 +101,6 @@ class VerifyUser(APIView):
     """
     permission_classes = tuple()
     def patch(self, request, profile_id):
-        #self.request.query_params
         profile = get_object_or_404(Profile, id=profile_id)
         if request.data['verification_code'] == profile.verification_code:
             profile.verified = True
@@ -125,3 +124,4 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
+
