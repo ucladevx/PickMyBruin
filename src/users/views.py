@@ -78,7 +78,7 @@ class CreateUser(generics.CreateAPIView):
         )
         new_profile = Profile(
             user=new_user,
-            verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=10)),
+            verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM)),
         )
         new_profile.save()
         #TODO(David & Sanyam): transactions
