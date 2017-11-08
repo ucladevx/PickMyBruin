@@ -214,6 +214,8 @@ Simplified tree diagram
   POST /requests/<MENTOR_ID>/  
   ```
       {
+          "phone": "<OPTIONAL_PHONE>"
+          "preferred_email": "<REPLY_EMAIL>"
           "message": "<EMAIL_BODY>"
       }
   ```
