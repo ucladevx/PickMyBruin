@@ -12,7 +12,10 @@ router.register(r'majors', views.MajorViewSet)
 router.register(r'mentors', views.MentorViewSet)
 
 urlpatterns = [
-    url(r'create/?$', views.NewUserView.as_view(), name='create'),
+    #url(r'create/?$', views.NewUserView.as_view(), name='create'),
     url(r'me/?$', views.OwnProfileView.as_view(), name='me'),
     url(r'mentors/?$', views.MentorsSearchView.as_view(), name='mentors_search'),
+    url(r'users/?$', views.CreateUser.as_view(), name='create'),
+    url(r'users/(?P<profile_id>[0-9]+)/verify/?$', views.VerifyUser.as_view(), name='verify')
+    #Added users url pattern
 ]

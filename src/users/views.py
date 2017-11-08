@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import random, string
 
 from django.shortcuts import render, get_object_or_404
 
@@ -17,7 +18,11 @@ from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
     MentorSerializer,
 )
-
+#import sendgrid
+# import sendgrid
+# import os
+# from send.helpers.mail import Email, Content, Substitution, Mail
+# sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -58,14 +63,8 @@ class MentorViewSet(viewsets.ModelViewSet):
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
 
-class NewUserView(APIView):
-    """
-    View to create a new user
-
-    * Currently doesn't do any checking on authentic requests or captcha
-    """
+class CreateUser(generics.CreateAPIView):
     permission_classes = tuple()
-
     def post(self, request):
         new_user = User.objects.create_user(
             username=request.data['email'],
@@ -74,12 +73,57 @@ class NewUserView(APIView):
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
         )
-
         new_profile = Profile(
             user=new_user,
+            verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=10)),
         )
         new_profile.save()
+
+        # from_email =  Email("test.marktai.com")
+        # to_email = Email(new_user.email)
+        # subject = "Pick a Brain with PickMyBruin!"
+        # content = Content("text/html", 
+        #     "Click the the link below to verify your account. \n"+
+        #     "https://pickmybruin.com/verify_user?user_id=" + new_profile.id +
+        #     "&code=" + new_profile.verification_code)
+        # mail = Mail(from_email, subject, to_email, content)
+        # response = sg.client.mail.send.post(request_body=mail.get())
         return Response(ProfileSerializer(new_profile).data)
+        #How
+class VerifyUser(APIView):
+    permission_classes = tuple()
+    def patch(self, request, profile_id):
+        #self.request.query_params
+        profile = get_object_or_404(Profile, id=profile_id)
+        if request.data['verification_code'] == profile.verification_code:
+            profile.verified = True
+            profile.save()
+        return  Response({'profile_id': profile_id})
+
+# class NewUserView(APIView):
+#     """
+#     View to create a new user
+
+#     * Currently doesn't do any checking on authentic requests or captcha
+#     """
+#     permission_classes = tuple()
+
+#     def post(self, request):
+#         new_user = User.objects.create_user(
+#             username=request.data['email'],
+#             email=request.data['email'],
+#             password=request.data['password'],
+#             first_name=request.data.get('first_name', ''),
+#             last_name=request.data.get('last_name', ''),
+#         )
+
+        # new_profile = Profile(
+        #   user=new_user,
+        #   )
+
+
+#         new_profile.save()
+#         return Response(ProfileSerializer(new_profile).data)
 
 # class OwnProfileView(APIView):
 #     def get(self, request):
