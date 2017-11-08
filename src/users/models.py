@@ -8,8 +8,11 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
+    VERIFICATION_CHAR_NUM = 10
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
+    verified = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM)
+
     def __str__(self):
         return str(self.user)
 
