@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.EmailRequestView, name='send_email'),
+    url(r'^([0-9]+)/$', views.EmailRequestView.as_view(), name='send_email'),
 ]

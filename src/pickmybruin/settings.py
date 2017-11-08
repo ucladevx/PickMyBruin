@@ -95,6 +95,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+# sending SMTP emails using sendgrid
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'pickMyBruin'
+EMAIL_HOST_PASSWORD = 'pickMyBruin123'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
@@ -171,4 +179,3 @@ SHELL_PLUS_PRE_IMPORTS = [
 ]
 
 logging.getLogger('factory').setLevel(logging.WARN)
-

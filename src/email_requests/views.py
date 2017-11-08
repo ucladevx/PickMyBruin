@@ -1,14 +1,23 @@
 from django.shortcuts import render
+from django.core.mail import send_mail
+from .models import Request
+from .serializers import RequestSerializer
 
 # Create your views here.
 class EmailRequestView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RequestSerializer
+
     def get_object(self):
         return get_object_or_404(Profile, user=self.request.user)
 
-    def post(self, *args, **kwargs):
-          super().post(*args, **kwargs)
-          do email shit
+    def post(self, request, mentor_id):
+
+        subject = ""
+        message_body = ""
+        from_email = ""
+        to_email = ""
+
+        send_mail(subject, message_body, from_email, [to_email], fail_silently=False)
 
 
 #*****This is all mostly copy paste from view in users^^^
@@ -22,4 +31,3 @@ class EmailRequestView(generics.RetrieveUpdateDestroyAPIView):
 	-Add new request to the table  <-- Look at generics documentation online
 	-Send email
 	-create tests'''
-
