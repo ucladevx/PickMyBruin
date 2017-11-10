@@ -8,7 +8,7 @@ from .models import Profile, Major, Mentor
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email',)
         read_only_fields = ('id',)
 
     def save(self, *args, **kwargs):
@@ -27,8 +27,9 @@ class ProfileSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Profile
-        fields = ('id', 'user')
-        read_only_fields = ('id', 'user',)
+        fields = ('id', 'user', 'verified')
+        read_only_fields = ('id', 'user', 'verified')
+        #added verified
 
 
 class MajorSerializer(serializers.ModelSerializer):

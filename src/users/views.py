@@ -99,8 +99,8 @@ class VerifyUser(APIView):
     """
     API endpoint that verifies a user based on profile_id and associated verification code.
     """
-    permission_classes = tuple()
-    def patch(self, request, profile_id):
+    def post(self, request):#, profile_id):
+        profile_id = self.request.user.profile.id
         profile = get_object_or_404(Profile, id=profile_id)
         if request.data['verification_code'] == profile.verification_code:
             profile.verified = True
