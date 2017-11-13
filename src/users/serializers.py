@@ -8,8 +8,7 @@ from .models import Profile, Major, Mentor
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email')
-        read_only_fields = ('id',)
+        fields = ('first_name', 'last_name', 'email')
 
     def save(self, *args, **kwargs):
         self.validated_data['username'] = self.validated_data['email']
