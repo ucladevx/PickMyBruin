@@ -6,7 +6,7 @@ from users.models import Profile, Mentor, User
 
 
 # Create your views here.
-class EmailRequestView(generics.RetrieveUpdateDestroyAPIView):
+class EmailRequestView(generics.CreateAPIView):
     serializer_class = RequestSerializer
 
     def get_object(self):
