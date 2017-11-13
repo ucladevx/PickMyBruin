@@ -16,15 +16,20 @@ class EmailRequestView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
 
+        mentor = Mentor.objects.all()
+        for i in mentor:
+            print (i.id)
+        mentors = Mentor.objects.all()
         mentor_id = int(self.kwargs['mentor_id'])
         mentor = get_object_or_404(Mentor, id=mentor_id)
-        mentor_email = models.profile.user.email
-
+        mentor_email = mentor.profile.user.email
+       
         phone_num = request.data["phone"]
         preferred_email = request.data["preferred_email"]
         user_message = request.data["message"]
 
         mentee_user=self.request.user
+        print(mentee_user)
         mentee_profile = get_object_or_404(Profile, user=mentee_user)
         mentee_name = mentee_user.first_name + ' ' + mentee_user.last_name
 
@@ -42,11 +47,13 @@ class EmailRequestView(generics.CreateAPIView):
             phone=phone_num,
         )
         
-        return Response(RequestSerializer(new_request).data)
-
-        send_mail(subject, message_body, from_email, [to_email], fail_silently=False)
-
         new_request.save()
+        
+        send_mail(subject, email_body, from_email, [to_email], fail_silently=False)
+
+        
+
+        return Response(RequestSerializer(new_request).data)
 
 '''What this needs to do is:
     -set up SendGrid
