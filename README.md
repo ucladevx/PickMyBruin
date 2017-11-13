@@ -80,7 +80,7 @@ Simplified tree diagram
   send a verification email with a link: "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>"
 
 ### Verify user
-  PATCH /verify/
+  POST /verify/
   ```
       {
           "code": "<VERIFICATION_CODE>"

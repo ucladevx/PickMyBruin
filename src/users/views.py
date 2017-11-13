@@ -12,14 +12,18 @@ from rest_framework.response import Response
 from rest_framework import generics
 
 from django.contrib.auth.models import User, Group
+from django.db import transaction
 
 from .models import Profile, Major, Mentor
 from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
     MentorSerializer,
 )
-#import sendgrid
-# import sendgrid
+
+import sendgrid
+from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+sg = sendgrid.SendGridAPIClient(apikey='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')
+
 # import os
 # from send.helpers.mail import Email, Content, Substitution, Mail
 # sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
@@ -68,6 +72,7 @@ class CreateUser(generics.CreateAPIView):
     API endpoint that allows a user to be created.
     """
     permission_classes = tuple()
+    @transaction.atomic
     def post(self, request):
         new_user = User.objects.create_user(
             username=request.data['email'],
@@ -81,17 +86,15 @@ class CreateUser(generics.CreateAPIView):
             verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM)),
         )
         new_profile.save()
-        #TODO(David & Sanyam): transactions
-        #TODO(David & Sanyam): implement sendgrid
-        # from_email =  Email("test.marktai.com")
-        # to_email = Email(new_user.email)
-        # subject = "Pick a Brain with PickMyBruin!"
-        # content = Content("text/html", 
-        #     "Click the the link below to verify your account. \n"+
-        #     "https://pickmybruin.com/verify_user?user_id=" + new_profile.id +
-        #     "&code=" + new_profile.verification_code)
-        # mail = Mail(from_email, subject, to_email, content)
-        # response = sg.client.mail.send.post(request_body=mail.get())
+
+        from_email =  Email("test@marktai.com")
+        to_email = Email(new_user.email)
+        subject = "Pick a Brain with PickMyBruin!"
+        content = Content("text/html", 
+            "Click the the link below to verify your account. \n"+
+            "https://pickmybruin.com/verify?code="+ new_profile.verification_code)
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
 
         return Response(ProfileSerializer(new_profile).data)
         

@@ -11,3 +11,4 @@ django-extensions
 ipython
 pprint
 factory_boy
+sendgrid
