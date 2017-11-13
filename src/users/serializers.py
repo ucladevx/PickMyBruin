@@ -29,7 +29,6 @@ class ProfileSerializer(WritableNestedModelSerializer):
         model = Profile
         fields = ('id', 'user', 'verified')
         read_only_fields = ('id', 'user', 'verified')
-        #added verified
 
 
 class MajorSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import random, string
+import random, string, re
 
 from django.shortcuts import render, get_object_or_404
 
@@ -20,12 +20,13 @@ from .serializers import (
     MentorSerializer,
 )
 
+import os
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 sg = sendgrid.SendGridAPIClient(apikey='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')
 
+#TODO: Make this work with Docker
 # import os
-# from send.helpers.mail import Email, Content, Substitution, Mail
 # sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -81,6 +82,11 @@ class CreateUser(generics.CreateAPIView):
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
         )
+
+        check = re.search(r'[\w.]+\@(g.)?ucla.edu', new_user.email)
+        if check is None:
+            raise Exception("Invalid Email")
+
         new_profile = Profile(
             user=new_user,
             verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM)),

@@ -22,8 +22,8 @@ class CreateUserTest(APITestCase):
         user_params = {
             'email': 'test@test.com',
             'password': 'password',
-            'first_name': 'first',
-            'last_name': 'last',
+            #'first_name': 'first',
+            #'last_name': 'last',
         }
 
         resp = self.client.post(
@@ -35,15 +35,15 @@ class CreateUserTest(APITestCase):
         profile = Profile.objects.get(user=user)
 
         self.assertEqual(user.email, user_params['email'])
-        self.assertEqual(user.first_name, user_params['first_name'])
-        self.assertEqual(user.last_name, user_params['last_name'])
+        #self.assertEqual(user.first_name, user_params['first_name'])
+        #self.assertEqual(user.last_name, user_params['last_name'])
 
     def test_user_username_and_email_equal(self):
         user_params = {
             'email': 'test2@test.com',
             'password': 'password',
-            'first_name': 'first',
-            'last_name': 'last',
+            #'first_name': 'first',
+            #'last_name': 'last',
         }
 
         resp = self.client.post(
@@ -53,6 +53,44 @@ class CreateUserTest(APITestCase):
 
         user = User.objects.get(email=user_params['email'])
         self.assertEqual(user.email, user.username)
+
+class VerifyUserTest(APITestCase):
+    verify_url = reverse('users:verify')
+
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.client.force_authenticate(user=self.profile.user)
+
+    def tearDown(self):
+        User.objects.all().delete()
+        Profile.objects.all().delete()
+
+    def test_verify_only_accepts_correct_code(self):
+        user_params = {
+            'verification_code' : '0',
+        }
+
+        resp = self.client.post(
+            self.verify_url,
+            data=user_params,
+        )
+
+        self.assertEqual(self.profile.verified, False)
+
+
+    #TODO: Tests (Do I need to Modify Factories)
+    # def test_verification_sets_verify_true(self):
+    #     user_params = {
+    #         'verification_code' : self.profile.verification_code,
+    #     }
+
+    #     resp = self.client.post(
+    #         self.verify_url,
+    #         data=user_params,
+    #     )
+
+    #     self.assertEqual(self.profile.verified, True)
+
 
 class OwnProfileViewTest(APITestCase):
     own_profile_url = reverse('users:me')
