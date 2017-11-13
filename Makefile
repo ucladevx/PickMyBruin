@@ -30,6 +30,7 @@ clean_db:
 
 init_db: clean_db 
 	cat init_db.sql | docker exec -i `docker ps -q --filter status=running --filter ancestor=postgres` psql -U postgres 
+	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "cd /code/src && ./manage.py migrate"
 
 backup_db:
 	docker exec -t `docker ps -q --filter status=running --filter ancestor=postgres` pg_dumpall -c -U postgres > pickmybruin_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
