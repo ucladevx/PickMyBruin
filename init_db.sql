@@ -1044,7 +1044,7 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 42, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', COALESCE((SELECT MAX(id)+1 FROM auth_permission), 1), true);
 
 
 --
@@ -1058,7 +1058,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 10, true);
+SELECT pg_catalog.setval('auth_user_id_seq', COALESCE((SELECT MAX(id)+1 FROM auth_user), 1), true);
 
 
 --
@@ -1079,28 +1079,28 @@ SELECT pg_catalog.setval('corsheaders_corsmodel_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 28, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_admin_log), 1), true);
 
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 14, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_content_type), 1), true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 22, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', COALESCE((SELECT MAX(id)+1 FROM django_migrations), 1), true);
 
 
 --
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 13, true);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', COALESCE((SELECT MAX(id)+1 FROM oauth2_provider_accesstoken), 1), true);
 
 
 --
@@ -1121,7 +1121,7 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 13, true);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', COALESCE((SELECT MAX(id)+1 FROM oauth2_provider_refreshtoken), 1), true);
 
 
 --
