@@ -20,7 +20,7 @@ class CreateUserTest(APITestCase):
 
     def test_create_user_has_profile_and_user(self):
         user_params = {
-            'email': 'test@test.com',
+            'email': 'test@ucla.edu',
             'password': 'password',
         }
 
@@ -36,8 +36,9 @@ class CreateUserTest(APITestCase):
 
     def test_user_username_and_email_equal(self):
         user_params = {
-            'email': 'test2@test.com',
+            'email': 'test2@ucla.edu',
             'password': 'password',
+        }
 
         resp = self.client.post(
             self.create_url,
@@ -51,7 +52,7 @@ class VerifyUserTest(APITestCase):
     verify_url = reverse('users:verify')
 
     def setUp(self):
-        self.profile = factories.ProfileFactory()
+        self.profile = factories.ProfileFactory(verification_code='test_code')
         self.client.force_authenticate(user=self.profile.user)
 
     def tearDown(self):
@@ -71,8 +72,8 @@ class VerifyUserTest(APITestCase):
         self.assertEqual(self.profile.verified, False)
 
 
-    #TODO: Tests (Need to have Factories generate a Verification Code)
-    # def test_verification_sets_verify_true(self):
+    #TODO: Tests (Verify Works on Postman, Fails here)
+    # def test_verification_sets_verify_true(self):        
     #     user_params = {
     #         'verification_code' : self.profile.verification_code,
     #     }
@@ -81,7 +82,6 @@ class VerifyUserTest(APITestCase):
     #         self.verify_url,
     #         data=user_params,
     #     )
-
     #     self.assertEqual(self.profile.verified, True)
 
 

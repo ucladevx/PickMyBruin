@@ -10,6 +10,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
 from django.contrib.auth.models import User, Group
 from django.db import transaction
@@ -84,15 +85,17 @@ class CreateUser(generics.CreateAPIView):
 
         check = re.search(r'[\w.]+\@(g.)?ucla.edu', new_user.email)
         if check is None:
-            raise Exception("Invalid Email")
+            raise ValidationError(('Invalid UCLA Email'), code='400')
 
         new_profile = Profile(
             user=new_user,
-            verification_code=''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM)),
+            verification_code = Profile.generate_verification_code(),
         )
+
         new_profile.save()
 
-        from_email =  Email("test@marktai.com")
+        #TODO: Use Sendgrid Templates
+        from_email =  Email("no_reply@gmail.com")
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
@@ -107,7 +110,7 @@ class VerifyUser(APIView):
     """
     API endpoint that verifies a user based on profile_id and associated verification code.
     """
-    def post(self, request):#, profile_id):
+    def post(self, request):
         profile_id = self.request.user.profile.id
         profile = get_object_or_404(Profile, id=profile_id)
         if request.data['verification_code'] == profile.verification_code:
