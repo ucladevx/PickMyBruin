@@ -9,7 +9,7 @@ from users.serializers import ProfileSerializer, MentorSerializer
 
 
 class RequestSerializer(WritableNestedModelSerializer):
-    profile = ProfileSerializer()
+    mentee = ProfileSerializer()
     mentor = MentorSerializer()
     class Meta:
         model = Request

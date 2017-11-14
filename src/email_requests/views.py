@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
+from rest_framework.response import Response
 from .models import Request
 from .serializers import RequestSerializer
 from users.models import Profile, Mentor, User
@@ -15,7 +16,7 @@ class EmailRequestView(generics.CreateAPIView):
     
 
     def post(self, request, *args, **kwargs):
-
+        print (Request.objects.all())
         mentor = Mentor.objects.all()
         for i in mentor:
             print (i.id)
@@ -35,7 +36,7 @@ class EmailRequestView(generics.CreateAPIView):
 
 
         subject = "New Request from PickMyBruin"
-        email_body = "You have a new request from " + mentee_name + "\n" + "Their email is: " + preferred_email + "and phone number is "+ phone_num + "\n" + user_message + "More we will add"
+        email_body = "You have a new request from " + mentee_name + "\n" + "Their email is: " + preferred_email + " and their phone number is "+ phone_num + "\nMessage from the user:\n" + user_message 
         from_email = "pickMyBruin@devx.com"
         to_email = mentor_email
 

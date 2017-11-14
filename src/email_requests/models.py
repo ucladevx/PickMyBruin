@@ -16,6 +16,6 @@ class Request(models.Model):
 
 
 	def __str__(self):
-		return '%s requeted %s at %s' % (self.mentee, self.mentor, self.date_created)
+		return '%s requested %s at %s' % (self.mentee, self.mentor, self.date_created)
 
  
