@@ -20,14 +20,13 @@ from .serializers import (
     MentorSerializer,
 )
 
-import os
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 sg = sendgrid.SendGridAPIClient(apikey='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')
 
 #TODO: Make this work with Docker
-# import os
-# sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+#import os
+#sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
 class UserViewSet(viewsets.ModelViewSet):
     """

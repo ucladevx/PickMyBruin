@@ -22,8 +22,6 @@ class CreateUserTest(APITestCase):
         user_params = {
             'email': 'test@test.com',
             'password': 'password',
-            #'first_name': 'first',
-            #'last_name': 'last',
         }
 
         resp = self.client.post(
@@ -35,16 +33,11 @@ class CreateUserTest(APITestCase):
         profile = Profile.objects.get(user=user)
 
         self.assertEqual(user.email, user_params['email'])
-        #self.assertEqual(user.first_name, user_params['first_name'])
-        #self.assertEqual(user.last_name, user_params['last_name'])
 
     def test_user_username_and_email_equal(self):
         user_params = {
             'email': 'test2@test.com',
             'password': 'password',
-            #'first_name': 'first',
-            #'last_name': 'last',
-        }
 
         resp = self.client.post(
             self.create_url,
@@ -78,7 +71,7 @@ class VerifyUserTest(APITestCase):
         self.assertEqual(self.profile.verified, False)
 
 
-    #TODO: Tests (Do I need to Modify Factories)
+    #TODO: Tests (Need to have Factories generate a Verification Code)
     # def test_verification_sets_verify_true(self):
     #     user_params = {
     #         'verification_code' : self.profile.verification_code,
