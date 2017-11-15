@@ -52,7 +52,7 @@ class VerifyUserTest(APITestCase):
     verify_url = reverse('users:verify')
 
     def setUp(self):
-        self.profile = factories.ProfileFactory(verification_code='test_code')
+        self.profile = factories.ProfileFactory()
         self.client.force_authenticate(user=self.profile.user)
 
     def tearDown(self):
@@ -61,28 +61,28 @@ class VerifyUserTest(APITestCase):
 
     def test_verify_only_accepts_correct_code(self):
         user_params = {
-            'verification_code' : '0',
+            'verification_code' : 'fake_code_',
         }
 
         resp = self.client.post(
             self.verify_url,
             data=user_params,
         )
-
+        self.profile.refresh_from_db()
         self.assertEqual(self.profile.verified, False)
 
 
-    #TODO: Tests (Verify Works on Postman, Fails here)
-    # def test_verification_sets_verify_true(self):        
-    #     user_params = {
-    #         'verification_code' : self.profile.verification_code,
-    #     }
+    def test_verification_sets_verify_true(self):        
+        user_params = {
+            'verification_code' : self.profile.verification_code,
+        }
 
-    #     resp = self.client.post(
-    #         self.verify_url,
-    #         data=user_params,
-    #     )
-    #     self.assertEqual(self.profile.verified, True)
+        resp = self.client.post(
+            self.verify_url,
+            data=user_params,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.verified, True)
 
 
 class OwnProfileViewTest(APITestCase):

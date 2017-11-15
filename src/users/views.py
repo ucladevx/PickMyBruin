@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 
 from django.contrib.auth.models import User, Group
 from django.db import transaction
+from django.conf import settings
 
 from .models import Profile, Major, Mentor
 from .serializers import (
@@ -23,11 +24,6 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-sg = sendgrid.SendGridAPIClient(apikey='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')
-
-#TODO: Make this work with Docker
-#import os
-#sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -75,6 +71,9 @@ class CreateUser(generics.CreateAPIView):
     permission_classes = tuple()
     @transaction.atomic
     def post(self, request):
+        if User.objects.filter(email=request.data['email']).exists():
+            raise ValidationError({'error': 'Email already registered'})
+
         new_user = User.objects.create_user(
             username=request.data['email'],
             email=request.data['email'],
@@ -85,7 +84,7 @@ class CreateUser(generics.CreateAPIView):
 
         check = re.search(r'[\w.]+\@(g.)?ucla.edu', new_user.email)
         if check is None:
-            raise ValidationError(('Invalid UCLA Email'), code='400')
+            raise ValidationError({'error': 'Invalid UCLA email'})
 
         new_profile = Profile(
             user=new_user,
@@ -102,6 +101,7 @@ class CreateUser(generics.CreateAPIView):
             "Click the the link below to verify your account. \n"+
             "https://pickmybruin.com/verify?code="+ new_profile.verification_code)
         mail = Mail(from_email, subject, to_email, content)
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
 
         return Response(ProfileSerializer(new_profile).data)
