@@ -26,8 +26,8 @@ class ProfileSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Profile
-        fields = ('id', 'user')
-        read_only_fields = ('id', 'user',)
+        fields = ('id', 'user', 'verified')
+        read_only_fields = ('id', 'user', 'verified')
 
 
 class MajorSerializer(serializers.ModelSerializer):

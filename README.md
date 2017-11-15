@@ -77,10 +77,10 @@ Simplified tree diagram
           "id": <PROFILE_ID>
       }
   ```
-  send a verification email with a link: "https://pickmybruin.com/verify_user?user_id=<PROFILE_ID>&code=<VERIFICATION_CODE>"
+  send a verification email with a link: "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>"
 
 ### Verify user
-  POST /users/<USER_ID>/verify
+  POST /verify/
   ```
       {
           "code": "<VERIFICATION_CODE>"
