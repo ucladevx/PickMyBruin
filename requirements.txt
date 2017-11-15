@@ -28,6 +28,7 @@ Pygments==2.2.0
 python-dateutil==2.6.1
 pytz==2017.3
 requests==2.18.4
+sendgrid==5.3.0
 simplegeneric==0.8.1
 six==1.11.0
 text-unidecode==1.0
@@ -35,4 +36,3 @@ traitlets==4.3.2
 typing==3.6.2
 urllib3==1.22
 wcwidth==0.1.7
-sendgrid
