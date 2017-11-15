@@ -69,6 +69,7 @@ class CreateUser(generics.CreateAPIView):
     API endpoint that allows a user to be created.
     """
     permission_classes = tuple()
+
     @transaction.atomic
     def post(self, request):
         if User.objects.filter(email=request.data['email']).exists():
