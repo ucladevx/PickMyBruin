@@ -95,7 +95,7 @@ class CreateUser(generics.CreateAPIView):
         new_profile.save()
 
         #TODO: Use Sendgrid Templates
-        from_email =  Email("no_reply@gmail.com")
+        from_email =  Email("no_reply@example.com")
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
