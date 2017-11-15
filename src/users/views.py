@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import random, string, re
 
 from django.shortcuts import render, get_object_or_404
 
@@ -9,8 +10,11 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
 from django.contrib.auth.models import User, Group
+from django.db import transaction
+from django.conf import settings
 
 from .models import Profile, Major, Mentor
 from .serializers import (
@@ -18,6 +22,8 @@ from .serializers import (
     MentorSerializer,
 )
 
+import sendgrid
+from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -58,15 +64,17 @@ class MentorViewSet(viewsets.ModelViewSet):
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
 
-class NewUserView(APIView):
+class CreateUser(generics.CreateAPIView):
     """
-    View to create a new user
-
-    * Currently doesn't do any checking on authentic requests or captcha
+    API endpoint that allows a user to be created.
     """
     permission_classes = tuple()
 
+    @transaction.atomic
     def post(self, request):
+        if User.objects.filter(email=request.data['email']).exists():
+            raise ValidationError({'error': 'Email already registered'})
+
         new_user = User.objects.create_user(
             username=request.data['email'],
             email=request.data['email'],
@@ -75,17 +83,43 @@ class NewUserView(APIView):
             last_name=request.data.get('last_name', ''),
         )
 
+        check = re.search(r'[\w.]+\@(g.)?ucla.edu', new_user.email)
+        if check is None:
+            raise ValidationError({'error': 'Invalid UCLA email'})
+
         new_profile = Profile(
             user=new_user,
+            verification_code = Profile.generate_verification_code(),
         )
-        new_profile.save()
-        return Response(ProfileSerializer(new_profile).data)
 
-# class OwnProfileView(APIView):
-#     def get(self, request):
-#         profile = Profile.objects.get(user=request.user)
-#         return Response(ProfileSerializer(profile).data)
-# 
+        new_profile.save()
+
+        #TODO: Use Sendgrid Templates
+        from_email =  Email("no_reply@example.com")
+        to_email = Email(new_user.email)
+        subject = "Pick a Brain with PickMyBruin!"
+        content = Content("text/html", 
+            "Click the the link below to verify your account. \n"+
+            "https://pickmybruin.com/verify?code="+ new_profile.verification_code)
+        mail = Mail(from_email, subject, to_email, content)
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+
+        return Response(ProfileSerializer(new_profile).data)
+        
+class VerifyUser(APIView):
+    """
+    API endpoint that verifies a user based on profile_id and associated verification code.
+    """
+    def post(self, request):
+        profile_id = self.request.user.profile.id
+        profile = get_object_or_404(Profile, id=profile_id)
+        if request.data['verification_code'] == profile.verification_code:
+            profile.verified = True
+            profile.save()
+        return  Response({'profile_id': profile_id})
+
+
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileSerializer
     def get_object(self):
@@ -95,7 +129,6 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
         super().post(*args, **kwargs)
 
 
-
 class MentorsSearchView(generics.ListAPIView):
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
@@ -103,6 +136,4 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
-
-    
 
