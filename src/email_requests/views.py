@@ -19,25 +19,23 @@ class EmailRequestView(generics.CreateAPIView):
 
 
     def post(self, request, *args, **kwargs):
-        print (Request.objects.all())
-        mentor = Mentor.objects.all()
-        mentors = Mentor.objects.all()
+        
         mentor_id = int(self.kwargs['mentor_id'])
         mentor = get_object_or_404(Mentor, id=mentor_id)
         mentor_email = mentor.profile.user.email
 
         phone_num = request.data["phone"]
-        preferred_email = request.data["preferred_email"]
+        preferred_mentee_email = request.data["preferred_mentee_email"]
         user_message = request.data["message"]
 
         mentee_user=self.request.user
-        print(mentee_user)
         mentee_profile = get_object_or_404(Profile, user=mentee_user)
         mentee_name = mentee_user.first_name + ' ' + mentee_user.last_name
 
+        #TODO: Use SendGrid Templates
         content_string = '\n\n'.join([
             "You have a new request from " + mentee_name,
-            "Their email is: " + preferred_email + " and their phone number is "+ phone_num,
+            "Their email is: " + preferred_mentee_email + " and their phone number is "+ phone_num,
             "Message from the user:",
             user_message,
         ])
@@ -54,7 +52,7 @@ class EmailRequestView(generics.CreateAPIView):
             mentee=mentee_profile,
             mentor=mentor,
             email_body=content_string,
-            preferred_email=preferred_email,
+            preferred_mentee_email=preferred_mentee_email,
             phone=phone_num,
         )
 

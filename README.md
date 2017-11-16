@@ -214,7 +214,7 @@ Simplified tree diagram
   ```
       {
           "phone": "<OPTIONAL_PHONE>"
-          "preferred_email": "<REPLY_EMAIL>"
+          "preferred_mentee_email": "<REPLY_EMAIL>"
           "message": "<EMAIL_BODY>"
       }
   ```

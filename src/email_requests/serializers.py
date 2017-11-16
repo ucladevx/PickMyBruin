@@ -13,5 +13,5 @@ class RequestSerializer(WritableNestedModelSerializer):
     mentor = MentorSerializer()
     class Meta:
         model = Request
-        fields = ('mentee', 'mentor', 'email_body', 'preferred_email', 'phone', 'date_created',)
-        read_only_fields = ('mentee', 'mentor', 'email_body', 'preferred_email', 'phone', 'date_created',)
+        fields = ('mentee', 'mentor', 'email_body', 'preferred_mentee_email', 'phone', 'date_created',)
+        read_only_fields = ('mentee', 'mentor', 'email_body', 'preferred_mentee_email', 'phone', 'date_created',)
