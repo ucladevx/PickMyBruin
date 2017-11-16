@@ -60,14 +60,4 @@ class EmailRequestView(generics.CreateAPIView):
 
         new_request.save()
 
-        print("email sent")
         return Response(RequestSerializer(new_request).data)
-
-'''What this needs to do is:
-    -set up SendGrid
-    -Get email of mentor from mentor id in url
-    -Get email of mentee from self of who made the request
-    -Get email body from api request body
-    -Add new request to the table  <-- Look at generics documentation online
-    -Send email
-    -create tests'''
