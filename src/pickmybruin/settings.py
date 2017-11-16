@@ -43,6 +43,7 @@ INSTALLED_APPS = (
 
     # Pick My Bruin Apps
     'users',
+    'email_requests'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -170,4 +171,3 @@ SHELL_PLUS_PRE_IMPORTS = [
 ]
 
 logging.getLogger('factory').setLevel(logging.WARN)
-
