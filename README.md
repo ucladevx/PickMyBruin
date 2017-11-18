@@ -77,7 +77,9 @@ Simplified tree diagram
           "id": <PROFILE_ID>
       }
   ```
-  send a verification email with a link: "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>"
+  send a verification email with a link:
+    "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>" or 
+    "http://localhost:8000/users/verify?code=<VERIFICATION_CODE> in development
 
 ### Verify user
   POST /verify/
