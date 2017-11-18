@@ -59,3 +59,14 @@ class EmailRequestView(generics.CreateAPIView):
         new_request.save()
 
         return Response(RequestSerializer(new_request).data)
+
+
+class RequestsByMentorView(generics.ListAPIView):
+    serializer_class = RequestSerializer
+
+    def get_queryset(self):
+        mentor_id = int(self.kwargs['mentor_id'])
+        return Request.objects.filter(mentor__id=mentor_id)
+
+
+
