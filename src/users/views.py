@@ -69,7 +69,7 @@ class CreateUser(generics.CreateAPIView):
     API endpoint that allows a user to be created.
     """
     permission_classes = tuple()
-
+    
     @transaction.atomic
     def post(self, request):
         if User.objects.filter(email=request.data['email']).exists():
@@ -93,14 +93,18 @@ class CreateUser(generics.CreateAPIView):
         )
 
         new_profile.save()
+        
+        url = "https://pickmybruin.com/verify?code="
+        if settings.DEBUG:
+            url = "http://localhost:8000/users/verify?code="
 
         #TODO: Use Sendgrid Templates
         from_email =  Email("no_reply@example.com")
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
-            "Click the the link below to verify your account. \n"+
-            "https://pickmybruin.com/verify?code="+ new_profile.verification_code)
+                "Click the the link below to verify your account. \n"+
+                url+ new_profile.verification_code)
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
