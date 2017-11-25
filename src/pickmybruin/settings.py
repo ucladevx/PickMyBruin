@@ -40,10 +40,11 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'corsheaders',
     'django_extensions',
+    'storages',
 
     # Pick My Bruin Apps
     'users',
-    'email_requests'
+    'email_requests',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -105,6 +106,14 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = '/static/';
+
+AWS_STORAGE_BUCKET_NAME = 'bequest-dev'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+DEFAULT_FILE_STORAGE = 'pickmybruin.storage_backends.MediaStorage'
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None # ignores number of parameters sent
 
 TEMPLATES = [
     {
@@ -171,3 +180,4 @@ SHELL_PLUS_PRE_IMPORTS = [
 ]
 
 logging.getLogger('factory').setLevel(logging.WARN)
+

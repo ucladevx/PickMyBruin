@@ -11,7 +11,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name', 'email')
 
     def save(self, *args, **kwargs):
-        self.validated_data['username'] = self.validated_data['email']
+        if 'email' in self.validated_data:
+            self.validated_data['username'] = self.validated_data['email']
         super().save(*args, **kwargs)
 
 
@@ -26,8 +27,8 @@ class ProfileSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'verified')
-        read_only_fields = ('id', 'user', 'verified')
+        fields = ('id', 'user', 'verified', 'picture')
+        read_only_fields = ('id', 'verified')
 
 
 class MajorSerializer(serializers.ModelSerializer):
@@ -44,3 +45,4 @@ class MentorSerializer(WritableNestedModelSerializer):
         model = Mentor
         fields = ('id', 'profile', 'active', 'major', 'bio')
         read_only_fields = ('id',)
+
