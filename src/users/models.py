@@ -12,7 +12,8 @@ class Profile(models.Model):
     VERIFICATION_CHAR_NUM = 10
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     verified = models.BooleanField(default=False)
-    verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM)
+    verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
+    picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
 
     @staticmethod
     def generate_verification_code():

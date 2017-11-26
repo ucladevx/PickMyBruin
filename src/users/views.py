@@ -6,11 +6,11 @@ from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
 from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import MultiPartParser
 
 from django.contrib.auth.models import User, Group
 from django.db import transaction
@@ -121,16 +121,17 @@ class VerifyUser(APIView):
         if request.data['verification_code'] == profile.verification_code:
             profile.verified = True
             profile.save()
-        return  Response({'profile_id': profile_id})
+        return Response({'profile_id': profile_id})
 
 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View to retrieve, update, or destroy the logged in user
+    """
+    parser_classes = generics.RetrieveUpdateDestroyAPIView.parser_classes + [MultiPartParser]
     serializer_class = ProfileSerializer
     def get_object(self):
         return get_object_or_404(Profile, user=self.request.user)
-
-    def post(self, *args, **kwargs):
-        super().post(*args, **kwargs)
 
 
 class MentorsSearchView(generics.ListAPIView):

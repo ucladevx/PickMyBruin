@@ -37,3 +37,10 @@ restore-db:
 backup_db:
 	docker exec -t `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` pg_dumpall -c -U postgres > pickmybruin_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
 
+save_requirements:
+	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "pip3 freeze" | tail -n +2 > requirements.txt
+
+install_package:
+	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "pip3 install $(pkg)"
+	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "pip3 freeze" | tail -n +2 > requirements.txt
+
