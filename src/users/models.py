@@ -33,6 +33,8 @@ class Mentor(models.Model):
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
     bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
     active = models.BooleanField(default=True)
+    gpa = models.DecimalField(default=0.00, max_digits = 4, decimal_places =2)
+    clubs = models.CharField(max_length=500, null=False, blank=True, default = '')
 
     def __str__(self):
         return '%s (%s)' % (self.profile, self.major)
