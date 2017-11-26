@@ -131,3 +131,39 @@ class MentorsSearchTest(APITestCase):
 
         self.assertEqual(resp.data['count'], 0)
 
+class MentorsUpdateTest(APITestCase):
+    mentors_search_url = reverse('users:mentors_active')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+
+    def set_mentor_as_inactive():
+        user_params = {
+            'active' : 'False'
+        }
+
+        resp = self.client.post(
+            self.verify_url,
+            data=user_params,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.mentor.active, False)
+        
+    def set_mentor_as_active():
+        user_params = {
+            'active' : 'True'
+        }
+
+        resp = self.client.post(
+            self.verify_url,
+            data=user_params,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.mentor.active, True)
+
+    
+
