@@ -97,7 +97,18 @@ class OwnProfileViewTest(APITestCase):
 
     def test_own_profile_returns_own_profile(self):
         resp = self.client.get(self.own_profile_url)
-        self.assertEqual(self.profile.user.email, resp.data['user']['email'])
+        self.assertEqual(self.profile.user.email, resp.data['email'])
+
+    def test_edit_user_fields(self):
+        data = {
+            'first_name': 'fake',
+            'last_name': 'name',
+            'email': 'fakename@example.com',
+        }
+        resp = self.client.patch(self.own_profile_url, data=data)
+        for field, val in data.items():
+            self.assertEqual(val, resp.data[field])
+
 
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
