@@ -125,11 +125,9 @@ Simplified tree diagram
   ```
       {
           "id": <PROFILE_ID>,
-          "user": {
-              "first_name": "<USER_FIRST_NAME>",
-              "last_name": "<USER_LAST_NAME>",
-              "email": "<USER_EMAIL>"
-          },
+          "first_name": "<USER_FIRST_NAME>",
+          "last_name": "<USER_LAST_NAME>",
+          "email": "<USER_EMAIL>",
           "year": "<YEAR>",
           "verified": "<VERIFIED>",
           "date_created": "<DATE_CREATED_ISO8601>"
