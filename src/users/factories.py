@@ -25,5 +25,5 @@ class MentorFactory(factory.django.DjangoModelFactory):
         model = models.Mentor
     profile = factory.SubFactory(ProfileFactory)
     major = factory.SubFactory(MajorFactory)
-    active = factory.LazyAttribute(lambda a: True)
+    active = True
 
