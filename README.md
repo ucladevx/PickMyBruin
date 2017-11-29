@@ -219,6 +219,28 @@ Simplified tree diagram
       }
   ```
 
+### Get all requests for mentor
+  GET /requests/list/me/  
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_REQUESTS>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_REQUESTS> [
+            {
+              "mentee": <MENTEE_INFO>
+              "mentor": <MENTOR_INFO>
+              "email_body": "<EMAIL_SENT_TO_MENTOR>"
+              "preferred_mentee_email": "<REPLY_EMAIL>"
+              "phone": "<OPTIONAL_MENTEE_PHONE>"
+              "date_created": "<DATE_OF_REQUEST>"
+            }
+            ...
+          ]
+      }
+  ```
+
 ## Current Database Schema (Will probably be outdated soon)
 
 ### NOTE: you don't really need to understand this, but this is how Django will create tables for the models
