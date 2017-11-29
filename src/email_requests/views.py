@@ -61,7 +61,7 @@ class EmailRequestView(generics.CreateAPIView):
         return Response(RequestSerializer(new_request).data)
 
 
-class RequestsByMentorView(generics.ListAPIView):
+class ListOwnRequestsView(generics.ListAPIView):
     serializer_class = RequestSerializer
 
     def get_queryset(self):
