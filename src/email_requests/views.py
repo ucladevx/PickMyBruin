@@ -65,8 +65,8 @@ class RequestsByMentorView(generics.ListAPIView):
     serializer_class = RequestSerializer
 
     def get_queryset(self):
-        mentor_id = int(self.kwargs['mentor_id'])
-        return Request.objects.filter(mentor__id=mentor_id)
+        mentor = get_object_or_404(Mentor, profile__user=self.request.user)
+        return Request.objects.filter(mentor=mentor).order_by('date_created')
 
 
 
