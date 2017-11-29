@@ -100,8 +100,9 @@ class ListRequestsTest(APITestCase):
         self.assertEqual(resp.data['count'], 2)
         self.assertEqual(len(resp.data['results']), 2)
 
-        resp_request1 = resp.data['results'][0]
-        resp_request2 = resp.data['results'][1]
+        #order is changed because response is ordered in reverse
+        resp_request1 = resp.data['results'][1]
+        resp_request2 = resp.data['results'][0]
 
      
         self.assertEqual(self.request1_json, resp_request1)

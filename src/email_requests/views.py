@@ -66,7 +66,7 @@ class RequestsByMentorView(generics.ListAPIView):
 
     def get_queryset(self):
         mentor = get_object_or_404(Mentor, profile__user=self.request.user)
-        return Request.objects.filter(mentor=mentor).order_by('date_created')
+        return Request.objects.filter(mentor=mentor).order_by('date_created').reverse()
 
 
 
