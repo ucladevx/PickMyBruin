@@ -220,7 +220,7 @@ Simplified tree diagram
   ```
 
 ### Get all requests for mentor
-  GET /requests/list/<MENTOR_ID>/  
+  GET /requests/list/me/  
   returns
   ```
       {
