@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^drf/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^users/', include('users.urls', namespace='users')),
+    url(r'', include('users.urls', namespace='users')),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
 ]
