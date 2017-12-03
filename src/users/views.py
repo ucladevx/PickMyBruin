@@ -94,7 +94,7 @@ class CreateUser(generics.CreateAPIView):
 
         new_profile.save()
         
-        url = "https://pickmybruin.com/verify?code="
+        url = "https://bquest.ucladevx.com/verify?code="
         if settings.DEBUG:
             url = "http://localhost:8000/users/verify?code="
 
@@ -135,6 +135,9 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class MentorsSearchView(generics.ListAPIView):
+    """
+    View for finding a mentor by major
+    """
     queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
 
@@ -146,3 +149,10 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):#Create Mentor edit p
     serializer_class = MentorSerializer
     def get_object(self):
         return get_object_or_404(Mentor, profile__user=self.request.user)
+
+    def post (self,request):
+        profile_id = self.request.user.profile.id
+        profile = get_object_or_404(Profile, id=profile_id)
+        # try:
+        #     get_object_or_404(Mentor, id=profile_id)
+        # except:

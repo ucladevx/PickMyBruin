@@ -78,7 +78,7 @@ Simplified tree diagram
       }
   ```
   send a verification email with a link:
-    "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>" or 
+    "https://bquest.ucladevx.com/verify?code=<VERIFICATION_CODE>" or 
     "http://localhost:8000/users/verify?code=<VERIFICATION_CODE> in development
 
 ### Verify user
