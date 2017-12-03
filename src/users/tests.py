@@ -132,7 +132,7 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['count'], 0)
 
 class MentorsUpdateTest(APITestCase):
-    mentors_search_url = reverse('users:mentors_active')
+    mentors_search_url = reverse('users:mentors_me')
     def setUp(self):
         self.mentor = factories.MentorFactory()
         self.client.force_authenticate(user=self.mentor.profile.user)

@@ -142,13 +142,7 @@ class MentorsSearchView(generics.ListAPIView):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
 
-class MentorsUpdateView(APIView):
-    def patch(self, request):
-        profile_id = self.request.user.profile.id
-        profile = get_object_or_404(Profile, id=profile_id)
-        mentor = get_object_or_404(Mentor,profile=profile)
-        mentor.active = self.request.data['active']
-        #if request.data['verification_code'] == profile.verification_code:
-        #    profile.verified = True
-        mentor.save()
-        return Response(MentorSerializer(mentor).data)
+class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):#Create Mentor edit post
+    serializer_class = MentorSerializer
+    def get_object(self):
+        return get_object_or_404(Mentor, profile__user=self.request.user)
