@@ -30,7 +30,7 @@ class CreateRequestTest(APITestCase):
         create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
         
         request_params = {
-            'phone': '12345678910',
+            #'phone': '12345678910',
             'preferred_mentee_email': 'test@ucla.edu',
             'message': 'Hi this is test message',
         }
@@ -46,7 +46,7 @@ class CreateRequestTest(APITestCase):
 
         self.assertEqual(request.mentor, self.mentor)
         self.assertEqual(request.mentee, self.mentee)
-        self.assertEqual(request.phone, request_params['phone'])
+        #self.assertEqual(request.phone, request_params['phone'])
         self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
 
     def test_make_request_no_phone(self):
@@ -77,15 +77,16 @@ class ListRequestsTest(APITestCase):
     get_url = reverse('email_requests:requests_list')
 
     def setUp(self):
-        self.mentor = users_factories.MentorFactory()
-        self.client.force_authenticate(user=self.mentor.profile.user)
+        self.profile = users_factories.ProfileFactory()
+        self.mentor = users_factories.MentorFactory(profile=self.profile)
+        self.client.force_authenticate(user=self.profile.user)
         
 
     def tearDown(self):
         self.mentor.profile.user.delete()
         Request.objects.all().delete()
 
-    def test_list_requests(self):
+    def test_mentor_only_requests(self):
         
         self.request1 = factories.RequestFactory(mentor=self.mentor)
         self.request2 = factories.RequestFactory(mentor=self.mentor)
@@ -107,6 +108,62 @@ class ListRequestsTest(APITestCase):
      
         self.assertEqual(self.request1_json, resp_request1)
         self.assertEqual(self.request1_json, resp_request1)
+
+    def test_mentee_mentor_requests(self):
+        
+        self.request1 = factories.RequestFactory(mentor=self.mentor)
+        self.request2 = factories.RequestFactory(mentee=self.profile)
+        self.request3 = factories.RequestFactory(mentor=self.mentor)
+        self.request4 = factories.RequestFactory(mentee=self.profile)
+
+        self.request1_json = RequestSerializer(self.request1).data
+        self.request2_json = RequestSerializer(self.request2).data
+        self.request3_json = RequestSerializer(self.request3).data
+        self.request4_json = RequestSerializer(self.request4).data
+
+        resp = self.client.get(
+            self.get_url,
+        )
+
+        self.assertEqual(resp.data['count'], 4)
+        self.assertEqual(len(resp.data['results']), 4)
+
+        #order is changed because response is ordered in reverse
+        resp_request1 = resp.data['results'][3]
+        resp_request2 = resp.data['results'][2]
+        resp_request3 = resp.data['results'][1]
+        resp_request4 = resp.data['results'][0]
+
+     
+        self.assertEqual(self.request1_json, resp_request1)
+        self.assertEqual(self.request2_json, resp_request2)
+        self.assertEqual(self.request3_json, resp_request3)
+        self.assertEqual(self.request4_json, resp_request4)
+
+
+    def test_mentee_only_requests(self):
+        
+        self.request1 = factories.RequestFactory(mentee=self.profile)
+        self.request2 = factories.RequestFactory(mentee=self.profile)
+
+        self.request1_json = RequestSerializer(self.request1).data
+        self.request2_json = RequestSerializer(self.request2).data
+        
+
+        resp = self.client.get(
+            self.get_url,
+        )
+
+        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(len(resp.data['results']), 2)
+
+        #order is changed because response is ordered in reverse
+        resp_request1 = resp.data['results'][1]
+        resp_request2 = resp.data['results'][0]
+
+     
+        self.assertEqual(self.request1_json, resp_request1)
+        self.assertEqual(self.request2_json, resp_request2)
 
 
     def test_list_reqests_empty(self):

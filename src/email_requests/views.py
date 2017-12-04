@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
+from django.db.models import Q
 from rest_framework.response import Response
 from .models import Request
 from .serializers import RequestSerializer
@@ -24,9 +25,9 @@ class EmailRequestView(generics.CreateAPIView):
         mentor = get_object_or_404(Mentor, id=mentor_id)
         mentor_email = mentor.profile.user.email
 
-        phone_num = request.data["phone"]
-        preferred_mentee_email = request.data["preferred_mentee_email"]
-        user_message = request.data["message"]
+        #phone_num = request.data["phone"]
+        preferred_mentee_email = request.data.get('preferred_mentee_email', '')
+        user_message = request.data.get('message', '')
 
         mentee_user=self.request.user
         mentee_profile = get_object_or_404(Profile, user=mentee_user)
@@ -35,14 +36,14 @@ class EmailRequestView(generics.CreateAPIView):
         #TODO: Use SendGrid Templates
         content_string = '\n\n'.join([
             "You have a new request from " + mentee_name,
-            "Their email is: " + preferred_mentee_email + " and their phone number is "+ phone_num,
+            "Their email is: " + preferred_mentee_email + #" and their phone number is "+ phone_num,
             "Message from the user:",
             user_message,
         ])
 
-        from_email =  Email("pickMyBruin@devx.com")
+        from_email =  Email("noreply@bquest.ucladevx.com")
         to_email = Email(mentor_email)
-        subject = "New Request from PickMyBruin"
+        subject = "New Request from BQuest"
         content = Content("text/html", content_string)
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
@@ -51,9 +52,9 @@ class EmailRequestView(generics.CreateAPIView):
         new_request = Request(
             mentee=mentee_profile,
             mentor=mentor,
-            email_body=content_string,
+            email_body=user_message,
             preferred_mentee_email=preferred_mentee_email,
-            phone=phone_num,
+            #phone=phone_num,
         )
 
         new_request.save()
@@ -65,8 +66,17 @@ class ListOwnRequestsView(generics.ListAPIView):
     serializer_class = RequestSerializer
 
     def get_queryset(self):
-        mentor = get_object_or_404(Mentor, profile__user=self.request.user)
-        return Request.objects.filter(mentor=mentor).order_by('date_created').reverse()
+        profile = get_object_or_404(Profile, user=self.request.user)
+
+        try:
+            mentor = Mentor.objects.get(profile=profile)
+        except Mentor.DoesNotExist:
+            mentor = None
+
+        if (mentor!=None):
+            return Request.objects.filter(Q(mentor=mentor) | Q(mentee=profile)).order_by('date_created').reverse()
+        else:
+            return Request.objects.filter(mentee=profile).order_by('date_created').reverse()
 
 
 
