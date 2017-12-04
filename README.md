@@ -213,13 +213,12 @@ Simplified tree diagram
   POST /requests/<MENTOR_ID>/  
   ```
       {
-          "phone": "<OPTIONAL_PHONE>"
           "preferred_mentee_email": "<REPLY_EMAIL>"
           "message": "<EMAIL_BODY>"
       }
   ```
 
-### Get all requests for mentor
+### Get all requests for user
   GET /requests/list/me/  
   returns
   ```
