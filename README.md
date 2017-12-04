@@ -78,14 +78,14 @@ Simplified tree diagram
       }
   ```
   send a verification email with a link:
-    "https://pickmybruin.com/verify?code=<VERIFICATION_CODE>" or 
+    "https://bquest.ucladevx.com/verify?code=<VERIFICATION_CODE>" or 
     "http://localhost:8000/users/verify?code=<VERIFICATION_CODE> in development
 
 ### Verify user
   POST /verify/
   ```
       {
-          "code": "<VERIFICATION_CODE>"
+          "verification_code": "<VERIFICATION_CODE>"
       }
   ```
   returns  
@@ -160,31 +160,23 @@ Simplified tree diagram
   POST /mentors/me/
     - create mentor it doesn't exist
     - activate mentor if it does exist
+    - will always set active to true
+    - takes no params
   returns same as /mentors/me/  
 
 ### Update own mentor
   PATCH /mentors/me/  
   schema is same as /mentors/me/, but will update subfields (don't change the id please)  
   return is same as /mentors/me/  
+    -use this when setting mentor to inactive
 
-### Get possible majors
+### Get possible majors (Not Implemented - Unecessary)
   GET /majors/  
   returns  
   ```
       {
           "majors": [
               <MAJORS>...
-          ]
-      }
-  ```
-
-### Get possible years
-  GET /years/  
-  returns  
-  ```
-      {
-          "years": [
-              <YEARS>...
           ]
       }
   ```

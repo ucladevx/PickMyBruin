@@ -94,7 +94,7 @@ class CreateUser(generics.CreateAPIView):
 
         new_profile.save()
         
-        url = "https://pickmybruin.com/verify?code="
+        url = "https://bquest.ucladevx.com/verify?code="
         if settings.DEBUG:
             url = "http://localhost:8000/users/verify?code="
 
@@ -103,8 +103,10 @@ class CreateUser(generics.CreateAPIView):
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
-                "Click the the link below to verify your account. \n"+
-                url+ new_profile.verification_code)
+                "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile. \n" +
+                "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.\n"+
+                url+ new_profile.verification_code+
+                "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.")
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
@@ -135,10 +137,43 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class MentorsSearchView(generics.ListAPIView):
-    queryset = Mentor.objects.all()
+    """
+    View for finding a mentor by major
+    """
+    queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
 
     def filter_queryset(self, queryset):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
 
+
+class MentorView(generics.RetrieveAPIView):
+    """
+    View for getting mentor data by mentor id
+    """
+    serializer_class = MentorSerializer
+    def get_object(self):
+        return get_object_or_404(Mentor, id=int(self.kwargs['mentor_id']))
+
+
+class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for turning mentor status on and off
+    """
+    serializer_class = MentorSerializer
+    def get_object(self):
+        return get_object_or_404(Mentor, profile__user=self.request.user)
+    serializer_class = MentorSerializer
+    def post (self,request):
+
+        profile_id = self.request.user.profile.id
+        profile = Profile.objects.get(id=profile_id)
+        mentor_request = Mentor.objects.filter(profile__user=self.request.user)
+        if not mentor_request.exists():
+            mentor = Mentor(profile=profile, active=True)
+        else:
+            mentor = mentor_request[0]
+        mentor.save()
+
+        return Response(MentorSerializer(mentor).data)

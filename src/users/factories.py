@@ -25,4 +25,5 @@ class MentorFactory(factory.django.DjangoModelFactory):
         model = models.Mentor
     profile = factory.SubFactory(ProfileFactory)
     major = factory.SubFactory(MajorFactory)
+    active = True
 

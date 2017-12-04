@@ -30,6 +30,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
+
         fields = ('id', 'first_name', 'last_name', 'email', 'verified', 'picture')
         read_only_fields = ('id', 'verified')
 
@@ -54,6 +55,6 @@ class MentorSerializer(WritableNestedModelSerializer):
     major = MajorSerializer()
     class Meta:
         model = Mentor
-        fields = ('id', 'profile', 'active', 'major', 'bio')
+        fields = ('id', 'profile', 'active', 'major', 'bio','gpa', 'clubs','classes', 'pros', 'cons',)
         read_only_fields = ('id',)
 
