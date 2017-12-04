@@ -180,3 +180,21 @@ class CreateMentorTest(APITestCase):
         )
         self.profile.refresh_from_db()
         self.assertEqual(self.mentor.active,True)
+
+class FindMentorByIDTest(APITestCase):
+    mentors_find_url = reverse('users:mentor',kwargs={'mentor_id':1})
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+
+    def create_mentor(self):
+
+        resp = self.client.get(
+            self.mentors_find_url,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.mentor.active,True)
