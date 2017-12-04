@@ -23,12 +23,23 @@ class GroupSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
-class ProfileSerializer(WritableNestedModelSerializer):
-    user = UserSerializer()
+class ProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
+
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'verified', 'picture',)
-        read_only_fields = ('id', 'verified',)
+        fields = ('id', 'first_name', 'last_name', 'email', 'verified', 'picture')
+        read_only_fields = ('id', 'verified')
+
+    def update(self, instance, validated_data):
+        if 'user' in validated_data:
+            user_data = validated_data.pop('user')
+            for field, val in user_data.items():
+                setattr(instance.user, field, val)
+            instance.user.save()
+        return super().update(instance, validated_data)
 
 
 class MajorSerializer(serializers.ModelSerializer):

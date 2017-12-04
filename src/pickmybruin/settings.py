@@ -180,4 +180,8 @@ SHELL_PLUS_PRE_IMPORTS = [
 ]
 
 logging.getLogger('factory').setLevel(logging.WARN)
+logging.getLogger('boto3').setLevel(logging.WARN)
+logging.getLogger('botocore').setLevel(logging.WARN)
+logging.getLogger('nose').setLevel(logging.WARN)
+logging.getLogger('s3transfer').setLevel(logging.WARN)
 
