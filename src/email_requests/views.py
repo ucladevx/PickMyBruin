@@ -59,3 +59,14 @@ class EmailRequestView(generics.CreateAPIView):
         new_request.save()
 
         return Response(RequestSerializer(new_request).data)
+
+
+class ListOwnRequestsView(generics.ListAPIView):
+    serializer_class = RequestSerializer
+
+    def get_queryset(self):
+        mentor = get_object_or_404(Mentor, profile__user=self.request.user)
+        return Request.objects.filter(mentor=mentor).order_by('date_created').reverse()
+
+
+
