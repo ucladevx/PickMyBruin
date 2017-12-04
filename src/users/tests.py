@@ -84,7 +84,6 @@ class VerifyUserTest(APITestCase):
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.verified, True)
 
-
 class OwnProfileViewTest(APITestCase):
     own_profile_url = reverse('users:me')
     def setUp(self):
@@ -132,7 +131,7 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['count'], 0)
 
 class MentorsUpdateTest(APITestCase):
-    mentors_search_url = reverse('users:mentors_me')
+    mentors_update_url = reverse('users:mentors_me')
     def setUp(self):
         self.mentor = factories.MentorFactory()
         self.client.force_authenticate(user=self.mentor.profile.user)
@@ -146,8 +145,8 @@ class MentorsUpdateTest(APITestCase):
             'active' : 'False'
         }
 
-        resp = self.client.post(
-            self.verify_url,
+        resp = self.client.patch(
+            self.mentors_update_url,
             data=user_params,
         )
         self.profile.refresh_from_db()
@@ -165,5 +164,19 @@ class MentorsUpdateTest(APITestCase):
         self.profile.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
 
+class CreateMentorTest(APITestCase):
+    mentors_create_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.client.force_authenticate(user=self.profile.user)
     
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
 
+    def create_mentor(self):
+        resp = self.client.post(
+            self.mentors_create_url,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.mentor.active,True)

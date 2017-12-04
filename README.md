@@ -85,7 +85,7 @@ Simplified tree diagram
   POST /verify/
   ```
       {
-          "code": "<VERIFICATION_CODE>"
+          "verification_code": "<VERIFICATION_CODE>"
       }
   ```
   returns  
@@ -168,6 +168,7 @@ Simplified tree diagram
   PATCH /mentors/me/  
   schema is same as /mentors/me/, but will update subfields (don't change the id please)  
   return is same as /mentors/me/  
+    -use this when setting mentor to inactive
 
 ### Get possible majors
   GET /majors/  

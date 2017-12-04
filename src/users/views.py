@@ -103,8 +103,10 @@ class CreateUser(generics.CreateAPIView):
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
-                "Click the the link below to verify your account. \n"+
-                url+ new_profile.verification_code)
+                "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile. \n" +
+                "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.\n"+
+                url+ new_profile.verification_code+
+                "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.")
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
@@ -145,14 +147,33 @@ class MentorsSearchView(generics.ListAPIView):
         major = self.request.query_params['major']
         return queryset.filter(major__name=major)
 
-class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):#Create Mentor edit post
+
+# class MentorView(APIView):
+#     serializer_class = MentorSerializer
+#     def get(self, request, id):
+#         return get_object_or_404(Mentor, id = id)
+
+
+class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    View for turning mentor status on and off
+    """
     serializer_class = MentorSerializer
     def get_object(self):
         return get_object_or_404(Mentor, profile__user=self.request.user)
-
+    serializer_class = MentorSerializer
     def post (self,request):
+
         profile_id = self.request.user.profile.id
         profile = get_object_or_404(Profile, id=profile_id)
-        # try:
-        #     get_object_or_404(Mentor, id=profile_id)
-        # except:
+        try:
+            new_mentor = get_object_or_404(Mentor, profile__user=self.request.user)
+            new_mentor.active = True
+        except:
+            new_mentor = Mentor(
+                profile = profile,
+                active = True,
+            )
+            new_mentor.save()
+
+        return Response(MentorSerializer(new_mentor).data)
