@@ -140,28 +140,28 @@ class MentorsUpdateTest(APITestCase):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def set_mentor_as_inactive():
+    def test_set_mentor_as_inactive(self):
         user_params = {
-            'active' : 'False'
+            'active' : False,
         }
 
         resp = self.client.patch(
             self.mentors_update_url,
             data=user_params,
         )
-        self.profile.refresh_from_db()
+        self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, False)
         
-    def set_mentor_as_active():
+    def test_set_mentor_as_active(self):
         user_params = {
-            'active' : 'True'
+            'active' : True,
         }
 
         resp = self.client.post(
-            self.verify_url,
+            self.mentors_update_url,
             data=user_params,
         )
-        self.profile.refresh_from_db()
+        self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
 
 class CreateMentorTest(APITestCase):
@@ -174,27 +174,33 @@ class CreateMentorTest(APITestCase):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def create_mentor(self):
+    def test_mentor_does_not_exist(self):
+        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), False)
+
+    def test_create_mentor(self):
         resp = self.client.post(
             self.mentors_create_url,
         )
-        self.profile.refresh_from_db()
-        self.assertEqual(self.mentor.active,True)
+        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), True)
 
 class FindMentorByIDTest(APITestCase):
-    mentors_find_url = reverse('users:mentor',kwargs={'mentor_id':1})
+    
     def setUp(self):
         self.mentor = factories.MentorFactory()
-        self.client.force_authenticate(user=self.profile.user)
+        self.client.force_authenticate(user=self.mentor.profile.user)
     
     def tearDown(self):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def create_mentor(self):
-
+    def test_find_mentor_by_id(self):
         resp = self.client.get(
-            self.mentors_find_url,
+            reverse('users:mentor',kwargs={'mentor_id':self.mentor.id}),
         )
-        self.profile.refresh_from_db()
-        self.assertEqual(self.mentor.active,True)
+        self.assertEqual(resp.data['id'], self.mentor.id)
+
+    def test_404_if_mentor_with_id_does_not_exist(self):
+        resp = self.client.get(
+            reverse('users:mentor',kwargs={'mentor_id':self.mentor.id+100000000}),
+        )
+        self.assertEqual(resp.status_code, 404)

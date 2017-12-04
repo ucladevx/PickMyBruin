@@ -162,6 +162,8 @@ Simplified tree diagram
   POST /mentors/me/
     - create mentor it doesn't exist
     - activate mentor if it does exist
+    - will always set active to true
+    - takes no params
   returns same as /mentors/me/  
 
 ### Update own mentor
