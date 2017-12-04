@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('id', 'name',)
+        fields = ('id', 'name')
         read_only_fields = ('id',)
 
 
@@ -27,14 +27,14 @@ class ProfileSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'verified', 'picture',)
-        read_only_fields = ('id', 'verified',)
+        fields = ('id', 'user', 'verified', 'picture')
+        read_only_fields = ('id', 'verified')
 
 
 class MajorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Major
-        fields = ('id', 'name',)
+        fields = ('id', 'name')
         read_only_fields = ('id',)
 
 

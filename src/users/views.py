@@ -148,15 +148,13 @@ class MentorsSearchView(generics.ListAPIView):
         return queryset.filter(major__name=major)
 
 
-class MentorView(APIView):
+class MentorView(generics.RetrieveAPIView):
     """
-    Currently Unneeded: View Mentor By ID
+    View for getting mentor data by mentor id
     """
     serializer_class = MentorSerializer
-    def get(self, request, *args, **kwargs):
-        mentor_id = int(self.kwargs['mentor_id'])
-        mentor = get_object_or_404(Mentor, id=mentor_id)
-        return Response(MentorSerializer(mentor).data)
+    def get_object(self):
+        return get_object_or_404(Mentor, id=int(self.kwargs['mentor_id']))
 
 
 class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
@@ -170,15 +168,12 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     def post (self,request):
 
         profile_id = self.request.user.profile.id
-        profile = get_object_or_404(Profile, id=profile_id)
-        try:
-            new_mentor = get_object_or_404(Mentor, profile__user=self.request.user)
-            new_mentor.active = True
-        except:
-            new_mentor = Mentor(
-                profile = profile,
-                active = True,
-            )
-            new_mentor.save()
+        profile = Profile.objects.get(id=profile_id)
+        mentor_request = Mentor.objects.filter(profile__user=self.request.user)
+        if not mentor_request.exists():
+            mentor = Mentor(profile=profile, active=True)
+        else:
+            mentor = mentor_request[0]
+        mentor.save()
 
-        return Response(MentorSerializer(new_mentor).data)
+        return Response(MentorSerializer(mentor).data)

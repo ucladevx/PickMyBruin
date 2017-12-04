@@ -153,13 +153,8 @@ class MentorsUpdateTest(APITestCase):
         self.assertEqual(self.mentor.active, False)
         
     def test_set_mentor_as_active(self):
-        user_params = {
-            'active' : True,
-        }
-
         resp = self.client.post(
             self.mentors_update_url,
-            data=user_params,
         )
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
@@ -184,7 +179,6 @@ class CreateMentorTest(APITestCase):
         self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), True)
 
 class FindMentorByIDTest(APITestCase):
-    
     def setUp(self):
         self.mentor = factories.MentorFactory()
         self.client.force_authenticate(user=self.mentor.profile.user)
@@ -201,6 +195,6 @@ class FindMentorByIDTest(APITestCase):
 
     def test_404_if_mentor_with_id_does_not_exist(self):
         resp = self.client.get(
-            reverse('users:mentor',kwargs={'mentor_id':self.mentor.id+100000000}),
+            reverse('users:mentor',kwargs={'mentor_id': self.mentor.id + 100000000}), #100000000 is to force an invalid mentor ID
         )
         self.assertEqual(resp.status_code, 404)

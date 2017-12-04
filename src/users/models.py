@@ -31,13 +31,14 @@ class Major(models.Model):
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
-    bio = models.CharField(max_length=5000, null=False, blank=True, default = '')
+    bio = models.CharField(max_length=5000, null=False, blank=True, default='')
     active = models.BooleanField(default=True)
-    gpa = models.DecimalField(default=0.00, max_digits = 4, decimal_places =2)
-    clubs = models.CharField(max_length=500, null=False, blank=True, default = '')
-    classes = models.CharField(max_length=5000, null=False, blank=True, default = '')
-    pros =  models.CharField(max_length=5000, null=False, blank=True, default = '')
-    cons =  models.CharField(max_length=5000, null=False, blank=True, default = '')
+    gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
+    clubs = models.CharField(max_length=500, null=False, blank=True, default='')
+    classes = models.CharField(max_length=5000, null=False, blank=True, default='')
+    pros =  models.CharField(max_length=5000, null=False, blank=True, default='')
+    cons =  models.CharField(max_length=5000, null=False, blank=True, default='')
+    
     def __str__(self):
         return '%s (%s)' % (self.profile, self.major)
 
