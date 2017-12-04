@@ -170,24 +170,13 @@ Simplified tree diagram
   return is same as /mentors/me/  
     -use this when setting mentor to inactive
 
-### Get possible majors
+### Get possible majors (Not Implemented - Unecessary)
   GET /majors/  
   returns  
   ```
       {
           "majors": [
               <MAJORS>...
-          ]
-      }
-  ```
-
-### Get possible years
-  GET /years/  
-  returns  
-  ```
-      {
-          "years": [
-              <YEARS>...
           ]
       }
   ```

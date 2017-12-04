@@ -148,10 +148,15 @@ class MentorsSearchView(generics.ListAPIView):
         return queryset.filter(major__name=major)
 
 
-# class MentorView(APIView):
-#     serializer_class = MentorSerializer
-#     def get(self, request, id):
-#         return get_object_or_404(Mentor, id = id)
+class MentorView(APIView):
+    """
+    Currently Unneeded: View Mentor By ID
+    """
+    serializer_class = MentorSerializer
+    def get(self, request, *args, **kwargs):
+        mentor_id = int(self.kwargs['mentor_id'])
+        mentor = get_object_or_404(Mentor, id=mentor_id)
+        return Response(MentorSerializer(mentor).data)
 
 
 class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
