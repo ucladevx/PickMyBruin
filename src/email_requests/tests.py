@@ -53,7 +53,6 @@ class CreateRequestTest(APITestCase):
         create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
         
         request_params = {
-            'phone': '',
             'preferred_mentee_email': 'test@ucla.edu',
             'message': 'Hi this is test message',
         }
@@ -69,7 +68,7 @@ class CreateRequestTest(APITestCase):
 
         self.assertEqual(request.mentor, self.mentor)
         self.assertEqual(request.mentee, self.mentee)
-        self.assertEqual(request.phone, request_params['phone'])
+        self.assertEqual(request.phone, '')
         self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
 
 class ListRequestsTest(APITestCase):

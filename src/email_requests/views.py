@@ -25,7 +25,7 @@ class EmailRequestView(generics.CreateAPIView):
         mentor = get_object_or_404(Mentor, id=mentor_id)
         mentor_email = mentor.profile.user.email
 
-        #phone_num = request.data["phone"]
+        phone_num = request.data.get('phone', '')
         preferred_mentee_email = request.data.get('preferred_mentee_email', '')
         user_message = request.data.get('message', '')
 
@@ -36,8 +36,8 @@ class EmailRequestView(generics.CreateAPIView):
         #TODO: Use SendGrid Templates
         content_string = '\n\n'.join([
             "You have a new request from " + mentee_name,
-            "Their email is: " + preferred_mentee_email + #" and their phone number is "+ phone_num,
-            "Message from the user:",
+            "Their email is: " + preferred_mentee_email + "\n"
+            "Message from the user:\n",
             user_message,
         ])
 
@@ -54,7 +54,7 @@ class EmailRequestView(generics.CreateAPIView):
             mentor=mentor,
             email_body=user_message,
             preferred_mentee_email=preferred_mentee_email,
-            #phone=phone_num,
+            phone=phone_num,
         )
 
         new_request.save()
@@ -68,15 +68,14 @@ class ListOwnRequestsView(generics.ListAPIView):
     def get_queryset(self):
         profile = get_object_or_404(Profile, user=self.request.user)
 
-        try:
-            mentor = Mentor.objects.get(profile=profile)
-        except Mentor.DoesNotExist:
-            mentor = None
+        mentor = Mentor.objects.filter(profile=profile).first()
 
-        if (mentor!=None):
-            return Request.objects.filter(Q(mentor=mentor) | Q(mentee=profile)).order_by('date_created').reverse()
-        else:
-            return Request.objects.filter(mentee=profile).order_by('date_created').reverse()
+        query = Q(mentee=profile)
+
+        if (mentor is not None):
+            query |= Q(mentor=mentor)
+
+        return Request.objects.filter(query).order_by('date_created').reverse()
 
 
 
