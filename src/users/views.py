@@ -99,14 +99,14 @@ class CreateUser(generics.CreateAPIView):
             url = "http://localhost:8000/users/verify?code="
 
         #TODO: Use Sendgrid Templates
-        from_email =  Email("no_reply@example.com")
+        from_email =  Email("no_reply@bquest.ucladevx.com")
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
                 "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile. \n" +
                 "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.\n"+
-                url+ new_profile.verification_code+ "\n" +
-                "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.")
+                "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.\n"+
+                url+ new_profile.verification_code)
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
