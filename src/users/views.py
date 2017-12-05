@@ -159,7 +159,7 @@ class MentorView(generics.RetrieveAPIView):
 
 class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     """
-    View for turning mentor status on and off
+    View for turning mentor status on (post) and modifying all mentor fields
     """
     serializer_class = MentorSerializer
     def get_object(self):
@@ -173,7 +173,7 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
         if not mentor_request.exists():
             mentor = Mentor(profile=profile, active=True)
         else:
-            mentor = mentor_request[0]
+            mentor = mentor_request.first()
         mentor.save()
 
         return Response(MentorSerializer(mentor).data)
