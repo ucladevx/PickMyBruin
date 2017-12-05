@@ -142,7 +142,7 @@ Simplified tree diagram
       }
   ```
 
-### Get specific user (not sure if needed)
+### Get specific user (Not Implemented)
   GET /users/<PROFILE_ID>/  
   return is same as /users/me/  
 
