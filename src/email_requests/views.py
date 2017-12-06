@@ -32,14 +32,16 @@ class EmailRequestView(generics.CreateAPIView):
         mentee_user=self.request.user
         mentee_profile = get_object_or_404(Profile, user=mentee_user)
         mentee_name = mentee_user.first_name + ' ' + mentee_user.last_name
+        phone_html = '' if phone_num=='' else ('<b>Phone Number:</b> ' + phone_num)
+        email_html = '<b>Email:</b> ' + preferred_mentee_email
 
         #TODO: Use SendGrid Templates
-        content_string = '\n\n'.join([
-            "You have a new request from " + mentee_name,
-            "Their email is: " + preferred_mentee_email + "\n"
-            "Message from the user:\n",
-            user_message,
-        ])
+        content_string = "<html> <p> You have a new request from " + mentee_name + "! Check it out below. If you want to meet with " + mentee_name + """, you should email them back, and the two of you can set up a meeting somewhere on campus.
+            If you aren’t able to meet up, it would be helpful if you email them back and let them know, so they can contact other ambassadors.
+            If you want an easy way to plan a meeting, consider using services such as <a href='https://doodle.com'>Doodle</a> or <a href='https://www.when2meet.com'>When2Meet</a>.
+            We hope you’ll have a good meeting with the student, and thank you for helping out your fellow Bruins!
+            <br><br>""" + email_html + "<br>" + phone_html + "<br><br> <b>Message from the User:</b> <br>" + user_message + "</p> </html>"
+
 
         from_email =  Email("noreply@bquest.ucladevx.com")
         to_email = Email(mentor_email)
