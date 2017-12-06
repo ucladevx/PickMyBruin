@@ -59,4 +59,4 @@ RUN pip3 install -r requirements.txt
 ADD . /code
 #RUN chmod ug+x /code/initialize.sh
 
-#CMD ["/usr/bin/supervisord"]
+CMD ["/bin/sh","/code/initialize.sh"]
