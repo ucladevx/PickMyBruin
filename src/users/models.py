@@ -21,7 +21,7 @@ class Profile(models.Model):
     verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
     picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True, default='profile_pictures/default_pic.jpg')
-    year = models.CharField(max_length=15, choices=YEAR_CHOICES, default='1')
+    year = models.CharField(max_length=15, choices=YEAR_CHOICES, default='1st')
 
     @staticmethod
     def generate_verification_code():
