@@ -177,6 +177,7 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
             mentor = Mentor(profile=profile, active=True)
         else:
             mentor = mentor_request.first()
+            mentor.active = True
         mentor.save()
 
         return Response(MentorSerializer(mentor).data)
