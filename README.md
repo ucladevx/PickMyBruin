@@ -213,10 +213,12 @@ Simplified tree diagram
   POST /requests/<MENTOR_ID>/  
   ```
       {
+          "phone": "<OPTIONAL_PHONE>"
           "preferred_mentee_email": "<REPLY_EMAIL>"
           "message": "<EMAIL_BODY>"
       }
   ```
+  returns a Request object (seen below)
 
 ### Get all requests for user
   GET /requests/list/me/  
@@ -230,7 +232,7 @@ Simplified tree diagram
             {
               "mentee": <MENTEE_INFO>
               "mentor": <MENTOR_INFO>
-              "email_body": "<EMAIL_SENT_TO_MENTOR>"
+              "email_body": "<MESSAGE_FROM_MENTEE>"
               "preferred_mentee_email": "<REPLY_EMAIL>"
               "phone": "<OPTIONAL_MENTEE_PHONE>"
               "date_created": "<DATE_OF_REQUEST>"
