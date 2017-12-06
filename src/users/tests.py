@@ -180,14 +180,20 @@ class CreateMentorTest(APITestCase):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def test_mentor_does_not_exist(self):
-        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), False)
-
     def test_create_mentor(self):
+        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), False)
         resp = self.client.post(
             self.mentors_create_url,
         )
         self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), True)
+
+    def test_makes_existing_mentor_active(self):
+        mentor = factories.MentorFactory(profile=self.profile, active=False)
+        resp = self.client.post(
+            self.mentors_create_url,
+        )
+        mentor.refresh_from_db()
+        self.assertTrue(mentor.active)
 
 class FindMentorByIDTest(APITestCase):
     def setUp(self):
