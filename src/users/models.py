@@ -9,11 +9,19 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
+    YEAR_CHOICES = (
+        ('1st', '1st'),
+        ('2nd', '2nd'),
+        ('3rd', '3rd'),
+        ('4th', '4th'),
+    )
+
     VERIFICATION_CHAR_NUM = 10
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
     picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True, default='profile_pictures/default_pic.jpg')
+    year = models.CharField(max_length=15, choices=YEAR_CHOICES, default='1st')
 
     @staticmethod
     def generate_verification_code():
