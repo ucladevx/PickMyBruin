@@ -38,6 +38,7 @@ Simplified tree diagram
     - `make run_command cmd="echo hi"` will run `echo hi` inside the latest Django container
 - `make shell` starts a `manage.py shell_plus` inside the latest Django container
     - If you don't know what this means, that's fine
+- `make test` runs test.py use `args=--keepdb` to use previous test database
 
 ## How to add a new app
 1. Run `make run_command cmd="src/manage.py startapp $APPNAME`
@@ -74,10 +75,17 @@ Simplified tree diagram
   returns 
   ```
       {
-          "id": <PROFILE_ID>
+          "id": <PROFILE_ID>,
+          "user": {
+            "id" : <USER_ID>,
+            "first_name" : "<FIRST_NAME>",
+            "last_name" : "<LAST_NAME>",
+            "email" : "<EMAIL>"
+          },
+          "verfied" : <VERIFIED>
       }
   ```
-  send a verification email with a link:
+  sends a verification email with a link:
     "https://bquest.ucladevx.com/verify?code=<VERIFICATION_CODE>" or 
     "http://localhost:8000/users/verify?code=<VERIFICATION_CODE> in development
 
@@ -91,7 +99,7 @@ Simplified tree diagram
   returns  
   ```
       {
-          "user_id": <PROFILE_ID>
+          "profile_id": <PROFILE_ID>
       }
   ```
 
@@ -134,7 +142,7 @@ Simplified tree diagram
       }
   ```
 
-### Get specific user (not sure if needed)
+### Get specific user (Not Implemented)
   GET /users/<PROFILE_ID>/  
   return is same as /users/me/  
 
@@ -170,7 +178,7 @@ Simplified tree diagram
   return is same as /mentors/me/  
     -use this when setting mentor to inactive
 
-### Get possible majors (Not Implemented - Unecessary)
+### Get possible majors (Not Implemented)
   GET /majors/  
   returns  
   ```

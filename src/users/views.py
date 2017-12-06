@@ -99,14 +99,17 @@ class CreateUser(generics.CreateAPIView):
             url = "http://localhost:8000/users/verify?code="
 
         #TODO: Use Sendgrid Templates
-        from_email =  Email("no_reply@example.com")
+        from_email =  Email("no_reply@bquest.ucladevx.com")
         to_email = Email(new_user.email)
         subject = "Pick a Brain with PickMyBruin!"
         content = Content("text/html", 
-                "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile. \n" +
-                "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.\n"+
-                url+ new_profile.verification_code+
-                "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.")
+                    "\n".join([
+                            "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile.",
+                            "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.",
+                            url+ new_profile.verification_code,
+                            "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.",
+                            ])
+                        )
         mail = Mail(from_email, subject, to_email, content)
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
@@ -159,7 +162,7 @@ class MentorView(generics.RetrieveAPIView):
 
 class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     """
-    View for turning mentor status on and off
+    View for turning mentor status on (post) and modifying all mentor fields
     """
     serializer_class = MentorSerializer
     def get_object(self):
@@ -173,7 +176,7 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
         if not mentor_request.exists():
             mentor = Mentor(profile=profile, active=True)
         else:
-            mentor = mentor_request[0]
+            mentor = mentor_request.first()
         mentor.save()
 
         return Response(MentorSerializer(mentor).data)
