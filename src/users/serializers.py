@@ -58,3 +58,12 @@ class MentorSerializer(WritableNestedModelSerializer):
         fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'classes', 'pros', 'cons',)
         read_only_fields = ('id',)
 
+
+    def update(self, instance, validated_data):
+        if 'major' in validated_data:
+            major_text = validated_data.pop('major')
+            major = Major.objects.get(name=major_text)
+            if major.exists():
+                instance.major=major
+            instance.save()
+        return super().update(instance, validated_data)
