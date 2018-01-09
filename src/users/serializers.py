@@ -63,8 +63,9 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'major' in validated_data:
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
-            major = Major.objects.filter(name=major_text).first()
-            if major.exists():
+            major_list = Major.objects.filter(name=major_text)
+            if len(major_list)>0:
+                major = major_list[0]
                 instance.major=major
             instance.save()
         return super().update(instance, validated_data)
