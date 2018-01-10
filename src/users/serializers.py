@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
+from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
 from .models import Profile, Major, Mentor
@@ -58,3 +59,12 @@ class MentorSerializer(WritableNestedModelSerializer):
         fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'classes', 'pros', 'cons',)
         read_only_fields = ('id',)
 
+
+    def update(self, instance, validated_data):
+        if 'major' in validated_data:
+            major_obj = validated_data.pop('major')
+            major_text = major_obj['name']
+            major_object = get_object_or_404(Major, name=major_text)
+            instance.major = major_object
+            instance.save()
+        return super().update(instance, validated_data)
