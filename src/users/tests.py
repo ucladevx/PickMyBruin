@@ -172,9 +172,8 @@ class MentorsUpdateTest(APITestCase):
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
 
-    def test_patch_major_correct_and_404(self):
-        
-        #Test correct
+    def test_patch_major_correct(self):
+    
         user_params = {
             'major' : {
                 'name' : 'Test Major'
@@ -192,8 +191,10 @@ class MentorsUpdateTest(APITestCase):
         self.assertEqual(len(Major.objects.all()), 1) 
         self.mentor2 = factories.MentorFactory()
         
+    def test_patch_major_404(self):
 
-        #Test Error
+        self.mentor = factories.MentorFactory(major=self.major)
+        
         user_params = {
             'major' : {
                 'name' : 'Wrong'
@@ -210,8 +211,6 @@ class MentorsUpdateTest(APITestCase):
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.major.name, 'Test Major')
         self.assertEqual(len(Major.objects.all()), 1) 
-         
-    
 
 class CreateMentorTest(APITestCase):
     mentors_create_url = reverse('users:mentors_me')
