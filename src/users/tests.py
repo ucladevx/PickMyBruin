@@ -173,8 +173,8 @@ class MentorsUpdateTest(APITestCase):
         self.assertEqual(self.mentor.active, True)
 
     def test_patch_major_correct_and_404(self):
+        
         #Test correct
-
         user_params = {
             'major' : {
                 'name' : 'Test Major'
@@ -194,7 +194,6 @@ class MentorsUpdateTest(APITestCase):
         
 
         #Test Error
-
         user_params = {
             'major' : {
                 'name' : 'Wrong'
