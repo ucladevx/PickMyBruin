@@ -31,7 +31,7 @@ class Profile(models.Model):
         return str(self.user)
 
 class Major(models.Model):
-    name = models.CharField(max_length=100, null=False, unique=True)
+    name = models.CharField(max_length=100, null=False)
 
     def __str__(self):
         return self.name
