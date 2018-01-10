@@ -6,7 +6,6 @@ import json
 
 
 class Command(BaseCommand):
-
     def _create_majors(self):
         base_path = path.dirname(__file__)
         majors_path = path.abspath(path.join(base_path, "..", "..", "majors.json"))
@@ -15,7 +14,6 @@ class Command(BaseCommand):
             majors = json.load(majors_file)
             for major in majors:
                 major_entry = Major(name=major)
-
                 try:
                     major_entry.save()
                 except IntegrityError:
