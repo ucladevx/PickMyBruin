@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from django.contrib.auth.models import User
@@ -146,6 +147,7 @@ class MentorsUpdateTest(APITestCase):
     def setUp(self):
         self.mentor = factories.MentorFactory()
         self.client.force_authenticate(user=self.mentor.profile.user)
+        self.major = factories.MajorFactory(name='Test Major')
     
     def tearDown(self):
         User.objects.all().delete()
@@ -169,6 +171,48 @@ class MentorsUpdateTest(APITestCase):
         )
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
+
+    def test_patch_major_correct_and_404(self):
+        #Test correct
+
+        user_params = {
+            'major' : {
+                'name' : 'Test Major'
+            }
+        }
+
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+
+        self.mentor.refresh_from_db()
+        self.assertEqual(self.mentor.major.name, 'Test Major')
+        self.assertEqual(len(Major.objects.all()), 1) 
+        self.mentor2 = factories.MentorFactory()
+        
+
+        #Test Error
+
+        user_params = {
+            'major' : {
+                'name' : 'Wrong'
+            }
+        }
+
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+    
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.mentor.refresh_from_db()
+        self.assertEqual(self.mentor.major.name, 'Test Major')
+        self.assertEqual(len(Major.objects.all()), 1) 
+         
+    
 
 class CreateMentorTest(APITestCase):
     mentors_create_url = reverse('users:mentors_me')
