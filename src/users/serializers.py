@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
+from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
 from .models import Profile, Major, Mentor
@@ -63,9 +64,7 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'major' in validated_data:
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
-            major_query = Major.objects.filter(name=major_text)
-            if major_query.exists():
-                instance.major=major_query.first()
-                instance.save()
-        #TODO: Add error response if major is not found
+            major_query = get_object_or_404(Major, name=major_text)
+            instance.major=major_query.first()
+            instance.save()
         return super().update(instance, validated_data)
