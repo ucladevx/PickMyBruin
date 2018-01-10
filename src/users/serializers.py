@@ -67,4 +67,5 @@ class MentorSerializer(WritableNestedModelSerializer):
         if major_query.exists():
             instance.major=major_query.first()
             instance.save()
+        #TODO: Add error response if major is not found
         return super().update(instance, validated_data)
