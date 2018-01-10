@@ -64,8 +64,8 @@ class MentorSerializer(WritableNestedModelSerializer):
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
             major_query = Major.objects.filter(name=major_text)
-        if major_query.exists():
-            instance.major=major_query.first()
-            instance.save()
+            if major_query.exists():
+                instance.major=major_query.first()
+                instance.save()
         #TODO: Add error response if major is not found
         return super().update(instance, validated_data)
