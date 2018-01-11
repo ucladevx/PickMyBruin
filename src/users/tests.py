@@ -176,9 +176,11 @@ class MentorsUpdateTest(APITestCase):
     
         user_params = {
             'major' : {
-                'name' : 'Test Major'
-            }
+                'name' : 'Test Major',
+            },
         }
+
+        self.assertEqual(self.mentor.major, None)
 
         resp = self.client.patch(
             self.mentors_update_url,
@@ -187,9 +189,8 @@ class MentorsUpdateTest(APITestCase):
         )
 
         self.mentor.refresh_from_db()
-        self.assertEqual(self.mentor.major.name, 'Test Major')
+        self.assertEqual(self.mentor.major.name, user_params['major']['name'])
         self.assertEqual(len(Major.objects.all()), 1) 
-        self.mentor2 = factories.MentorFactory()
         
     def test_patch_major_404(self):
 
@@ -197,8 +198,8 @@ class MentorsUpdateTest(APITestCase):
         
         user_params = {
             'major' : {
-                'name' : 'Wrong'
-            }
+                'name' : 'Wrong',
+            },
         }
 
         resp = self.client.patch(
@@ -209,7 +210,7 @@ class MentorsUpdateTest(APITestCase):
     
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.mentor.refresh_from_db()
-        self.assertEqual(self.mentor.major.name, 'Test Major')
+        self.assertEqual(self.mentor.major.name, self.major.name)
         self.assertEqual(len(Major.objects.all()), 1) 
 
 class CreateMentorTest(APITestCase):
