@@ -215,3 +215,29 @@ class FindMentorByIDTest(APITestCase):
             reverse('users:mentor',kwargs={'mentor_id': self.mentor.id + 100000000}), #100000000 is to force an invalid mentor ID
         )
         self.assertEqual(resp.status_code, 404)
+
+class CourseEdittingTest(APITestCase):
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+
+    # def test_adding_new_course(self):
+    #     user_params = {
+    #         'active' : False,
+    #     }
+
+    #     resp = self.client.patch(
+    #         self.mentors_update_url,
+    #         data=user_params,
+    #     )
+    #     self.mentor.refresh_from_db()
+    #     self.assertEqual(self.mentor.active, False)
+    # def test_removing_course(self):
+    # def test_adding_existing_course(self):
+
+
+

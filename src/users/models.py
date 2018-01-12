@@ -36,7 +36,7 @@ class Major(models.Model):
     def __str__(self):
         return self.name
 
-class Classes(models.Model):
+class Course(models.Model):
     name = models.CharField(max_length=100, null=False)
 
     def __str__(self):
@@ -52,9 +52,7 @@ class Mentor(models.Model):
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
     clubs = models.CharField(max_length=500, null=False, blank=True, default='')
-    #classes = ArrayField(models.CharField(max_length=50, default=''), default=[], blank=True)
-    #classes = models.CharField(max_length=5000, null=False, blank=True, default='')
-    classes = models.ManyToManyField(Classes, blank=True)
+    courses = models.ManyToManyField(Course, blank=True)
     pros =  models.CharField(max_length=5000, null=False, blank=True, default='')
     cons =  models.CharField(max_length=5000, null=False, blank=True, default='')
     

@@ -4,7 +4,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
-from .models import Profile, Major, Mentor, Classes
+from .models import Profile, Major, Mentor, Course
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -51,41 +51,43 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
         read_only_fields = ('id',)
 
-class ClassesSerializer(serializers.ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Classes
+        model = Course
         fields = ('id', 'name')
         read_only_fields = ('id',)
 
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
     major = MajorSerializer()
-    classes = ClassesSerializer(many=True)
+    courses = CourseSerializer(many=True)
     class Meta:
         model = Mentor
-        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'classes', 'pros', 'cons',)
+        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
         read_only_fields = ('id',)
 
 
     def update(self, instance, validated_data):
         import pprint
         pprint.pprint(validated_data)
-        if 'classes' in validated_data:
-            classes_obj = validated_data.pop('classes')
-
-            print(classes_obj)
-            for klass in classes_obj:
+        if 'courses' in validated_data:
+            print(instance.courses.clear())
+            courses_obj = validated_data.pop('courses')
+            print(courses_obj)
+            for klass in courses_obj:
                 print(klass)
                 d=dict(klass)
-                c, _ = Classes.objects.get_or_create(name=klass['name'])
+                c, _ = Course.objects.get_or_create(name=klass['name'])
                 print(c)
-                instance.classes.add(c)
+                instance.courses.add(c)
                 instance.save()
 
         if 'major' in validated_data:
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
+            print(major_obj)
             major_object = get_object_or_404(Major, name=major_text)
+            print (major_obj)
             instance.major = major_object
             instance.save()
         return super().update(instance, validated_data)
