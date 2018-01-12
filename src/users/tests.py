@@ -259,28 +259,28 @@ class FindMentorByIDTest(APITestCase):
         )
         self.assertEqual(resp.status_code, 404)
 
-# class CourseEdittingTest(APITestCase):
-#     mentors_update_url = reverse('users:mentors_me')
-#     def setUp(self):
-#         self.mentor = factories.MentorFactory()
-#         self.client.force_authenticate(user=self.mentor.profile.user)
+class CourseEdittingTest(APITestCase):
+    mentors_update_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
     
-#     def tearDown(self):
-#         User.objects.all().delete()
-#         Major.objects.all().delete()
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
 
-    # def test_adding_new_course(self):
-    #     user_params = {
-    #         'courses': [
-    #             { 'name' : 'New_Course' }
-    #         ]
-    #     }
-    #     resp = self.client.patch(
-    #         self.mentors_update_url,
-    #         data=user_params,
-    #     )
-    #     self.mentor.refresh_from_db()
-    #     self.assertEqual(list(self.mentor.courses.all()), ["New_Course"])
+    def test_adding_new_course(self):
+        user_params = {
+            'courses': [
+                { 'name' : 'New_Course' }
+            ]
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+        )
+        self.mentor.refresh_from_db()
+        self.assertEqual(list(self.mentor.courses.all()), ["New_Course"])
     # def test_removing_course(self):
     # def test_adding_existing_course(self):
 
