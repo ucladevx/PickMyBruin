@@ -68,6 +68,7 @@ class MentorSerializer(WritableNestedModelSerializer):
 
 
     def update(self, instance, validated_data):
+
         import pprint
         pprint.pprint(validated_data)
         if 'courses' in validated_data:
@@ -85,11 +86,8 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'major' in validated_data:
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
-            print(major_obj)
             major_object = get_object_or_404(Major, name=major_text)
-            print (major_obj)
             instance.major = major_object
             instance.save()
         return super().update(instance, validated_data)
-
 

@@ -28,7 +28,6 @@ class MentorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Mentor
     profile = factory.SubFactory(ProfileFactory)
-    major = factory.SubFactory(MajorFactory)
     active = True
     # courses = factory.SubFactory(CourseFactory)
 
