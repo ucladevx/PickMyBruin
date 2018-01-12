@@ -20,16 +20,18 @@ class MajorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Major
 
+# class CourseFactory(factory.django.DjangoModelFactory):
+#     class Meta:
+#         model = models.Course
+
 class MentorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Mentor
     profile = factory.SubFactory(ProfileFactory)
     major = factory.SubFactory(MajorFactory)
     active = True
-    #classes = []
-#   classes = factory.SubFactory(ClassesFactory)
+    # courses = factory.SubFactory(CourseFactory)
 
-# class ClassesFactoryc(factory.django.DjangoModelFactory):
-#     class Meta:
-#         model = models.Classes
+
+
 
