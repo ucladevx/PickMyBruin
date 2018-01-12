@@ -26,4 +26,9 @@ class MentorFactory(factory.django.DjangoModelFactory):
     profile = factory.SubFactory(ProfileFactory)
     major = factory.SubFactory(MajorFactory)
     active = True
+#     classes = factory.SubFactory(ClassesFactory)
+
+# class ClassesFactoryc(factory.django.DjangoModelFactory):
+#     class Meta:
+#         model = models.Classes
 
