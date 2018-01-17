@@ -27,7 +27,7 @@ class EmailRequestView(generics.CreateAPIView):
 
         phone_num = request.data.get('phone', '')
         preferred_mentee_email = request.data.get('preferred_mentee_email', '')
-        user_message = request.data.get('message', '')
+        user_message = request.data.get('message', 'No message entered')
 
         mentee_user=self.request.user
         mentee_profile = get_object_or_404(Profile, user=mentee_user)
@@ -35,19 +35,17 @@ class EmailRequestView(generics.CreateAPIView):
         phone_html = '' if phone_num=='' else ('<b>Phone Number:</b> ' + phone_num)
         email_html = '<b>Email:</b> ' + preferred_mentee_email
 
-        #TODO: Use SendGrid Templates
-        content_string = "<html> <p> You have a new request from " + mentee_name + "! Check it out below. If you want to meet with " + mentee_name + """, you should email them back, and the two of you can set up a meeting somewhere on campus.
-            If you aren’t able to meet up, it would be helpful if you email them back and let them know, so they can contact other ambassadors.
-            If you want an easy way to plan a meeting, consider using services such as <a href='https://doodle.com'>Doodle</a> or <a href='https://www.when2meet.com'>When2Meet</a>.
-            We hope you’ll have a good meeting with the student, and thank you for helping out your fellow Bruins!
-            <br><br>""" + email_html + "<br>" + phone_html + "<br><br> <b>Message from the User:</b> <br>" + user_message + "</p> </html>"
-
 
         from_email =  Email("noreply@bquest.ucladevx.com")
         to_email = Email(mentor_email)
         subject = "New Request from BQuest"
-        content = Content("text/html", content_string)
+        content = Content("text/html", "N/A")
         mail = Mail(from_email, subject, to_email, content)
+        mail.personalizations[0].add_substitution(Substitution("mentee_name", mentee_name))
+        mail.personalizations[0].add_substitution(Substitution("user_message", user_message))
+        mail.personalizations[0].add_substitution(Substitution("email_html", email_html))
+        mail.personalizations[0].add_substitution(Substitution("phone_html", phone_html))
+        mail.template_id = "f9bd9c0f-809e-40ea-a022-d1bc4ae86295"
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
 
