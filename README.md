@@ -149,6 +149,15 @@ Simplified tree diagram
 ### Update own user
   PATCH /users/me/  
   schema is same as /users/me/, but will update subfields (don't change the id please)  
+  Note: Format to update courses is as follows:
+  ```
+    {
+      "courses": [
+        { "name" : "<COURSE>" },
+        { "name" : "<COURSE2>" }
+      ]
+    }
+  ```
   return is same as /users/me/  
 
 ### Get own mentor
