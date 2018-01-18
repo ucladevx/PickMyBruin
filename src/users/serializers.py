@@ -68,18 +68,12 @@ class MentorSerializer(WritableNestedModelSerializer):
 
 
     def update(self, instance, validated_data):
-
-        import pprint
-        pprint.pprint(validated_data)
         if 'courses' in validated_data:
-            print(instance.courses.clear())
+            instance.courses.clear()
             courses_obj = validated_data.pop('courses')
-            print(courses_obj)
             for klass in courses_obj:
-                print(klass)
-                d=dict(klass)
+                dict(klass)
                 c, _ = Course.objects.get_or_create(name=klass['name'])
-                print(c)
                 instance.courses.add(c)
                 instance.save()
 

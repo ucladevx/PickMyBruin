@@ -289,7 +289,6 @@ class CourseEdittingTest(APITestCase):
         old_course.save()
         self.mentor.courses.add(old_course)
 
-
         courses = self.mentor.courses.all()
         self.assertEqual(len(courses), 1)
         self.assertEqual(courses[0].name, old_course.name)
@@ -308,6 +307,4 @@ class CourseEdittingTest(APITestCase):
         courses = self.mentor.courses.all()
         self.assertEqual(len(courses), 1)
         self.assertEqual(courses[0].name, 'New_Course')
-
-
 
