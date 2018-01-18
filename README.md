@@ -132,7 +132,7 @@ Simplified tree diagram
   returns
   ```
       {
-          "id": <PROFILE_ID>,
+          "id": "<PROFILE_ID>",
           "first_name": "<USER_FIRST_NAME>",
           "last_name": "<USER_LAST_NAME>",
           "email": "<USER_EMAIL>",
@@ -156,10 +156,17 @@ Simplified tree diagram
   returns  
   ```
       {
-          "major": "<MAJOR>",
-          "classes_taken": [
-              <CLASSES_TAKEN> ...
+          "id": "<MENTOR_ID>",
+          "profile": <PROFILE>,
+          "active": "<MENTOR_STATE>",
+          "major": <MAJOR>,
+          "gpa": "<GPA",
+          "clubs": "<CLUBS>"
+          "courses": [
+              <COURSES> ...
           ],
+          "pros": "<PROS>",
+          "cons": "<CONS>",
           "date_created": "<DATE_CREATED_ISO8601>"
       }
   ```
@@ -275,5 +282,11 @@ id | name
 id | profile_id | major_id | bio 
 --- | --- | --- | --- 
 1 | 2 | 1 | I will teach you the ways of corgis 
+
+#### Course Table
+
+id | name 
+--- | --- 
+1 | CS31 
 
 
