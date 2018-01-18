@@ -7,11 +7,10 @@ from .serializers import RequestSerializer
 from users.models import Profile, Mentor, User
 from .models import Request
 from rest_framework import generics
+from pickmybruin.settings import REQUEST_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-
-REQUEST_TEMPLATE = 'f9bd9c0f-809e-40ea-a022-d1bc4ae86295'
 
 # Create your views here.
 class EmailRequestView(generics.CreateAPIView):

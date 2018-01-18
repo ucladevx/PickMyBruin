@@ -24,8 +24,7 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-
-USER_VERIFICATION_TEMPLATE = '5f22ae47-2831-4677-8db7-825f9e1b4bce'
+from pickmybruin.settings import USER_VERIFICATION_TEMPLATE
 
 class UserViewSet(viewsets.ModelViewSet):
     """
