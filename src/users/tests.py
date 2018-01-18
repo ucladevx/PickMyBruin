@@ -267,22 +267,47 @@ class CourseEdittingTest(APITestCase):
     
     def tearDown(self):
         User.objects.all().delete()
-        Major.objects.all().delete()
 
-    def test_adding_new_course(self):
+    def test_update_new_course(self):
         user_params = {
             'courses': [
-                { 'name' : 'New_Course' }
-            ]
+                { 'name' : 'New_Course' },
+            ],
         }
         resp = self.client.patch(
             self.mentors_update_url,
             data=user_params,
+            format='json',
         )
         self.mentor.refresh_from_db()
-        self.assertEqual(list(self.mentor.courses.all()), ["New_Course"])
-    # def test_removing_course(self):
-    # def test_adding_existing_course(self):
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, 'New_Course')
+
+    def test_update_removes_old_courses(self):
+        old_course = Course(name='Old Course')
+        old_course.save()
+        self.mentor.courses.add(old_course)
+
+
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, old_course.name)
+
+        user_params = {
+            'courses': [
+                { 'name' : 'New_Course' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, 'New_Course')
 
 
 
