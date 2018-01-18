@@ -149,15 +149,6 @@ Simplified tree diagram
 ### Update own user
   PATCH /users/me/  
   schema is same as /users/me/, but will update subfields (don't change the id please)  
-  Note: Format to update courses is as follows:
-  ```
-    {
-      "courses": [
-        { "name" : "<COURSE>" },
-        { "name" : "<COURSE2>" }
-      ]
-    }
-  ```
   return is same as /users/me/  
 
 ### Get own mentor
@@ -190,9 +181,19 @@ Simplified tree diagram
 
 ### Update own mentor
   PATCH /mentors/me/  
-  schema is same as /mentors/me/, but will update subfields (don't change the id please)  
+  schema is same as /mentors/me/, but will update subfields (don't change the id please) 
+  Note: Use this when setting mentor to inactive 
+  Note: Format to update courses is as follows:
+  ```
+    {
+      "courses": [
+        { "name" : "<COURSE>" },
+        { "name" : "<COURSE2>" }
+      ]
+    }
+  ```
   return is same as /mentors/me/  
-    -use this when setting mentor to inactive
+
 
 ### Get possible majors (Not Implemented)
   GET /majors/  
