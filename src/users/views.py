@@ -94,13 +94,13 @@ class CreateUser(generics.CreateAPIView):
 
         new_profile.save()
         
-        url = "https://bquest.ucladevx.com/verify?code="
+        url = 'https://bquest.ucladevx.com/verify?code='
         if settings.DEBUG:
-            url = "http://localhost:8000/users/verify?code="
+            url = 'http://localhost:8000/verify?code='
 
-        from_email =  Email("noreply@bquest.ucladevx.com")
+        from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(new_user.email)
-        subject = "BQuest User Verification"
+        subject = 'BQuest User Verification'
         verification_link = url + new_profile.verification_code
         content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
