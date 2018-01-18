@@ -30,18 +30,4 @@ class MentorFactory(factory.django.DjangoModelFactory):
     profile = factory.SubFactory(ProfileFactory)
     active = True
 
-    @factory.post_generation
-    def courses(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        if extracted:
-            # A list of groups were passed in, use them
-            for course in extracted:
-                self.courses.add(course)
-    # courses = factory.SubFactory(CourseFactory)
-
-
-
 

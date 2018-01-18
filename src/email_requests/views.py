@@ -48,8 +48,8 @@ class EmailRequestView(generics.CreateAPIView):
         subject = "New Request from BQuest"
         content = Content("text/html", content_string)
         mail = Mail(from_email, subject, to_email, content)
-        # sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-        # response = sg.client.mail.send.post(request_body=mail.get())
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
 
         new_request = Request(
             mentee=mentee_profile,
