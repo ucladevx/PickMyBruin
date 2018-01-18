@@ -24,6 +24,7 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+from pickmybruin.settings import USER_VERIFICATION_TEMPLATE
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -94,23 +95,18 @@ class CreateUser(generics.CreateAPIView):
 
         new_profile.save()
         
-        url = "https://bquest.ucladevx.com/verify?code="
+        url = 'https://bquest.ucladevx.com/verify?code='
         if settings.DEBUG:
-            url = "http://localhost:8000/users/verify?code="
+            url = 'http://localhost:8000/verify?code='
 
-        #TODO: Use Sendgrid Templates
-        from_email =  Email("no_reply@bquest.ucladevx.com")
+        from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(new_user.email)
-        subject = "Pick a Brain with PickMyBruin!"
-        content = Content("text/html", 
-                    "\n".join([
-                            "Thank you for joining BQuest! We are happy you are here! Click the link below to verify that you are a UCLA student, and create your profile.",
-                            "You will be receiving emails from us, so make sure to update your address on your profile, if you prefer to use another email.",
-                            url+ new_profile.verification_code,
-                            "If you have any questions, feel free to contact us on bquest.ucla@gmail.com.",
-                            ])
-                        )
+        subject = 'BQuest User Verification'
+        verification_link = url + new_profile.verification_code
+        content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
+        mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
+        mail.template_id = USER_VERIFICATION_TEMPLATE
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
 
