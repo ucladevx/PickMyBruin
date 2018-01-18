@@ -25,6 +25,8 @@ from .serializers import (
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 
+USER_VERIFICATION_TEMPLATE = '5f22ae47-2831-4677-8db7-825f9e1b4bce'
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -105,7 +107,7 @@ class CreateUser(generics.CreateAPIView):
         content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
-        mail.template_id = '5f22ae47-2831-4677-8db7-825f9e1b4bce'
+        mail.template_id = USER_VERIFICATION_TEMPLATE
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
 
