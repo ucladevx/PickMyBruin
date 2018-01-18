@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from django.contrib.auth.models import User
-from .models import Profile, Mentor, Major
+from .models import Profile, Mentor, Major, Course
 from . import factories
 
 # Create your tests here.
@@ -258,3 +258,53 @@ class FindMentorByIDTest(APITestCase):
             reverse('users:mentor',kwargs={'mentor_id': self.mentor.id + 100000000}), #100000000 is to force an invalid mentor ID
         )
         self.assertEqual(resp.status_code, 404)
+
+class CourseEdittingTest(APITestCase):
+    mentors_update_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+
+    def test_update_new_course(self):
+        user_params = {
+            'courses': [
+                { 'name' : 'New_Course' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, 'New_Course')
+
+    def test_update_removes_old_courses(self):
+        old_course = Course(name='Old Course')
+        old_course.save()
+        self.mentor.courses.add(old_course)
+
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, old_course.name)
+
+        user_params = {
+            'courses': [
+                { 'name' : 'New_Course' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 1)
+        self.assertEqual(courses[0].name, 'New_Course')
+

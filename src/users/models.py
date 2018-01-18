@@ -36,6 +36,15 @@ class Major(models.Model):
     def __str__(self):
         return self.name
 
+class Course(models.Model):
+    name = models.CharField(max_length=100, null=False)
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        ordering = ('name',)
+
+
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
@@ -43,10 +52,12 @@ class Mentor(models.Model):
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
     clubs = models.CharField(max_length=500, null=False, blank=True, default='')
-    classes = models.CharField(max_length=5000, null=False, blank=True, default='')
+    courses = models.ManyToManyField(Course, blank=True)
     pros =  models.CharField(max_length=5000, null=False, blank=True, default='')
     cons =  models.CharField(max_length=5000, null=False, blank=True, default='')
     
+    class Meta:
+    	ordering = ('profile',)
     def __str__(self):
         return '%s (%s)' % (self.profile, self.major)
 

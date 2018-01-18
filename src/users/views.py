@@ -16,10 +16,10 @@ from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
 
-from .models import Profile, Major, Mentor
+from .models import Profile, Major, Mentor, Course
 from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
-    MentorSerializer,
+    MentorSerializer, CourseSerializer,
 )
 
 import sendgrid
@@ -56,6 +56,13 @@ class MajorViewSet(viewsets.ModelViewSet):
     """
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
+
+class CourseViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows courses to be viewed or edited.
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
 
 
 class MentorViewSet(viewsets.ModelViewSet):

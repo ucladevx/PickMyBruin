@@ -10,6 +10,7 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'profiles', views.ProfileViewSet)
 router.register(r'majors', views.MajorViewSet)
 router.register(r'mentors', views.MentorViewSet)
+router.register(r'courses', views.CourseViewSet)
 
 urlpatterns = [
     url(r'^mentors/me/?$', views.OwnMentorView.as_view(), name='mentors_me'),

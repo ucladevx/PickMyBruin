@@ -20,9 +20,14 @@ class MajorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Major
 
+class CourseFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Course
+
 class MentorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Mentor
     profile = factory.SubFactory(ProfileFactory)
     active = True
+
 

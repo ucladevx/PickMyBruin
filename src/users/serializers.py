@@ -1,9 +1,10 @@
 from rest_framework import serializers
+from rest_framework.fields import ListField
 from drf_writable_nested import WritableNestedModelSerializer
 from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
-from .models import Profile, Major, Mentor
+from .models import Profile, Major, Mentor, Course
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,17 +51,32 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
         read_only_fields = ('id',)
 
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ('id', 'name')
+        read_only_fields = ('id',)
 
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
     major = MajorSerializer()
+    courses = CourseSerializer(many=True)
     class Meta:
         model = Mentor
-        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'classes', 'pros', 'cons',)
+        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
         read_only_fields = ('id',)
 
 
     def update(self, instance, validated_data):
+        if 'courses' in validated_data:
+            instance.courses.clear()
+            courses_obj = validated_data.pop('courses')
+            for klass in courses_obj:
+                dict(klass)
+                c, _ = Course.objects.get_or_create(name=klass['name'])
+                instance.courses.add(c)
+                instance.save()
+
         if 'major' in validated_data:
             major_obj = validated_data.pop('major')
             major_text = major_obj['name']
@@ -68,3 +84,4 @@ class MentorSerializer(WritableNestedModelSerializer):
             instance.major = major_object
             instance.save()
         return super().update(instance, validated_data)
+
