@@ -91,7 +91,7 @@ class CreateUser(generics.CreateAPIView):
             last_name=request.data.get('last_name', ''),
         )
 
-        check = re.search(r'[\w.]+\@(g.)?ucla.edu', new_user.email)
+        check = re.search(r'^[\w\.]+\@(g.)?ucla.edu$', new_user.email)
         if check is None:
             raise ValidationError({'error': 'Invalid UCLA email'})
 

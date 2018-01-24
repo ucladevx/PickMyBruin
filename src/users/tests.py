@@ -49,6 +49,21 @@ class CreateUserTest(APITestCase):
         user = User.objects.get(email=user_params['email'])
         self.assertEqual(user.email, user.username)
 
+    def test_create_user_cant_have_illegal_email(self):
+        user_params = {
+            'email': 'test@veryfakedomain.com@ucla.edu',
+            'password': 'password',
+        }
+
+        resp = self.client.post(
+            self.create_url,
+            data=user_params,
+        )
+
+        self.assertFalse(User.objects.filter(email=user_params['email']).exists())
+
+
+
 class VerifyUserTest(APITestCase):
     verify_url = reverse('users:verify')
 
