@@ -21,6 +21,7 @@ from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
     MentorSerializer, CourseSerializer,
 )
+from .permissions import VerifiedUser
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
@@ -169,12 +170,13 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     """
     View for turning mentor status on (post) and modifying all mentor fields
     """
+    permission_classes = tuple()
     serializer_class = MentorSerializer
+
     def get_object(self):
         return get_object_or_404(Mentor, profile__user=self.request.user)
-    serializer_class = MentorSerializer
-    def post (self,request):
 
+    def post (self, request):
         profile_id = self.request.user.profile.id
         profile = Profile.objects.get(id=profile_id)
         mentor_request = Mentor.objects.filter(profile__user=self.request.user)

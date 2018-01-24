@@ -53,7 +53,7 @@ class VerifyUserTest(APITestCase):
     verify_url = reverse('users:verify')
 
     def setUp(self):
-        self.profile = factories.ProfileFactory()
+        self.profile = factories.ProfileFactory(verified=False)
         self.client.force_authenticate(user=self.profile.user)
 
     def tearDown(self):
@@ -239,6 +239,15 @@ class CreateMentorTest(APITestCase):
         )
         mentor.refresh_from_db()
         self.assertTrue(mentor.active)
+
+    def test_requires_verification(self):
+        self.profile = factories.ProfileFactory(verified=False)
+        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), False)
+        resp = self.client.post(
+            self.mentors_create_url,
+        )
+        self.assertEqual(Mentor.objects.filter(profile = self.profile).exists(), False)
+
 
 class FindMentorByIDTest(APITestCase):
     def setUp(self):

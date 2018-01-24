@@ -30,7 +30,6 @@ class CreateRequestTest(APITestCase):
         create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
         
         request_params = {
-            #'phone': '12345678910',
             'preferred_mentee_email': 'test@ucla.edu',
             'message': 'Hi this is test message',
         }
@@ -46,7 +45,6 @@ class CreateRequestTest(APITestCase):
 
         self.assertEqual(request.mentor, self.mentor)
         self.assertEqual(request.mentee, self.mentee)
-        #self.assertEqual(request.phone, request_params['phone'])
         self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
 
     def test_make_request_no_phone(self):
@@ -70,6 +68,22 @@ class CreateRequestTest(APITestCase):
         self.assertEqual(request.mentee, self.mentee)
         self.assertEqual(request.phone, '')
         self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
+
+    def test_make_request_unverified(self):
+        self.mentee = users_factories.ProfileFactory(verified=False)
+        create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
+        
+        request_params = {
+            'preferred_mentee_email': 'test@ucla.edu',
+            'message': 'Hi this is test message',
+        }
+
+        resp = self.client.post(
+            create_url,
+            data=request_params,
+        )
+
+        self.assertFalse(Request.objects.filter(mentor=self.mentor, mentee=self.mentee).exists())
 
 class ListRequestsTest(APITestCase):
     
@@ -166,17 +180,10 @@ class ListRequestsTest(APITestCase):
 
 
     def test_list_reqests_empty(self):
-        
-
         resp = self.client.get(
             self.get_url,
         )
 
         self.assertEqual(resp.data['count'], 0)
         self.assertEqual(len(resp.data['results']), 0)
-
-       
-
-    
-
 
