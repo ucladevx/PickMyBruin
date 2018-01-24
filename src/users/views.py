@@ -126,9 +126,11 @@ class VerifyUser(APIView):
     def post(self, request):
         profile_id = self.request.user.profile.id
         profile = get_object_or_404(Profile, id=profile_id)
-        if request.data['verification_code'] == profile.verification_code:
-            profile.verified = True
-            profile.save()
+        if request.data['verification_code'] != profile.verification_code:
+            raise ValidationError('Incorrect verification code')
+
+        profile.verified = True
+        profile.save()
         return Response({'profile_id': profile_id})
 
 

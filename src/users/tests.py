@@ -69,6 +69,8 @@ class VerifyUserTest(APITestCase):
             self.verify_url,
             data=user_params,
         )
+
+        self.assertEqual(resp.status_code, 400)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.verified, False)
 
