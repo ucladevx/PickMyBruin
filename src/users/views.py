@@ -170,7 +170,7 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     """
     View for turning mentor status on (post) and modifying all mentor fields
     """
-    permission_classes = tuple()
+    permission_classes = (VerifiedUser,)
     serializer_class = MentorSerializer
 
     def get_object(self):
