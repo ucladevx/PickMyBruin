@@ -161,6 +161,7 @@ Simplified tree diagram
           "active": "<MENTOR_STATE>",
           "major": <MAJOR>,
           "gpa": "<GPA",
+          "bio": <BIO>,
           "clubs": "<CLUBS>"
           "courses": [
               <COURSES> ...
@@ -215,8 +216,11 @@ Simplified tree diagram
   returns   
   ```
       {
-          "mentors": [
-              <MENTORS>... // same as /mentor/me/ format
+          "count": <NUMBER OF RESULTS>,
+          "next": null,
+          "previous": null,
+          "results": [
+              <MENTOR_PROFILE> ... // same as /mentor/me/ format
           ]
       }
   ```
