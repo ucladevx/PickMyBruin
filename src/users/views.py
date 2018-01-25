@@ -80,18 +80,18 @@ class CreateUser(generics.CreateAPIView):
     
     @transaction.atomic
     def post(self, request):
-        if User.objects.filter(email=request.data['email'].lower()).exists():
+        if User.objects.filter(email=request.data['email']).exists():
             raise ValidationError({'error': 'Email already registered'})
 
         new_user = User.objects.create_user(
             username=request.data['email'],
-            email=request.data['email'].lower(),
+            email=request.data['email'],
             password=request.data['password'],
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
         )
 
-        check = re.search(r'^[\w.]+\@g.ucla.edu$', new_user.email)
+        check = re.search(r'^[\w.]+\@(g.)?ucla.edu$', new_user.email)
         if check is None:
             raise ValidationError({'error': 'Invalid UCLA email'})
 
@@ -114,8 +114,8 @@ class CreateUser(generics.CreateAPIView):
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
         mail.template_id = USER_VERIFICATION_TEMPLATE
-        #sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-        #response = sg.client.mail.send.post(request_body=mail.get())
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
 
         return Response(ProfileSerializer(new_profile).data)
         
