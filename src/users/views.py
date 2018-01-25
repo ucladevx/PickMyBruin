@@ -85,7 +85,7 @@ class CreateUser(generics.CreateAPIView):
 
         new_user = User.objects.create_user(
             username=request.data['email'],
-            email=request.data['email'].lower(),
+            email=request.data['email'],
             password=request.data['password'],
             first_name=request.data.get('first_name', ''),
             last_name=request.data.get('last_name', ''),
