@@ -11,9 +11,11 @@ from pickmybruin.settings import REQUEST_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+from users.permissions import VerifiedUser
 
 # Create your views here.
 class EmailRequestView(generics.CreateAPIView):
+    permission_classes = (VerifiedUser,)
     serializer_class = RequestSerializer
 
     def get_object(self):
