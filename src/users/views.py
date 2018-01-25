@@ -116,6 +116,8 @@ class CreateUser(generics.CreateAPIView):
         mail.template_id = USER_VERIFICATION_TEMPLATE
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'status_code': response.status_code})
         return Response(ProfileSerializer(new_profile).data)
         
 class VerifyUser(APIView):
