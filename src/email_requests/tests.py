@@ -165,7 +165,7 @@ class ListRequestsTest(APITestCase):
         self.assertEqual(self.request2_json, resp_request2)
 
 
-    def test_list_reqests_empty(self):
+    def test_list_requests_empty(self):
         
 
         resp = self.client.get(
