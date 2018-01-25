@@ -46,8 +46,8 @@ class EmailRequestView(generics.CreateAPIView):
         mail.personalizations[0].add_substitution(Substitution('email_html', email_html))
         mail.personalizations[0].add_substitution(Substitution('phone_html', phone_html))
         mail.template_id = REQUEST_TEMPLATE
-        #sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-        #response = sg.client.mail.send.post(request_body=mail.get())
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
 
         new_request = Request(
             mentee=mentee_profile,
