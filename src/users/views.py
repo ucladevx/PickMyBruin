@@ -80,7 +80,7 @@ class CreateUser(generics.CreateAPIView):
     
     @transaction.atomic
     def post(self, request):
-        if User.objects.filter(email=request.data['email'].lower()).exists():
+        if User.objects.filter(email__iexact=request.data['email']).exists():
             raise ValidationError({'error': 'Email already registered'})
 
         new_user = User.objects.create_user(
