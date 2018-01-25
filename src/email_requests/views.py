@@ -49,7 +49,9 @@ class EmailRequestView(generics.CreateAPIView):
         mail.template_id = REQUEST_TEMPLATE
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
-
+        if response.status_code != 202:
+            raise ValidationError({'error': response.status_code})
+            
         new_request = Request(
             mentee=mentee_profile,
             mentor=mentor,
