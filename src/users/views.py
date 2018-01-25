@@ -114,8 +114,8 @@ class CreateUser(generics.CreateAPIView):
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
         mail.template_id = USER_VERIFICATION_TEMPLATE
-        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        #sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        #response = sg.client.mail.send.post(request_body=mail.get())
         return Response(ProfileSerializer(new_profile).data)
         
 class VerifyUser(APIView):

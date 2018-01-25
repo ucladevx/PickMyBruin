@@ -21,7 +21,7 @@ class CreateUserTest(APITestCase):
 
     def test_create_user_has_profile_and_user(self):
         user_params = {
-            'email': 'test@ucla.edu',
+            'email': 'test@g.ucla.edu',
             'password': 'password',
         }
 
@@ -37,7 +37,7 @@ class CreateUserTest(APITestCase):
 
     def test_user_username_and_email_equal(self):
         user_params = {
-            'email': 'test2@ucla.edu',
+            'email': 'test2@g.ucla.edu',
             'password': 'password',
         }
 
