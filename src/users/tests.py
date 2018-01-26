@@ -21,7 +21,7 @@ class CreateUserTest(APITestCase):
 
     def test_create_user_has_profile_and_user(self):
         user_params = {
-            'email': 'test@ucla.edu',
+            'email': 'test@g.ucla.edu',
             'password': 'password',
         }
 
@@ -37,7 +37,7 @@ class CreateUserTest(APITestCase):
 
     def test_user_username_and_email_equal(self):
         user_params = {
-            'email': 'test2@ucla.edu',
+            'email': 'test2@g.ucla.edu',
             'password': 'password',
         }
 
@@ -62,7 +62,30 @@ class CreateUserTest(APITestCase):
 
         self.assertFalse(User.objects.filter(email=user_params['email']).exists())
 
+    def test_create_user_rejects_duplicate_emails(self):
+        user_params = {
+            'email': 'testCASE@g.ucla.edu',
+            'password': 'password',
+        }
 
+        user_params_2 = {
+            'email': 'testcase@g.ucla.edu',
+            'password': 'password',
+        }
+
+        resp = self.client.post(
+            self.create_url,
+            data=user_params,
+        )
+        
+        resp = self.client.post(
+            self.create_url,
+            data=user_params_2,
+        )
+
+        self.assertTrue(User.objects.filter(email=user_params['email']).exists())
+        self.assertFalse(User.objects.filter(email=user_params_2['email']).exists())
+        self.assertTrue(User.objects.filter(email__iexact=user_params_2['email']).exists())
 
 class VerifyUserTest(APITestCase):
     verify_url = reverse('users:verify')

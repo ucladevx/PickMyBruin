@@ -36,7 +36,6 @@ class EmailRequestView(generics.CreateAPIView):
         phone_html = '' if phone_num=='' else ('<b>Phone Number:</b> ' + phone_num)
         email_html = '<b>Email:</b> ' + preferred_mentee_email
 
-
         from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(mentor_email)
         subject = 'New Request from BQuest'

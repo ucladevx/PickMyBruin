@@ -80,7 +80,7 @@ class CreateUser(generics.CreateAPIView):
     
     @transaction.atomic
     def post(self, request):
-        if User.objects.filter(email=request.data['email']).exists():
+        if User.objects.filter(email__iexact=request.data['email']).exists():
             raise ValidationError({'error': 'Email already registered'})
 
         new_user = User.objects.create_user(
@@ -91,7 +91,7 @@ class CreateUser(generics.CreateAPIView):
             last_name=request.data.get('last_name', ''),
         )
 
-        check = re.search(r'^[\w\.]+\@(g.)?ucla.edu$', new_user.email)
+        check = re.search(r'^[\w\.]+\@g.ucla.edu$', new_user.email)
         if check is None:
             raise ValidationError({'error': 'Invalid UCLA email'})
 
