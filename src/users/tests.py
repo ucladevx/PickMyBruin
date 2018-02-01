@@ -149,6 +149,22 @@ class OwnProfileViewTest(APITestCase):
         for field, val in data.items():
             self.assertEqual(val, resp.data[field])
 
+    def test_phone_validation_accept(self):
+        data = {
+            'phone_number': '(012)345-6789',
+        }
+        resp = self.client.patch(self.own_profile_url, data=data)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.phone_number, resp.data['phone_number'])
+
+    def test_phone_validation_deny(self):
+        old_phone = self.profile.phone_number
+        data = {
+            'phone_number': '0123456789',
+        }
+        resp = self.client.patch(self.own_profile_url, data=data)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.phone_number, old_phone)
 
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
