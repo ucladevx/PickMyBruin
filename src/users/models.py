@@ -24,7 +24,7 @@ class Profile(models.Model):
     verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
     picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True, default='profile_pictures/default_pic.jpg')
     year = models.CharField(max_length=15, choices=YEAR_CHOICES, default='1st')
-    phone_regex = RegexValidator(regex=r'^\(([0-9]{3})\)([0-9]{3})[-]([0-9]{4})$', message='Phone number must be entered in the format: (012)345-6789')
+    phone_regex = RegexValidator(regex=r'^\([0-9]{3}\)[0-9]{3}[-][0-9]{4}$', message='Phone number must be entered in the format: (012)345-6789')
     phone_number = models.CharField(validators=[phone_regex], max_length=13, blank=True) 
 
     @staticmethod
