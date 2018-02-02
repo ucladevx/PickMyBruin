@@ -138,6 +138,8 @@ Simplified tree diagram
           "email": "<USER_EMAIL>",
           "year": "<YEAR>",
           "verified": "<VERIFIED>",
+          "picture": <PICTURE>,
+          "phone_number": "<PHONE_NUMBER>"
           "date_created": "<DATE_CREATED_ISO8601>"
       }
   ```
