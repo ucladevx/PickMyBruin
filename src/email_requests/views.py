@@ -36,20 +36,21 @@ class EmailRequestView(generics.CreateAPIView):
         phone_html = '' if phone_num=='' else ('<b>Phone Number:</b> ' + phone_num)
         email_html = '<b>Email:</b> ' + preferred_mentee_email
 
-        from_email =  Email('noreply@bquest.ucladevx.com')
-        to_email = Email(mentor_email)
-        subject = 'New Request from BQuest'
-        content = Content('text/html', 'N/A')
-        mail = Mail(from_email, subject, to_email, content)
-        mail.personalizations[0].add_substitution(Substitution('mentee_name', mentee_name))
-        mail.personalizations[0].add_substitution(Substitution('user_message', user_message))
-        mail.personalizations[0].add_substitution(Substitution('email_html', email_html))
-        mail.personalizations[0].add_substitution(Substitution('phone_html', phone_html))
-        mail.template_id = REQUEST_TEMPLATE
-        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-        response = sg.client.mail.send.post(request_body=mail.get())
-        if not (200 <= response.status_code < 300):
-            raise ValidationError({'status_code': response.status_code})
+        if mentor.profile.notifications_enabled is True:
+            from_email =  Email('noreply@bquest.ucladevx.com')
+            to_email = Email(mentor_email)
+            subject = 'New Request from BQuest'
+            content = Content('text/html', 'N/A')
+            mail = Mail(from_email, subject, to_email, content)
+            mail.personalizations[0].add_substitution(Substitution('mentee_name', mentee_name))
+            mail.personalizations[0].add_substitution(Substitution('user_message', user_message))
+            mail.personalizations[0].add_substitution(Substitution('email_html', email_html))
+            mail.personalizations[0].add_substitution(Substitution('phone_html', phone_html))
+            mail.template_id = REQUEST_TEMPLATE
+            sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+            response = sg.client.mail.send.post(request_body=mail.get())
+            if not (200 <= response.status_code < 300):
+                raise ValidationError({'status_code': response.status_code})
 
         new_request = Request(
             mentee=mentee_profile,
