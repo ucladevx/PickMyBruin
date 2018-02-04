@@ -139,7 +139,7 @@ Simplified tree diagram
           "year": "<YEAR>",
           "verified": "<VERIFIED>",
           "picture": <PICTURE>,
-          "notification": "<NOTIFICATION_BOOL>
+          "notifications_enabled": "<NOTIFICATION_BOOL>
           "phone_number": "<PHONE_NUMBER>"
           "date_created": "<DATE_CREATED_ISO8601>"
       }
