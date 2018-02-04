@@ -156,13 +156,13 @@ class MentorsSearchView(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         major = self.request.query_params['major']
-        courses = self.request.query_params['courses']
+        #courses = self.request.query_params['courses']
         year = self.request.query_params['year']
         q = Q()
         if major != 'all':
             q &= Q(major__name=major)
-        if courses != 'all':
-            q &= Q(courses__name=courses)
+        #if courses != 'all':
+        #    q &= Q(courses__name__in=courses)
         if year != 'all':
             q &= Q(profile__year=year)
         return queryset.filter(q).exclude(profile__user=self.request.user)

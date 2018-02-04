@@ -169,34 +169,64 @@ class OwnProfileViewTest(APITestCase):
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
-        self.major = factories.MajorFactory(name='Test Major')
+
+        self.major = factories.MajorFactory(name='Major')
         self.mentor = factories.MentorFactory(major=self.major)
+
+        self.major1 = factories.MajorFactory(name='Test_Major')
+        self.mentor1 = factories.MentorFactory(major=self.major1)
+
+        #self.mentor2 = factories.MentorFactory(courses = Course(name='Old Course'))
+
+        #self.profile = factories.ProfileFactory()
+        #self.mentor3 = factories.MentorFactory(profile = self.profile)
+
         self.client.force_authenticate(user=self.mentor.profile.user)
 
     def tearDown(self):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def test_correct_major_name_filtering(self):
+    def test_filter_out_self(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
                 'major': self.major.name,
+                #'course': 'all',
+                'year': 'all',
             },
         )
+        self.assertEqual(resp.data['count'], 0)
 
+    def test_correct_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+                #'course': 'all',
+                'year': 'all',
+            },
+        )
         self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor.major.name)
+        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
 
     def test_incorrect_major_name_filtering(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.mentor.major.name + 'wonrg',
+                'major': self.major1.name + 'wonrg',
+                #'course': 'all',
+                'year': 'all',
             },
         )
-
         self.assertEqual(resp.data['count'], 0)
+    # def test_correct_year_filtering(self):
+    # def test_incorrect_year_filtering(self):
+    # def test_multi_field_filtering(self):
+        
+    # def test_correct_courses_name_filtering(self):
+    # def test_incorrect_course_name_filtering(self):
+    
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
