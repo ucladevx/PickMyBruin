@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^mentors/?$', views.MentorsSearchView.as_view(), name='mentors_search'),
     url(r'^users/?$', views.CreateUser.as_view(), name='create'),
     url(r'^verify/?$', views.VerifyUser.as_view(), name='verify'),
+    url(r'^verify_link/?$', views.ResendVerifyUser.as_view(), name='verify_link'),
 ]
