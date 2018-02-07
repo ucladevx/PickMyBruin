@@ -185,5 +185,5 @@ logging.getLogger('botocore').setLevel(logging.WARN)
 logging.getLogger('nose').setLevel(logging.WARN)
 logging.getLogger('s3transfer').setLevel(logging.WARN)
 
-REQUEST_TEMPLATE = 'f9bd9c0f-809e-40ea-a022-d1bc4ae86295'
-USER_VERIFICATION_TEMPLATE = '5f22ae47-2831-4677-8db7-825f9e1b4bce'
+REQUEST_TEMPLATE = '682f1eee-9441-4baf-aa1b-780281f25694'
+USER_VERIFICATION_TEMPLATE = 'ddd14008-25ee-46c6-9a55-b6b4d577a54b'
