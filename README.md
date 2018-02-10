@@ -211,10 +211,9 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?major=<MAJOR_ID>  
+  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>
     - only returns active mentors
     - excludes yourself
-    - sort by year decreasing for now
     - no pagination for now
   returns   
   ```
