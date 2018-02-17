@@ -130,9 +130,9 @@ class ResendVerifyUser(APIView):
         if settings.DEBUG:
             url = 'http://localhost:8000/verify?code='
         from_email =  Email('noreply@bquest.ucladevx.com')
-        to_email = Email(email) #
+        to_email = Email(email)
         subject = 'BQuest User Verification'
-        verification_link = url + verification_code #
+        verification_link = url + verification_code 
         content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
