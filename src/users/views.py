@@ -119,7 +119,30 @@ class CreateUser(generics.CreateAPIView):
         if not (200 <= response.status_code < 300):
             raise ValidationError({'status_code': response.status_code})
         return Response(ProfileSerializer(new_profile).data)
-        
+
+
+class ResendVerifyUser(APIView):
+    def get (self, request):
+        email = self.request.user.email
+        verification_code = self.request.user.profile.verification_code
+
+        url = 'https://bquest.ucladevx.com/verify?code='
+        if settings.DEBUG:
+            url = 'http://localhost:8000/verify?code='
+        from_email =  Email('noreply@bquest.ucladevx.com')
+        to_email = Email(email)
+        subject = 'BQuest User Verification'
+        verification_link = url + verification_code 
+        content = Content('text/html', 'N/A')
+        mail = Mail(from_email, subject, to_email, content)
+        mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
+        mail.template_id = USER_VERIFICATION_TEMPLATE
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'status_code': response.status_code})
+        return Response(ProfileSerializer(self.request.user.profile).data)
+
 class VerifyUser(APIView):
     """
     API endpoint that verifies a user based on profile_id and associated verification code.

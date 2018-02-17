@@ -103,6 +103,15 @@ Simplified tree diagram
       }
   ```
 
+  GET /verify_link/
+  re-sends verification link
+  returns  
+  ```
+      {
+          "profile_id": <PROFILE_ID>
+      }
+  ```
+
 ### Login
   POST /o/token/ (login)
   ```x-www-form-urlencoded
