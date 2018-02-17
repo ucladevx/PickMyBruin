@@ -171,7 +171,7 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
 
 class MentorsSearchView(generics.ListAPIView):
     """
-    View for finding a mentor by major #classes, year
+    View for finding a mentor by major, year
     """
     queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
