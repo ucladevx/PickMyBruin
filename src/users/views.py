@@ -182,7 +182,7 @@ class MentorsSearchView(generics.ListAPIView):
         year = 'all'
         if 'major' in self.request.GET:
             major = self.request.GET['major']
-        if 'yaer' in self.request.GET:
+        if 'year' in self.request.GET:
             year = self.request.GET['year']
 
         q = Q()

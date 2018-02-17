@@ -214,6 +214,16 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 0)
 
+    def test_only_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+        
     def test_correct_year_filtering(self):
         resp = self.client.get(
             self.mentors_search_url,
@@ -234,6 +244,36 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 0)
+
+    def test_only_year_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'year': self.profile1.year,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_filter_by_none(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_filter_by_all(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+                'year': self.profile1.year,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
 
 class MentorsUpdateTest(APITestCase):

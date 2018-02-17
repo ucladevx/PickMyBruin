@@ -221,6 +221,7 @@ Simplified tree diagram
 
 ### Search for mentors
   GET /mentors/?major=<MAJOR_ID>&year=<YEAR>
+    - if any query_param is missing, it defaults to 'all' for that parameter
     - only returns active mentors
     - excludes yourself
     - no pagination for now
