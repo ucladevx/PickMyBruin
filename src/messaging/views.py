@@ -58,7 +58,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
     """
     serializer_class = MessageSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get_queryset(self, *args, **kwargs):
         my_profile = get_object_or_404(Profile, user=self.request.user)
         other_id = int(self.kwargs['profile_id'])
         other_profile = get_object_or_404(Profile, id=other_id)
@@ -69,7 +69,12 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         query |= Q(profile_2=my_profile) & Q(profile_1=other_profile)
         thread = Thread.objects.filter(query).first()
 
-        return Message.objects.filter(thread=thread).order_by('timestamp').reverse()
+        if thread is None:
+            return 404
+
+        messages = Message.objects.filter(thread=thread).order_by('timestamp').reverse()
+
+        return messages
 
     def post(self, request, *args, **kwargs):
         my_profile = get_object_or_404(Profile, user=self.request.user)
@@ -78,8 +83,8 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         message_body = request.data['body']
         
         #Find associated thread, or create new thread
-        query = Q(profile_1=my_profile) | Q(profile_1=other_profile)
-        query &= Q(profile_2=my_profile) | Q(profile_2=other_profile)
+        query = Q(profile_1=my_profile) & Q(profile_2=other_profile)
+        query |= Q(profile_2=my_profile) & Q(profile_1=other_profile)
         thread = Thread.objects.filter(query).first()
         
         if thread is None:
@@ -102,6 +107,16 @@ class SendGetMessagesView(generics.ListCreateAPIView):
 
         return Response(MessageSerializer(new_message).data)
 
+class ListOwnThreadsView(generics.ListAPIView):
+    serializer_class = ThreadSerializer
+
+    def get_queryset(self):
+        my_profile = get_object_or_404(Profile, user=self.request.user)
+
+        #Find all threads that current user is involved in
+        query = Q(profile_1=my_profile) | Q(profile_2=my_profile)
+        
+        return Thread.objects.filter(query)
 
 
 
