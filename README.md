@@ -266,6 +266,48 @@ Simplified tree diagram
       }
   ```
 
+### Send a message
+  POST /messaging/<PROFILE_ID>/  
+  ```
+      {
+          "body": "<MESSAGE_BODY>"
+      }
+  ```
+  returns a Message object
+
+### Get all messages between user and someone else
+  GET /messaging/<PROFILE_ID>/
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_MESSAGES>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_MESSAGES> [
+          {
+            <MESSAGE_OBJECT>
+            }]
+      }
+  ```
+
+### Mark a message as read
+  POST /messaging/read/<MESSAGE_ID>/  
+  ```
+      {
+          <DOESN'T MATTER>
+      }
+  ```
+  returns the specified Message object
+
+### Check if a thread exists between two users
+  GET /messaging/check/<PROFILE_ID>
+  returns
+  ```
+      {
+          'exists': '<True/False>'
+      }
+  ```
+
 ## Current Database Schema (Will probably be outdated soon)
 
 ### NOTE: you don't really need to understand this, but this is how Django will create tables for the models

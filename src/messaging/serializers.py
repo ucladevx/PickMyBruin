@@ -10,14 +10,19 @@ from users.serializers import ProfileSerializer
 class ThreadSerializer(WritableNestedModelSerializer):
 	profile_1 = ProfileSerializer()
 	profile_2 = ProfileSerializer()
+	#message = MessageSerializer(serializers.SerializerMethodField('recent_message'))
+
+	def recent_message(self):
+		return Message.objects.filter(thread__id=self.id).filter_by('timestamp').first() #or thread=self
+
 	class Meta:
 		model = Thread
-		fields = ('profile_1', 'profile_2',)
-		read_only_fields = ('profile_1', 'profile_2',)
+		fields = ('id', 'profile_1', 'profile_2', )
+		read_only_fields = ('id', 'profile_1', 'profile_2', )
 
 class MessageSerializer(WritableNestedModelSerializer):
 	thread = ThreadSerializer()
 	class Meta:
 		model = Message
-		fields = ('thread', 'body', 'timestamp', 'read',)
-		read_only_fields = ('thread', 'body', 'timestamp', 'read',)
+		fields = ('id', 'thread', 'body', 'timestamp', 'read',)
+		read_only_fields = ('id', 'thread', 'body', 'timestamp', 'read',)
