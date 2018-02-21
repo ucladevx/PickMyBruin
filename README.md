@@ -268,6 +268,7 @@ Simplified tree diagram
 
 ### Get all threads for a user
   GET /messaging/me/
+
   returns
   ```
       {
@@ -294,6 +295,7 @@ Simplified tree diagram
 
 ### Get all messages between user and someone else
   GET /messaging/<PROFILE_ID>/
+
   returns
   ```
       {
@@ -321,6 +323,7 @@ Simplified tree diagram
 
 ### Check if a thread exists between two users
   GET /messaging/check/<PROFILE_ID>
+
   returns
   ```
       {
