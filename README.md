@@ -220,10 +220,11 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?major=<MAJOR_ID>  
+  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>
+    - if any query_param is missing, it defaults to 'all' for that parameter
+      (both params are optional)
     - only returns active mentors
     - excludes yourself
-    - sort by year decreasing for now
     - no pagination for now
   returns   
   ```

@@ -169,34 +169,112 @@ class OwnProfileViewTest(APITestCase):
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
-        self.major = factories.MajorFactory(name='Test Major')
+
+        self.major = factories.MajorFactory(name='Major')
         self.mentor = factories.MentorFactory(major=self.major)
+
+        self.major1 = factories.MajorFactory(name='Test_Major')
+        self.profile1 = factories.ProfileFactory(year='1st')
+        self.mentor1 = factories.MentorFactory(major=self.major1, profile=self.profile1)
+
         self.client.force_authenticate(user=self.mentor.profile.user)
 
     def tearDown(self):
         User.objects.all().delete()
         Major.objects.all().delete()
 
-    def test_correct_major_name_filtering(self):
+    def test_filter_out_self(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
                 'major': self.major.name,
+                'year': 'all',
             },
         )
+        self.assertEqual(resp.data['count'], 0)
 
+    def test_correct_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+                'year': 'all',
+            },
+        )
         self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor.major.name)
+        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
 
     def test_incorrect_major_name_filtering(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.mentor.major.name + 'wonrg',
+                'major': self.major1.name + 'wonrg',
+                'year': 'all',
             },
         )
-
         self.assertEqual(resp.data['count'], 0)
+
+    def test_only_major_name_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+        
+    def test_correct_year_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': 'all',
+                'year': self.profile1.year,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_incorrect_year_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': 'all',
+                'year': self.profile1.year + 'wonrg',
+            },
+        )
+        self.assertEqual(resp.data['count'], 0)
+
+    def test_only_year_filtering(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'year': self.profile1.year,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_filter_by_none(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_filter_by_all(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+                'year': self.profile1.year,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')

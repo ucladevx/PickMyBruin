@@ -15,6 +15,7 @@ from rest_framework.parsers import MultiPartParser
 from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
+from django.db.models import Q
 
 from .models import Profile, Major, Mentor, Course
 from .serializers import (
@@ -170,14 +171,26 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
 
 class MentorsSearchView(generics.ListAPIView):
     """
-    View for finding a mentor by major
+    View for finding a mentor by major, year
     """
     queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
 
+
     def filter_queryset(self, queryset):
-        major = self.request.query_params['major']
-        return queryset.filter(major__name=major)
+        major = 'all'
+        year = 'all'
+        if 'major' in self.request.GET:
+            major = self.request.GET['major']
+        if 'year' in self.request.GET:
+            year = self.request.GET['year']
+
+        q = Q()
+        if major != 'all':
+            q &= Q(major__name=major)
+        if year != 'all':
+            q &= Q(profile__year=year)
+        return queryset.filter(q).exclude(profile__user=self.request.user)
 
 
 class MentorView(generics.RetrieveAPIView):
