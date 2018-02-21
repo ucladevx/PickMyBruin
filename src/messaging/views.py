@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Max
 from rest_framework.response import Response
 from .models import Thread, Message
 from .serializers import MessageSerializer, ThreadSerializer
@@ -24,7 +24,7 @@ class ReadMessageView(generics.UpdateAPIView):
         message_id = int(self.kwargs['message_id'])
         message = get_object_or_404(Message, id=message_id)
 
-        message.read = True
+        message.unread = False
 
         message.save()
 
@@ -100,7 +100,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         new_message = Message(
             thread=thread,
             body=message_body,
-            read=False,
+            unread=True,
         )
 
         new_message.save()
@@ -116,7 +116,13 @@ class ListOwnThreadsView(generics.ListAPIView):
         #Find all threads that current user is involved in
         query = Q(profile_1=my_profile) | Q(profile_2=my_profile)
         
-        return Thread.objects.filter(query)
+        ret = Thread.objects.filter(
+            query,
+        ).annotate(
+            recent_message_timestamp=Max('message__timestamp'),
+        ).order_by(
+            '-recent_message_timestamp',
+        )
 
-
+        return ret
 

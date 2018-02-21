@@ -11,4 +11,4 @@ class Message(models.Model):
 	thread = models.ForeignKey(Thread, null=True, on_delete=models.SET_NULL)
 	body = models.TextField(null=False, default = '')
 	timestamp = models.DateTimeField(auto_now_add=True)
-	read = models.BooleanField(default=False)
+	unread = models.BooleanField(default=True)

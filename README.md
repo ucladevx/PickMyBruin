@@ -1,4 +1,4 @@
-# Pick My Bruin
+# BQuest
 
 ## Setup
 1. Install `docker` and `docker-compose`. 
@@ -266,6 +266,23 @@ Simplified tree diagram
       }
   ```
 
+### Get all threads for a user
+  GET /messaging/me/
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_THREADS>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_THREADS> [
+          {
+            'profile_1': <PROFILE_1_DATA>
+            'profile_2': <PROFILE_2_DATA>
+            'recent_message': <MOST_RECENT_MESSAGE_DATA>
+            }]
+      }
+  ```
+
 ### Send a message
   POST /messaging/<PROFILE_ID>/  
   ```
@@ -285,13 +302,16 @@ Simplified tree diagram
           "prev": null
           "results": <LIST_OF_MESSAGES> [
           {
-            <MESSAGE_OBJECT>
+            'id':'<MESSAGE_ID>'
+            'body':'<MESSAGE_BODY>'
+            'timestamp':'TIME_SENT'
+            'unread': <BOOLEAN>
             }]
       }
   ```
 
 ### Mark a message as read
-  POST /messaging/read/<MESSAGE_ID>/  
+  PATCH /messaging/read/<MESSAGE_ID>/  
   ```
       {
           <DOESN'T MATTER>
