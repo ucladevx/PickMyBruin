@@ -180,6 +180,7 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         major = 'all'
         year = 'all'
+
         if 'major' in self.request.GET:
             major = self.request.GET['major']
         if 'year' in self.request.GET:
@@ -190,8 +191,20 @@ class MentorsSearchView(generics.ListAPIView):
             q &= Q(major__name=major)
         if year != 'all':
             q &= Q(profile__year=year)
+
         return queryset.filter(q).exclude(profile__user=self.request.user)
 
+class RandomMentorView(generics.ListAPIView):
+    queryset = Mentor.objects.all().filter(active=True)
+    serializer_class = MentorSerializer
+
+    
+
+    def filter_queryset(self, queryset):
+        num_random = 5
+        if 'random' in self.request.GET:
+            num_random = int(self.request.GET['random'])
+        return queryset.exclude(profile__user=self.request.user).order_by('?')[:num_random]
 
 class MentorView(generics.RetrieveAPIView):
     """
