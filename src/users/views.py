@@ -148,15 +148,24 @@ class VerifyUser(APIView):
     """
     API endpoint that verifies a user based on profile_id and associated verification code.
     """
+    permission_classes = tuple()
     def post(self, request):
-        profile_id = self.request.user.profile.id
-        profile = get_object_or_404(Profile, id=profile_id)
-        if request.data['verification_code'] != profile.verification_code:
+        profiles = Profile.objects.filter(verification_code=request.data['verification_code'])
+        if profiles.exists():
+            for p in profiles:
+                p.verified = True
+                p.save()
+        else:
             raise ValidationError('Incorrect verification code')
 
-        profile.verified = True
-        profile.save()
-        return Response({'profile_id': profile_id})
+        # profile_id = self.request.user.profile.id
+        # profile = get_object_or_404(Profile, id=profile_id)
+        # if request.data['verification_code'] != profile.verification_code:
+        #     raise ValidationError('Incorrect verification code')
+
+        # profile.verified = True
+        # profile.save()
+        return Response({'profile_id': p.id})
 
 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
@@ -209,7 +218,6 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MentorSerializer
     def get_object(self):
         return get_object_or_404(Mentor, profile__user=self.request.user)
-    serializer_class = MentorSerializer
     def post (self,request):
 
         profile_id = self.request.user.profile.id
