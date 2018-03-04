@@ -47,9 +47,9 @@ class CheckHistoryView(APIView):
         thread = Thread.objects.filter(query).first()
 
         if (thread is not None):
-            return Response({'exists': 'True'})
+            return Response({'exists': True})
         else:
-            return Response({'exists': 'False'})
+            return Response({'exists': False})
 
 
 class SendGetMessagesView(generics.ListCreateAPIView):

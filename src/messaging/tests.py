@@ -12,21 +12,6 @@ from users import factories as users_factories
 from .factories import MessageFactory, ThreadFactory
 from .serializers import MessageSerializer, ThreadSerializer
 
-# Create your tests here.
-
-
-
-#Send message with new thread
-#send message with existing thread (ensure doesnt make a new thread)
-
-#get all messages between two people, check order
-
-#mark message as read
-
-#check existence of thread, when it exists and doesnt
-
-#get all threads, ensure correct ordering
-#ensure correct most recent message?
 
 class SendMessageTest(APITestCase):
 
@@ -180,7 +165,7 @@ class CheckHistoryTest(APITestCase):
             create_url,
         )
 
-        self.assertEqual(resp.data['exists'], 'True')
+        self.assertTrue(resp.data['exists'])
 
     def test_thread_not_exists(self):
         self.other2 = users_factories.ProfileFactory()
@@ -191,6 +176,64 @@ class CheckHistoryTest(APITestCase):
             create_url,
         )
 
-        self.assertEqual(resp.data['exists'], 'False')
+        self.assertFalse(resp.data['exists'])
 
         self.other2.user.delete()
+
+
+class GetThreadsTest(APITestCase):
+
+    def setUp(self):
+        self.me = users_factories.ProfileFactory()
+        self.client.force_authenticate(user=self.me.user)
+        self.other1 = users_factories.ProfileFactory()
+        self.other2 = users_factories.ProfileFactory()
+        
+    def tearDown(self):
+        self.me.user.delete()
+        self.other1.user.delete()
+        self.other2.user.delete()
+        Message.objects.all().delete()
+        Thread.objects.all().delete()
+
+    def test_no_threads(self):
+        create_url = reverse('messaging:thread_list')
+
+        resp = self.client.get(
+            create_url,
+        )
+
+        self.assertEqual(resp.data['count'], 0)
+        self.assertEqual(len(resp.data['results']),0)
+
+    def test_two_threads(self):
+        self.thread1 = ThreadFactory(profile_1=self.me, profile_2=self.other1)
+        self.thread2 = ThreadFactory(profile_1=self.other2, profile_2=self.me)
+        self.message1_t1 = MessageFactory(thread=self.thread1, sender=self.me)
+        self.message2_t1 = MessageFactory(thread=self.thread1, sender=self.other1)
+        self.message1_t2 = MessageFactory(thread=self.thread2, sender=self.other2)
+
+
+        self.t1_json = ThreadSerializer(self.thread1).data
+        self.t2_json = ThreadSerializer(self.thread2).data
+
+        self.t1_message_json = MessageSerializer(self.message2_t1).data
+        self.t2_message_json = MessageSerializer(self.message1_t2).data
+
+        create_url = reverse('messaging:thread_list')
+
+        resp = self.client.get(
+            create_url,
+        )
+
+        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(len(resp.data['results']), 2)
+
+        resp_thread_1 = resp.data['results'][1]
+        resp_thread_2 = resp.data['results'][0]
+
+        self.assertEqual(self.t1_json, resp_thread_1)
+        self.assertEqual(self.t2_json, resp_thread_2)
+
+        self.assertEqual(self.t1_message_json, resp_thread_1['recent_message'])
+        self.assertEqual(self.t2_message_json, resp_thread_2['recent_message'])
