@@ -99,6 +99,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         #TODO Send Email
         new_message = Message(
             thread=thread,
+            sender=my_profile,
             body=message_body,
             unread=True,
         )

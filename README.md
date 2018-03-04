@@ -305,6 +305,7 @@ Simplified tree diagram
           "results": <LIST_OF_MESSAGES> [
           {
             'id':'<MESSAGE_ID>'
+            'sender':<PROFILE_OF_SENDER>
             'body':'<MESSAGE_BODY>'
             'timestamp':'TIME_SENT'
             'unread': <BOOLEAN>

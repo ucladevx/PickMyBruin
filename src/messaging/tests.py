@@ -6,177 +6,191 @@ from django.core.urlresolvers import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from django.contrib.auth.models import User
-from users.models import Profile, Mentor, User
-from .models import Request
+from users.models import Profile
+from .models import Message, Thread
 from users import factories as users_factories
-from . import factories
-from .serializers import RequestSerializer
+from .factories import MessageFactory, ThreadFactory
+from .serializers import MessageSerializer, ThreadSerializer
 
 # Create your tests here.
 
-class CreateRequestTest(APITestCase):
-    
+
+
+#Send message with new thread
+#send message with existing thread (ensure doesnt make a new thread)
+
+#get all messages between two people, check order
+
+#mark message as read
+
+#check existence of thread, when it exists and doesnt
+
+#get all threads, ensure correct ordering
+#ensure correct most recent message?
+
+class SendMessageTest(APITestCase):
+
     def setUp(self):
-        self.mentee = users_factories.ProfileFactory()
-        self.client.force_authenticate(user=self.mentee.user)
-        self.mentor = users_factories.MentorFactory()
+        self.me = users_factories.ProfileFactory()
+        self.client.force_authenticate(user=self.me.user)
+        self.other = users_factories.ProfileFactory()
+        
 
     def tearDown(self):
-        Request.objects.all().delete()
-        self.mentor.profile.user.delete()
-        self.mentee.user.delete()
+        Message.objects.all().delete()
+        self.me.user.delete()
+        self.other.user.delete()
 
-    def test_make_request(self):
-        create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
-        
+    def test_send_new_thread(self):
+        create_url = reverse('messaging:send_get_messages', kwargs={'profile_id': self.other.id})
+
+        message_body = 'Test Message'
         request_params = {
-            #'phone': '12345678910',
-            'preferred_mentee_email': 'test@ucla.edu',
-            'message': 'Hi this is test message',
+            'body': message_body,
+        }
+
+        self.assertEqual(len(Thread.objects.all()), 0)
+
+        resp = self.client.post(
+            create_url,
+            data=request_params,
+            )
+
+        new_thread = Thread.objects.get(profile_1=self.me, profile_2=self.other)
+
+        new_message = Message.objects.get(thread=new_thread)
+
+        self.assertEqual(new_message.body, message_body)
+        self.assertTrue(new_message.unread)
+        self.assertEqual(new_message.thread, new_thread)
+        self.assertEqual(new_message.sender, self.me)
+
+
+    def test_send_existing_thread(self):
+        self.thread = ThreadFactory(profile_1=self.me, profile_2=self.other)
+
+        create_url = reverse('messaging:send_get_messages', kwargs={'profile_id': self.other.id})
+
+        message_body = 'Test Message'
+        request_params = {
+            'body': message_body,
         }
 
         resp = self.client.post(
             create_url,
             data=request_params,
-        )
+            )
 
-        self.assertTrue(Request.objects.filter(mentor=self.mentor, mentee=self.mentee).exists())
+        new_message=Message.objects.get(id=resp.data['id'])
 
-        request = Request.objects.get(mentor=self.mentor, mentee=self.mentee)
+        self.assertEqual(new_message.thread, self.thread)
+        self.assertEqual(len(Thread.objects.all()), 1)
+        self.assertEqual(new_message.body, message_body)
+        self.assertTrue(new_message.unread)
+        self.assertEqual(new_message.sender, self.me)
 
-        self.assertEqual(request.mentor, self.mentor)
-        self.assertEqual(request.mentee, self.mentee)
-        #self.assertEqual(request.phone, request_params['phone'])
-        self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
 
-    def test_make_request_no_phone(self):
-        create_url = reverse('email_requests:send_email', kwargs={'mentor_id': self.mentor.id})
-        
+class GetThreadTest(APITestCase):
+
+    def setUp(self):
+        self.me = users_factories.ProfileFactory()
+        self.client.force_authenticate(user=self.me.user)
+        self.other = users_factories.ProfileFactory()
+        self.thread = ThreadFactory(profile_1=self.me, profile_2=self.other)
+        self.message1 = MessageFactory(thread=self.thread, sender=self.me)
+        self.message2 = MessageFactory(thread=self.thread, sender=self.other)
+
+        self.message1_json = MessageSerializer(message1).data
+        self.message2_json = MessageSerializer(message2).data
+
+
+    def tearDown(self):
+        self.thread.delete()
+        Message.objects.all().delete()
+        self.me.user.delete()
+        self.other.user.delete()
+
+
+    def get_thread(self):
+        create_url = reverse('messaging:send_get_messages', kwargs={'profile_id': self.other.id})
+
+        resp = self.client.get(
+            create_url,
+            )
+
+        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(len(resp.data['results']), 2)
+
+        #order is changed because response is ordered in reverse
+        resp_message1 = resp.data['results'][1]
+        resp_message2 = resp.data['results'][0]
+
+     
+        self.assertEqual(self.message1_json, resp_message2)
+        self.assertEqual(self.message2_json, resp_message2)
+
+
+class MarkReadTest(APITestCase):
+
+    def setUp(self):
+        self.message=MessageFactory()
+        self.me = users_factories.ProfileFactory()
+        self.client.force_authenticate(user=self.me.user)
+
+    def tearDown(self):
+        self.message.delete()
+        self.me.user.delete()
+
+    def test_read_message(self):
+        create_url = reverse('messaging:read_message', kwargs={'message_id': self.message.id})
+
+        self.assertTrue(self.message.unread)
+
         request_params = {
-            'preferred_mentee_email': 'test@ucla.edu',
-            'message': 'Hi this is test message',
+        'null': 'null',
         }
 
-        resp = self.client.post(
+        resp = self.client.patch(
             create_url,
             data=request_params,
         )
 
-        self.assertTrue(Request.objects.filter(mentor=self.mentor, mentee=self.mentee).exists())
+        self.message = Message.objects.get(id=self.message.id)
+        
+        self.assertFalse(self.message.unread)
 
-        request = Request.objects.get(mentor=self.mentor, mentee=self.mentee)
 
-        self.assertEqual(request.mentor, self.mentor)
-        self.assertEqual(request.mentee, self.mentee)
-        self.assertEqual(request.phone, '')
-        self.assertEqual(request.preferred_mentee_email, request_params['preferred_mentee_email'])
-
-class ListRequestsTest(APITestCase):
-    
-    get_url = reverse('email_requests:requests_list')
+class CheckHistoryTest(APITestCase):
 
     def setUp(self):
-        self.profile = users_factories.ProfileFactory()
-        self.mentor = users_factories.MentorFactory(profile=self.profile)
-        self.client.force_authenticate(user=self.profile.user)
-        
+        self.me = users_factories.ProfileFactory()
+        self.client.force_authenticate(user=self.me.user)
+        self.other = users_factories.ProfileFactory()
+        self.thread = ThreadFactory(profile_1=self.me, profile_2=self.other)
 
     def tearDown(self):
-        self.mentor.profile.user.delete()
-        Request.objects.all().delete()
+        self.me.user.delete()
+        self.other.user.delete()
+        self.thread.delete()
 
-    def test_mentor_only_requests(self):
-        
-        self.request1 = factories.RequestFactory(mentor=self.mentor)
-        self.request2 = factories.RequestFactory(mentor=self.mentor)
-
-        self.request1_json = RequestSerializer(self.request1).data
-        self.request2_json = RequestSerializer(self.request2).data
+    def test_thread_exists(self):
+        create_url = reverse('messaging:check_history', kwargs={'profile_id': self.other.id})
 
         resp = self.client.get(
-            self.get_url,
+            create_url,
         )
 
-        self.assertEqual(resp.data['count'], 2)
-        self.assertEqual(len(resp.data['results']), 2)
+        self.assertEqual(resp.data['exists'], 'True')
 
-        #order is changed because response is ordered in reverse
-        resp_request1 = resp.data['results'][1]
-        resp_request2 = resp.data['results'][0]
+    def test_thread_not_exists(self):
+        self.other2 = users_factories.ProfileFactory()
 
-     
-        self.assertEqual(self.request1_json, resp_request1)
-        self.assertEqual(self.request1_json, resp_request1)
-
-    def test_mentee_mentor_requests(self):
-        
-        self.request1 = factories.RequestFactory(mentor=self.mentor)
-        self.request2 = factories.RequestFactory(mentee=self.profile)
-        self.request3 = factories.RequestFactory(mentor=self.mentor)
-        self.request4 = factories.RequestFactory(mentee=self.profile)
-
-        self.request1_json = RequestSerializer(self.request1).data
-        self.request2_json = RequestSerializer(self.request2).data
-        self.request3_json = RequestSerializer(self.request3).data
-        self.request4_json = RequestSerializer(self.request4).data
+        create_url = reverse('messaging:check_history', kwargs={'profile_id': self.other2.id})
 
         resp = self.client.get(
-            self.get_url,
+            create_url,
         )
 
-        self.assertEqual(resp.data['count'], 4)
-        self.assertEqual(len(resp.data['results']), 4)
+        self.assertEqual(resp.data['exists'], 'False')
 
-        #order is changed because response is ordered in reverse
-        resp_request1 = resp.data['results'][3]
-        resp_request2 = resp.data['results'][2]
-        resp_request3 = resp.data['results'][1]
-        resp_request4 = resp.data['results'][0]
-
-     
-        self.assertEqual(self.request1_json, resp_request1)
-        self.assertEqual(self.request2_json, resp_request2)
-        self.assertEqual(self.request3_json, resp_request3)
-        self.assertEqual(self.request4_json, resp_request4)
-
-
-    def test_mentee_only_requests(self):
-        
-        self.request1 = factories.RequestFactory(mentee=self.profile)
-        self.request2 = factories.RequestFactory(mentee=self.profile)
-
-        self.request1_json = RequestSerializer(self.request1).data
-        self.request2_json = RequestSerializer(self.request2).data
-        
-
-        resp = self.client.get(
-            self.get_url,
-        )
-
-        self.assertEqual(resp.data['count'], 2)
-        self.assertEqual(len(resp.data['results']), 2)
-
-        #order is changed because response is ordered in reverse
-        resp_request1 = resp.data['results'][1]
-        resp_request2 = resp.data['results'][0]
-
-     
-        self.assertEqual(self.request1_json, resp_request1)
-        self.assertEqual(self.request2_json, resp_request2)
-
-
-    def test_list_requests_empty(self):
-        
-
-        resp = self.client.get(
-            self.get_url,
-        )
-
-        self.assertEqual(resp.data['count'], 0)
-        self.assertEqual(len(resp.data['results']), 0)
-
-       
-
-    
-
-
+        self.other2.user.delete()

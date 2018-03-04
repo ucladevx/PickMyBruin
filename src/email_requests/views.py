@@ -52,6 +52,7 @@ class EmailRequestView(generics.CreateAPIView):
             if not (200 <= response.status_code < 300):
                 raise ValidationError({'status_code': response.status_code})
 
+
         new_request = Request(
             mentee=mentee_profile,
             mentor=mentor,

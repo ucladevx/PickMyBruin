@@ -8,10 +8,11 @@ from users.serializers import ProfileSerializer
 
 
 class MessageSerializer(WritableNestedModelSerializer):
+	sender = ProfileSerializer()
 	class Meta:
 		model = Message
-		fields = ('id', 'body', 'timestamp', 'unread',)
-		read_only_fields = ('id', 'body', 'timestamp', 'unread',)
+		fields = ('id', 'sender', 'body', 'timestamp', 'unread',)
+		read_only_fields = ('id', 'sender', 'body', 'timestamp', 'unread',)
 
 
 class ThreadSerializer(WritableNestedModelSerializer):

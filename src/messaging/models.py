@@ -9,6 +9,7 @@ class Thread(models.Model):
 
 class Message(models.Model):
 	thread = models.ForeignKey(Thread, null=True, on_delete=models.SET_NULL)
+	sender = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL)
 	body = models.TextField(null=False, default = '')
 	timestamp = models.DateTimeField(auto_now_add=True)
 	unread = models.BooleanField(default=True)
