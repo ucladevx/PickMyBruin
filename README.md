@@ -328,7 +328,7 @@ Simplified tree diagram
   returns
   ```
       {
-          'exists': '<True/False>'
+          'exists': <True/False>
       }
   ```
 
