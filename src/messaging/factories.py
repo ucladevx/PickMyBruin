@@ -14,5 +14,5 @@ class MessageFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Message
     thread = factory.SubFactory(ThreadFactory)
-    sender = factory.SubFactory(ProfileFactory)
+    sender = factory.SelfAttribute('thread.profile_1')
     

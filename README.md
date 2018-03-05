@@ -268,6 +268,7 @@ Simplified tree diagram
 
 ### Get all threads for a user
   GET /messaging/me/
+  GET /messaging/
 
   returns
   ```

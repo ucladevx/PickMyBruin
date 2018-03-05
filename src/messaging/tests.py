@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from rest_framework.test import APIClient, APITestCase
 
+from django.db.models import Q
 from django.contrib.auth.models import User
 from users.models import Profile
 from .models import Message, Thread
@@ -47,7 +48,6 @@ class SendMessageTest(APITestCase):
 
         self.assertEqual(new_message.body, message_body)
         self.assertTrue(new_message.unread)
-        self.assertEqual(new_message.thread, new_thread)
         self.assertEqual(new_message.sender, self.me)
 
 
@@ -69,7 +69,7 @@ class SendMessageTest(APITestCase):
         new_message=Message.objects.get(id=resp.data['id'])
 
         self.assertEqual(new_message.thread, self.thread)
-        self.assertEqual(len(Thread.objects.all()), 1)
+        self.assertEqual(len(Thread.objects.filter(Q(profile_1=self.me) | Q(profile_2=self.me))), 1)
         self.assertEqual(new_message.body, message_body)
         self.assertTrue(new_message.unread)
         self.assertEqual(new_message.sender, self.me)
@@ -131,13 +131,8 @@ class MarkReadTest(APITestCase):
 
         self.assertTrue(self.message.unread)
 
-        request_params = {
-        'null': 'null',
-        }
-
         resp = self.client.patch(
             create_url,
-            data=request_params,
         )
 
         self.message = Message.objects.get(id=self.message.id)

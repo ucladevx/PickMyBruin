@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.db.models import Q, Max
+from django.http import Http404
 from rest_framework.response import Response
 from .models import Thread, Message
 from .serializers import MessageSerializer, ThreadSerializer
@@ -13,6 +14,11 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 
 # Create your views here.
+
+def getQuery(prof1, prof2):
+    query = Q(profile_1=prof1) & Q(profile_2=prof2)
+    query |= Q(profile_2=prof1) & Q(profile_1=prof2)
+    return query
 
 class ReadMessageView(generics.UpdateAPIView):
     """
@@ -42,14 +48,13 @@ class CheckHistoryView(APIView):
         other_id = int(self.kwargs['profile_id'])
         other_profile = get_object_or_404(Profile, id=other_id)
 
-        query = Q(profile_1=my_profile) & Q(profile_2=other_profile)
-        query |= Q(profile_2=my_profile) & Q(profile_1=other_profile)
+        query = getQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
 
-        if (thread is not None):
-            return Response({'exists': True})
-        else:
+        if thread is None:
             return Response({'exists': False})
+        
+        return Response({'exists': True})
 
 
 class SendGetMessagesView(generics.ListCreateAPIView):
@@ -65,12 +70,11 @@ class SendGetMessagesView(generics.ListCreateAPIView):
 
         #Find associated thread
         
-        query = Q(profile_1=my_profile) & Q(profile_2=other_profile)
-        query |= Q(profile_2=my_profile) & Q(profile_1=other_profile)
+        query = getQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
 
         if thread is None:
-            return 404
+            raise Http404("User does not exist")
 
         messages = Message.objects.filter(thread=thread).order_by('timestamp').reverse()
 
@@ -83,8 +87,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         message_body = request.data['body']
         
         #Find associated thread, or create new thread
-        query = Q(profile_1=my_profile) & Q(profile_2=other_profile)
-        query |= Q(profile_2=my_profile) & Q(profile_1=other_profile)
+        query = getQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
         
         if thread is None:
