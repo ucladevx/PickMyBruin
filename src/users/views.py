@@ -178,8 +178,11 @@ class MentorsSearchView(generics.ListAPIView):
 
 
     def filter_queryset(self, queryset):
+        queryset = queryset.exclude(profile__user=self.request.user) 
+
         major = 'all'
         year = 'all'
+        
         if 'major' in self.request.GET:
             major = self.request.GET['major']
         if 'year' in self.request.GET:
@@ -190,7 +193,19 @@ class MentorsSearchView(generics.ListAPIView):
             q &= Q(major__name=major)
         if year != 'all':
             q &= Q(profile__year=year)
-        return queryset.filter(q).exclude(profile__user=self.request.user)
+
+        queryset = queryset.filter(q)
+        
+        
+        if 'random' in self.request.GET:
+            num_random = self.request.GET['random']
+            if isinstance(num_random, int):
+                num_random = int(num_random)
+            else:
+                num_random = queryset.count()
+            queryset = queryset.order_by('?')[:num_random]
+
+        return queryset
 
 
 class MentorView(generics.RetrieveAPIView):
