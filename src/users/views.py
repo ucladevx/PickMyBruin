@@ -195,10 +195,14 @@ class MentorsSearchView(generics.ListAPIView):
             q &= Q(profile__year=year)
 
         queryset = queryset.filter(q)
-
-        num_random = 5 
+        
+        
         if 'random' in self.request.GET:
-            num_random = int(self.request.GET['random'])
+            num_random = self.request.GET['random']
+            if isinstance(num_random, int):
+                num_random = int(num_random)
+            else:
+                num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
 
         return queryset

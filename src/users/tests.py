@@ -301,6 +301,14 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
+    def test_random_with_no_args(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'random': '',
+            },
+        )
+        self.assertEqual(resp.data['count'], 2)
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
