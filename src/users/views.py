@@ -199,8 +199,9 @@ class MentorsSearchView(generics.ListAPIView):
         num_random = 5 
         if 'random' in self.request.GET:
             num_random = int(self.request.GET['random'])
+            queryset = queryset.order_by('?')[:num_random]
 
-        return queryset.order_by('?')[:num_random]
+        return queryset
 
 
 class MentorView(generics.RetrieveAPIView):
