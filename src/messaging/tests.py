@@ -69,7 +69,7 @@ class SendMessageTest(APITestCase):
         new_message=Message.objects.get(id=resp.data['id'])
 
         self.assertEqual(new_message.thread, self.thread)
-        self.assertEqual(len(Thread.objects.filter(Thread.getProfileQuery(self.me, self.other))), 1)
+        self.assertEqual(len(Thread.objects.filter(Thread.getProfileQuery(self.me))), 1)
         self.assertEqual(new_message.body, message_body)
         self.assertTrue(new_message.unread)
         self.assertEqual(new_message.sender, self.me)
@@ -115,9 +115,7 @@ class GetThreadTest(APITestCase):
         self.assertEqual(self.message2_json, resp_message2)
 
     def get_thread_user_DNE(self):
-        bad_id = random.randInt(3,100)
-        while bad_id == self.me.id | bad_id == self.other.id:
-            bad_id = random.randInt(3,100)
+        bad_id = self.me.id + self.other.id
 
         create_url = reverse('messaging:send_get_messages', kwargs={'profile_id': bad_id})
 

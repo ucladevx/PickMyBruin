@@ -113,7 +113,7 @@ class ListOwnThreadsView(generics.ListAPIView):
         my_profile = get_object_or_404(Profile, user=self.request.user)
 
         #Find all threads that current user is involved in
-        query = Q(profile_1=my_profile) | Q(profile_2=my_profile)
+        query = Thread.getProfileQuery(my_profile)
         
         ret = Thread.objects.filter(
             query,
