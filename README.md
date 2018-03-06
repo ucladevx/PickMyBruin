@@ -1,4 +1,4 @@
-# Pick My Bruin
+# BQuest
 
 ## Setup
 1. Install `docker` and `docker-compose`. 
@@ -273,6 +273,73 @@ Simplified tree diagram
             }
             ...
           ]
+      }
+  ```
+
+### Get all threads for a user
+  GET /messaging/me/
+  GET /messaging/
+
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_THREADS>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_THREADS> [
+          {
+            'profile_1': <PROFILE_1_DATA>
+            'profile_2': <PROFILE_2_DATA>
+            'recent_message': <MOST_RECENT_MESSAGE_DATA>
+            }]
+      }
+  ```
+
+### Send a message
+  POST /messaging/<PROFILE_ID>/  
+  ```
+      {
+          "body": "<MESSAGE_BODY>"
+      }
+  ```
+  returns a Message object
+
+### Get all messages between user and someone else
+  GET /messaging/<PROFILE_ID>/
+
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_MESSAGES>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_MESSAGES> [
+          {
+            'id':'<MESSAGE_ID>'
+            'sender':<PROFILE_OF_SENDER>
+            'body':'<MESSAGE_BODY>'
+            'timestamp':'TIME_SENT'
+            'unread': <BOOLEAN>
+            }]
+      }
+  ```
+
+### Mark a message as read
+  PATCH /messaging/read/<MESSAGE_ID>/  
+  ```
+      {
+          <DOESN'T MATTER>
+      }
+  ```
+  returns the specified Message object
+
+### Check if a thread exists between two users
+  GET /messaging/check/<PROFILE_ID>
+
+  returns
+  ```
+      {
+          'exists': <True/False>
       }
   ```
 
