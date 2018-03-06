@@ -42,7 +42,7 @@ class SendMessageTest(APITestCase):
             data=request_params,
             )
 
-        new_thread = Thread.objects.get(profile_1=self.me, profile_2=self.other)
+        new_thread = Thread.objects.get(Thread.getProfileQuery(self.me, self.other))
 
         new_message = Message.objects.get(thread=new_thread)
 
