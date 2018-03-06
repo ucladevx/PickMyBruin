@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 from users.models import Profile
 # Create your models here.
@@ -6,6 +7,11 @@ from users.models import Profile
 class Thread(models.Model):
 	profile_1 = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL, related_name='profile_1')
 	profile_2 = models.ForeignKey(Profile, null=True, on_delete=models.SET_NULL, related_name='profile_2')
+
+	def getProfileQuery(prof1, prof2):
+		query = Q(profile_1=prof1) & Q(profile_2=prof2)
+		query |= Q(profile_2=prof1) & Q(profile_1=prof2)
+		return query
 
 class Message(models.Model):
 	thread = models.ForeignKey(Thread, null=True, on_delete=models.CASCADE)

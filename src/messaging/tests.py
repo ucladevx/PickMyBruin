@@ -12,7 +12,7 @@ from .models import Message, Thread
 from users import factories as users_factories
 from .factories import MessageFactory, ThreadFactory
 from .serializers import MessageSerializer, ThreadSerializer
-
+import random
 
 class SendMessageTest(APITestCase):
 
@@ -69,7 +69,7 @@ class SendMessageTest(APITestCase):
         new_message=Message.objects.get(id=resp.data['id'])
 
         self.assertEqual(new_message.thread, self.thread)
-        self.assertEqual(len(Thread.objects.filter(Q(profile_1=self.me) | Q(profile_2=self.me))), 1)
+        self.assertEqual(len(Thread.objects.filter(Thread.getProfileQuery(self.me, self.other))), 1)
         self.assertEqual(new_message.body, message_body)
         self.assertTrue(new_message.unread)
         self.assertEqual(new_message.sender, self.me)
@@ -113,6 +113,19 @@ class GetThreadTest(APITestCase):
      
         self.assertEqual(self.message1_json, resp_message2)
         self.assertEqual(self.message2_json, resp_message2)
+
+    def get_thread_user_DNE(self):
+        bad_id = random.randInt(3,100)
+        while bad_id == self.me.id | bad_id == self.other.id:
+            bad_id = random.randInt(3,100)
+
+        create_url = reverse('messaging:send_get_messages', kwargs={'profile_id': bad_id})
+
+        resp = self.client.get(
+            create_url,
+            )
+
+        self.assertEqual(resp.status_code, 404)
 
 
 class MarkReadTest(APITestCase):

@@ -15,11 +15,6 @@ from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 
 # Create your views here.
 
-def getQuery(prof1, prof2):
-    query = Q(profile_1=prof1) & Q(profile_2=prof2)
-    query |= Q(profile_2=prof1) & Q(profile_1=prof2)
-    return query
-
 class ReadMessageView(generics.UpdateAPIView):
     """
     View for marking a specified message as read
@@ -48,7 +43,7 @@ class CheckHistoryView(APIView):
         other_id = int(self.kwargs['profile_id'])
         other_profile = get_object_or_404(Profile, id=other_id)
 
-        query = getQuery(my_profile, other_profile)
+        query = Thread.getProfileQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
 
         if thread is None:
@@ -70,7 +65,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
 
         #Find associated thread
         
-        query = getQuery(my_profile, other_profile)
+        query = Thread.getProfileQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
 
         if thread is None:
@@ -87,7 +82,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         message_body = request.data['body']
         
         #Find associated thread, or create new thread
-        query = getQuery(my_profile, other_profile)
+        query = Thread.getProfileQuery(my_profile, other_profile)
         thread = Thread.objects.filter(query).first()
         
         if thread is None:
