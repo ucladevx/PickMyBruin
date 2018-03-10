@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'', include('users.urls', namespace='users')),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
+    url(r'^data/', include('data_collection.urls', namespace='data_collection')),
 ]
