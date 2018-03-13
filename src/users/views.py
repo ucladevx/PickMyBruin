@@ -58,6 +58,7 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+
 class CourseViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows courses to be viewed or edited.
@@ -72,6 +73,7 @@ class MentorViewSet(viewsets.ModelViewSet):
     """
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
+
 
 class CreateUser(generics.CreateAPIView):
     """
@@ -123,7 +125,7 @@ class CreateUser(generics.CreateAPIView):
 
 
 class ResendVerifyUser(APIView):
-    def get (self, request):
+    def post (self, request):
         email = self.request.user.email
         verification_code = self.request.user.profile.verification_code
 
@@ -157,6 +159,50 @@ class VerifyUser(APIView):
         profile.verified = True
         profile.save()
         return Response({'profile_id': profile_id})
+
+class SendPasswordReset(APIView):
+    permission_classes = tuple()
+    def post (self, request):
+        email = request.data['username']
+        user = User.objects.get(username=email)
+
+        profile_id = user.profile.id
+        profile = Profile.objects.get(id=profile_id)
+
+        profile.password_reset_code = Profile.generate_password_reset_code()
+        profile.save()
+        url = 'https://bquest.ucladevx.com/password_link?code='
+        if settings.DEBUG:
+            url = 'http://localhost:8000/password_link?code='
+        link = url + profile.password_reset_code
+
+        from_email =  Email('noreply@bquest.ucladevx.com')
+        to_email = Email(email)
+        subject = 'BQuest User Password Reset'
+        content = Content("text/html", 
+            "Click the the link below to reset your password. \n"+
+            link)
+        mail = Mail(from_email, subject, to_email, content)
+
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'status_code': response.status_code})
+        return Response(ProfileSerializer(profile).data)
+
+class PasswordReset(APIView):
+    permission_classes = tuple()
+    def post(self, request):
+        code = request.GET['code']
+        profile = Profile.objects.get(password_reset_code=code)
+        user = User.objects.get(profile=profile)
+        user.set_password(request.data['password'])
+        profile.password_reset_code = None
+
+        user.save()
+        profile.save()
+        return Response(UserSerializer(user).data)
+        
 
 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):

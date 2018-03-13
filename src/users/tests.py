@@ -275,7 +275,6 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
-
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):

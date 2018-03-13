@@ -19,6 +19,8 @@ class Profile(models.Model):
     )
 
     VERIFICATION_CHAR_NUM = 10
+    PASSWORD_RESET_CHAR_NUM = 20
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
@@ -28,10 +30,15 @@ class Profile(models.Model):
     phone_regex = RegexValidator(regex=r'^\([0-9]{3}\)[0-9]{3}[-][0-9]{4}$', message='Phone number must be entered in the format: (012)345-6789')
     phone_number = models.CharField(validators=[phone_regex], max_length=13, blank=True) 
 
-
+    password_reset_code = models.CharField(max_length=PASSWORD_RESET_CHAR_NUM, null=True, default=None, blank=True)
     @staticmethod
     def generate_verification_code():
         return ''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM))
+
+    @staticmethod
+    def generate_password_reset_code():
+        return ''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.PASSWORD_RESET_CHAR_NUM))
+
 
     def __str__(self):
         return str(self.user)
