@@ -25,7 +25,7 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-from pickmybruin.settings import USER_VERIFICATION_TEMPLATE
+from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -171,18 +171,18 @@ class SendPasswordReset(APIView):
 
         profile.password_reset_code = Profile.generate_password_reset_code()
         profile.save()
-        url = 'https://bquest.ucladevx.com/password_link?code='
+        url = 'https://bquest.ucladevx.com/password?code='
         if settings.DEBUG:
-            url = 'http://localhost:8000/password_link?code='
-        link = url + profile.password_reset_code
-
+            url = 'http://localhost:8000/password?code='
+        
         from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(email)
         subject = 'BQuest User Password Reset'
-        content = Content("text/html", 
-            "Click the the link below to reset your password. \n"+
-            link)
+        reset_link = url + profile.password_reset_code
+        content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
+        mail.personalizations[0].add_substitution(Substitution('password_reset_link', reset_link))
+        mail.template_id = PASSWORD_RESET_TEMPLATE
 
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
@@ -193,7 +193,7 @@ class SendPasswordReset(APIView):
 class PasswordReset(APIView):
     permission_classes = tuple()
     def post(self, request):
-        code = request.GET['code']
+        code = request.data['code']
         profile = Profile.objects.get(password_reset_code=code)
         user = User.objects.get(profile=profile)
         user.set_password(request.data['password'])
