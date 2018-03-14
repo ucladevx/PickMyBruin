@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     # Pick My Bruin Apps
     'users',
     'email_requests',
+    'messaging',
 )
 
 AUTHENTICATION_BACKENDS = (
