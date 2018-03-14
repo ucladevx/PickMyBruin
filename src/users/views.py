@@ -16,6 +16,7 @@ from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
+from django.http import HttpResponse
 
 from .models import Profile, Major, Mentor, Course
 from .serializers import (
@@ -143,7 +144,7 @@ class ResendVerifyUser(APIView):
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
         if not (200 <= response.status_code < 300):
-            raise ValidationError({'status_code': response.status_code})
+            raise ValidationError({'sendgrid_status_code': response.status_code})
         return Response(ProfileSerializer(self.request.user.profile).data)
 
 class VerifyUser(APIView):
@@ -187,8 +188,8 @@ class SendPasswordReset(APIView):
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
         if not (200 <= response.status_code < 300):
-            raise ValidationError({'status_code': response.status_code})
-        return Response(ProfileSerializer(profile).data)
+            raise ValidationError({'sendgrid_status_code': response.status_code})
+        return HttpResponse(status=200)
 
 class PasswordReset(APIView):
     permission_classes = tuple()
@@ -201,7 +202,7 @@ class PasswordReset(APIView):
 
         user.save()
         profile.save()
-        return Response(UserSerializer(user).data)
+        return HttpResponse(status=200)
         
 
 
