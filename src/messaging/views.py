@@ -12,6 +12,14 @@ from pickmybruin.settings import REQUEST_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+import requests
+
+def websockets_notify_user(user):
+    # handles both objects and raw id's
+    if hasattr(user, 'id'):
+        user = user.id
+
+    return requests.post('http://websockets/broadcast/%d' % user)
 
 # Create your views here.
 
@@ -28,6 +36,10 @@ class ReadMessageView(generics.UpdateAPIView):
         message.unread = False
 
         message.save()
+
+        my_profile = get_object_or_404(Profile, user=self.request.user)
+        other_user = message.thread.get_other_user(my_profile)
+        websockets_notify_user(other_user)
 
         return Response(MessageSerializer(message).data)
 
@@ -103,6 +115,9 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         )
 
         new_message.save()
+
+        other_user = message.thread.get_other_user(my_profile)
+        websockets_notify_user(other_user)
 
         return Response(MessageSerializer(new_message).data)
 
