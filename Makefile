@@ -26,11 +26,11 @@ test:
 	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "cd /code/src && ./manage.py test --no-input --parallel $(args)" 
 
 clean_db:
-	echo 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' | docker exec -i `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` psql -U postgres 
+	docker-compose exec db psql -U postgres -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
 
 init_db: clean_db 
-	cat init_db.sql | docker exec -i `docker ps -q --filter status=running --filter ancestor=postgres:10.1-alpine` psql -U postgres 
-	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "cd /code/src && ./manage.py migrate"
+	cat init_db.sql | docker exec -i `docker-compose ps -q db` psql -U postgres 
+	docker-compose exec web /bin/bash -c "cd /code/src && ./manage.py migrate"
 
 restore-db:
 
