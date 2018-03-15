@@ -19,7 +19,11 @@ def websockets_notify_user(user):
     if hasattr(user, 'id'):
         user = user.id
 
-    return requests.post('http://websockets/broadcast/%d' % user)
+    url = 'http://websockets/broadcast/%d' % user
+    json_body = {
+        'TYPE': 'MESSAGE_UPDATE',
+    }
+    return requests.post(url, json=json_body)
 
 # Create your views here.
 
@@ -116,7 +120,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
 
         new_message.save()
 
-        other_user = message.thread.get_other_user(my_profile)
+        other_user = new_message.thread.get_other_user(my_profile)
         websockets_notify_user(other_user)
 
         return Response(MessageSerializer(new_message).data)
