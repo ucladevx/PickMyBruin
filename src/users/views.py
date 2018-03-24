@@ -172,14 +172,14 @@ class SendPasswordReset(APIView):
 
         profile.password_reset_code = Profile.generate_password_reset_code()
         profile.save()
-        url = 'https://bquest.ucladevx.com/password?code='
+        url = 'https://bquest.ucladevx.com/password'
         if settings.DEBUG:
-            url = 'http://localhost:8000/password?code='
+            url = 'http://localhost:8000/password'
         
         from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(email)
         subject = 'BQuest User Password Reset'
-        reset_link = url + profile.password_reset_code
+        reset_link = "{}?code={}&username={}".format(url, profile.password_reset_code, email)
         content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('password_reset_link', reset_link))
@@ -195,11 +195,13 @@ class PasswordReset(APIView):
     permission_classes = tuple()
     def post(self, request):
         code = request.data['code']
+        username = request.data['username']
         profile = Profile.objects.get(password_reset_code=code)
         user = User.objects.get(profile=profile)
+        if username != user.username:
+            return HttpResponse(status=400)
         user.set_password(request.data['password'])
         profile.password_reset_code = None
-
         user.save()
         profile.save()
         return HttpResponse(status=200)

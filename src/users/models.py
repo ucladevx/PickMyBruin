@@ -30,7 +30,7 @@ class Profile(models.Model):
     phone_regex = RegexValidator(regex=r'^\([0-9]{3}\)[0-9]{3}[-][0-9]{4}$', message='Phone number must be entered in the format: (012)345-6789')
     phone_number = models.CharField(validators=[phone_regex], max_length=13, blank=True) 
 
-    password_reset_code = models.CharField(max_length=PASSWORD_RESET_CHAR_NUM, unique=True, null=True, default=None, blank=True)
+    password_reset_code = models.CharField(max_length=PASSWORD_RESET_CHAR_NUM, null=True, default=None, blank=True)
     @staticmethod
     def generate_verification_code():
         return ''.join(random.choices(string.ascii_uppercase+string.digits, k=Profile.VERIFICATION_CHAR_NUM))

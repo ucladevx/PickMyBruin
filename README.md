@@ -144,27 +144,24 @@ Simplified tree diagram
   ```
   returns 
   ```
-      #same as /users/me
+      HTTPResponse 200
   ```
   sends a verification email with a link:
-    "https://bquest.ucladevx.com/password?code=<PASSWORD_RESET_CODE>" or 
-    "http://localhost:8000/users/password?code=<PASSWORD_RESET_CODE> in development
+    "https://bquest.ucladevx.com/password?code=<PASSWORD_RESET_CODE>&username=<USERNAME>" or 
+    "http://localhost:8000/users/password?code=<PASSWORD_RESET_CODE>&username=<USERNAME>" in development
   
   POST /password (reset password)
   ```
       {
+          "usename" : <USERNAME>
           "code" : <PASSWORD_RESET_CODE>
           "password" : <NEW_PASSWORD>
       }
   ```
   returns 
   ```
-      {
-          "id" : <USER_ID>,
-          "first_name" : "<FIRST_NAME>",
-          "last_name" : "<LAST_NAME>",
-          "email" : "<EMAIL>"
-      }
+      HTTPResponse 200
+    
   ```
 ### Get own user
   GET /users/me/  

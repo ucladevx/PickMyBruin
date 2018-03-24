@@ -142,6 +142,7 @@ class ResetPasswordTest(APITestCase):
         user_params = {
             'code' : self.profile.password_reset_code,
             'password' : 'new_'+old_password,
+            'username' : self.profile.user.username,
         }
 
         resp = self.client.post(
@@ -158,6 +159,7 @@ class ResetPasswordTest(APITestCase):
         user_params = {
             'code' : self.profile.password_reset_code,
             'password' : 'new_'+old_password,
+            'username' : self.profile.user.username,
         }
 
         resp = self.client.post(
