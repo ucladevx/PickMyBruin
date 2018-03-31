@@ -153,7 +153,7 @@ Simplified tree diagram
   POST /password (reset password)
   ```
       {
-          "usename" : <USERNAME>
+          "userid" : <USERID>
           "code" : <PASSWORD_RESET_CODE>
           "password" : <NEW_PASSWORD>
       }
