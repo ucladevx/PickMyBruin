@@ -197,8 +197,6 @@ class PasswordReset(APIView):
         userid = request.data['userid']
         profile = Profile.objects.get(password_reset_code=code)
         user = User.objects.get(profile=profile)
-        print (userid)
-        print (user.id)
         if userid != str(user.id):
             return HttpResponse(status=400)
         user.set_password(request.data['password'])
