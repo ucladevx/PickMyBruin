@@ -131,11 +131,38 @@ Simplified tree diagram
           "refresh_token": "<REFRESH_TOKEN>"
       }
   ```
-
 ### Authorization
   Authorization done over headers  
   Authorization: "Bearer <ACCESS_TOKEN>"
 
+### Password
+  POST /password_link (get password reset link)
+  ```
+      {
+          "username" : <USERNAME>
+      }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+  ```
+  sends a verification email with a link:
+    "https://bquest.ucladevx.com/password?code=<PASSWORD_RESET_CODE>&username=<USERNAME>" or 
+    "http://localhost:8000/users/password?code=<PASSWORD_RESET_CODE>&username=<USERNAME>" in development
+  
+  POST /password (reset password)
+  ```
+      {
+          "userid" : <USERID>
+          "code" : <PASSWORD_RESET_CODE>
+          "password" : <NEW_PASSWORD>
+      }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+    
+  ```
 ### Get own user
   GET /users/me/  
   returns

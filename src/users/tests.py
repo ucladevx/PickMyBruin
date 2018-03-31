@@ -125,6 +125,50 @@ class VerifyUserTest(APITestCase):
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.verified, True)
 
+class ResetPasswordTest(APITestCase):
+    reset_url = reverse('users:password_reset')
+
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.profile.password_reset_code = Profile.generate_password_reset_code()
+        self.profile.save()
+
+    def tearDown(self):
+        User.objects.all().delete()
+        Profile.objects.all().delete()
+
+    def test_reset_changes_password(self):
+        old_password = self.profile.user.password
+        user_params = {
+            'code' : self.profile.password_reset_code,
+            'password' : 'new_'+old_password,
+            'userid' : self.profile.user.id,
+        }
+
+        resp = self.client.post(
+            self.reset_url,
+            data=user_params,
+        )
+
+        self.assertEqual(self.profile.user.password, old_password)
+        self.profile.user.refresh_from_db()
+        self.assertNotEqual(self.profile.user.password, old_password)
+
+    def test_reset_code_only_works_once(self):
+        old_password = self.profile.user.password
+        user_params = {
+            'code' : self.profile.password_reset_code,
+            'password' : 'new_'+old_password,
+            'userid' : self.profile.user.id,
+        }
+
+        resp = self.client.post(
+            self.reset_url,
+            data=user_params,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.password_reset_code, None)
+
 class OwnProfileViewTest(APITestCase):
     own_profile_url = reverse('users:me')
     def setUp(self):

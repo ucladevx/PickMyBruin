@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'^users/?$', views.CreateUser.as_view(), name='create'),
     url(r'^verify/?$', views.VerifyUser.as_view(), name='verify'),
     url(r'^verify_link/?$', views.ResendVerifyUser.as_view(), name='verify_link'),
+    url(r'^password/?$', views.PasswordReset.as_view(), name='password_reset'),
+    url(r'^password_link/?$', views.SendPasswordReset.as_view(), name='password_reset_link'),
 ]
