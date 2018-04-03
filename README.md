@@ -317,8 +317,7 @@ Simplified tree diagram
           "prev": null
           "results": <LIST_OF_THREADS> [
           {
-            'profile_1': <PROFILE_1_DATA>
-            'profile_2': <PROFILE_2_DATA>
+            'other_profile': <DATA_OF_OTHER_PROFILE>
             'recent_message': <MOST_RECENT_MESSAGE_DATA>
             }]
       }

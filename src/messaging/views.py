@@ -4,11 +4,11 @@ from django.db.models import Q, Max
 from django.http import Http404
 from rest_framework.response import Response
 from .models import Thread, Message
-from .serializers import MessageSerializer, ThreadSerializer
+from .serializers import MessageSerializer, OwnThreadSerializer
 from users.models import Profile, User
 from rest_framework import generics
 from rest_framework.views import APIView
-from pickmybruin.settings import REQUEST_TEMPLATE
+from pickmybruin.settings import MESSAGING_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
@@ -93,8 +93,26 @@ class SendGetMessagesView(generics.ListCreateAPIView):
 
             new_thread.save()
             thread=new_thread
+
+            #Send email to recipient of message
+            sender_name = my_profile.user.first_name + ' ' + my_profile.user.last_name
+            message_url = 'bquest.ucladevx.com/messages/' + str(other_profile.id) + '/'
+            recipient_email = other_profile.user.email
         
-        #TODO Send Email
+            from_email =  Email('noreply@bquest.ucladevx.com')
+            to_email = Email(recipient_email)
+            subject = 'New Message from BQuest'
+            content = Content('text/html', 'N/A')
+            mail = Mail(from_email, subject, to_email, content)
+            mail.personalizations[0].add_substitution(Substitution('mentee_name', sender_name))
+            mail.personalizations[0].add_substitution(Substitution('user_message', message_body))
+            mail.personalizations[0].add_substitution(Substitution('user_message_address', message_url))
+            mail.template_id = MESSAGING_TEMPLATE
+            sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+            response = sg.client.mail.send.post(request_body=mail.get())
+            if not (200 <= response.status_code < 300):
+                raise ValidationError({'status_code': response.status_code})
+
         new_message = Message(
             thread=thread,
             sender=my_profile,
@@ -107,7 +125,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         return Response(MessageSerializer(new_message).data)
 
 class ListOwnThreadsView(generics.ListAPIView):
-    serializer_class = ThreadSerializer
+    serializer_class = OwnThreadSerializer
 
     def get_queryset(self):
         my_profile = get_object_or_404(Profile, user=self.request.user)
@@ -124,4 +142,7 @@ class ListOwnThreadsView(generics.ListAPIView):
         )
 
         return ret
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
