@@ -16,6 +16,20 @@ class MessageSerializer(WritableNestedModelSerializer):
 
 
 class ThreadSerializer(WritableNestedModelSerializer):
+	profile_1 = ProfileSerializer()
+	profile_2 = ProfileSerializer()
+	recent_message = serializers.SerializerMethodField()
+	
+	def get_recent_message(self, obj):
+		return MessageSerializer(Message.objects.filter(thread__id=obj.id).order_by('timestamp').last()).data
+
+	class Meta:
+		model = Thread
+		fields = ('id', 'profile_1', 'profile_2', 'recent_message', )
+		read_only_fields = ('id', 'profile_1', 'profile_2', 'recent_message', )
+
+
+class ThreadListSerializer(WritableNestedModelSerializer):
 	recent_message = serializers.SerializerMethodField()
 	other_profile = serializers.SerializerMethodField()
 	

@@ -11,7 +11,7 @@ from users.models import Profile
 from .models import Message, Thread
 from users import factories as users_factories
 from .factories import MessageFactory, ThreadFactory
-from .serializers import MessageSerializer, ThreadSerializer, ProfileSerializer
+from .serializers import MessageSerializer, ProfileSerializer
 import random
 
 class SendMessageTest(APITestCase):
