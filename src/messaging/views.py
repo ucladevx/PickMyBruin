@@ -4,7 +4,7 @@ from django.db.models import Q, Max
 from django.http import Http404
 from rest_framework.response import Response
 from .models import Thread, Message
-from .serializers import MessageSerializer, ThreadListSerializer
+from .serializers import MessageSerializer, OwnThreadSerializer
 from users.models import Profile, User
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -125,7 +125,7 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         return Response(MessageSerializer(new_message).data)
 
 class ListOwnThreadsView(generics.ListAPIView):
-    serializer_class = ThreadListSerializer
+    serializer_class = OwnThreadSerializer
 
     def get_queryset(self):
         my_profile = get_object_or_404(Profile, user=self.request.user)

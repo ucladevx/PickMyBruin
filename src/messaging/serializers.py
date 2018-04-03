@@ -29,7 +29,8 @@ class ThreadSerializer(WritableNestedModelSerializer):
 		read_only_fields = ('id', 'profile_1', 'profile_2', 'recent_message', )
 
 
-class ThreadListSerializer(WritableNestedModelSerializer):
+#Context of request must be defined by get_serializer_context() in calling method
+class OwnThreadSerializer(WritableNestedModelSerializer):
 	recent_message = serializers.SerializerMethodField()
 	other_profile = serializers.SerializerMethodField()
 	
