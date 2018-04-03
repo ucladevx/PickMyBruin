@@ -11,7 +11,7 @@ from users.models import Profile
 from .models import Message, Thread
 from users import factories as users_factories
 from .factories import MessageFactory, ThreadFactory
-from .serializers import MessageSerializer, ThreadSerializer
+from .serializers import MessageSerializer, ThreadSerializer, ProfileSerializer
 import random
 
 class SendMessageTest(APITestCase):
@@ -219,10 +219,6 @@ class GetThreadsTest(APITestCase):
         self.message2_t1 = MessageFactory(thread=self.thread1, sender=self.other1)
         self.message1_t2 = MessageFactory(thread=self.thread2, sender=self.other2)
 
-
-        self.t1_json = ThreadSerializer(self.thread1).data
-        self.t2_json = ThreadSerializer(self.thread2).data
-
         self.t1_message_json = MessageSerializer(self.message2_t1).data
         self.t2_message_json = MessageSerializer(self.message1_t2).data
 
@@ -238,8 +234,8 @@ class GetThreadsTest(APITestCase):
         resp_thread_1 = resp.data['results'][1]
         resp_thread_2 = resp.data['results'][0]
 
-        self.assertEqual(self.t1_json, resp_thread_1)
-        self.assertEqual(self.t2_json, resp_thread_2)
+        self.assertEqual(resp_thread_1['other_profile'], ProfileSerializer(self.other1).data)
+        self.assertEqual(resp_thread_2['other_profile'], ProfileSerializer(self.other2).data)
 
         self.assertEqual(self.t1_message_json, resp_thread_1['recent_message'])
         self.assertEqual(self.t2_message_json, resp_thread_2['recent_message'])
