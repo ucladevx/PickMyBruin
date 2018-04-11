@@ -12,6 +12,26 @@ from pickmybruin.settings import MESSAGING_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
+import requests
+
+def websockets_notify_user(user):
+    # handles both objects and raw id's
+    if hasattr(user, 'id'):
+        user = user.id
+
+    url = 'http://websockets/broadcast/%d' % user
+    json_body = {
+        'TYPE': 'MESSAGE_UPDATE',
+    }
+    try:
+        resp = requests.post(url, json=json_body)
+    except requests.exceptions.ConnectionError as e:
+        import pprint
+        pprint(e)
+        return None
+    return resp
+        
+
 
 # Create your views here.
 
@@ -28,6 +48,10 @@ class ReadMessageView(generics.UpdateAPIView):
         message.unread = False
 
         message.save()
+
+        my_profile = get_object_or_404(Profile, user=self.request.user)
+        other_user = message.thread.get_other_user(my_profile)
+        websockets_notify_user(other_user)
 
         return Response(MessageSerializer(message).data)
 
@@ -121,6 +145,9 @@ class SendGetMessagesView(generics.ListCreateAPIView):
         )
 
         new_message.save()
+
+        other_user = new_message.thread.get_other_user(my_profile)
+        websockets_notify_user(other_user)
 
         return Response(MessageSerializer(new_message).data)
 
