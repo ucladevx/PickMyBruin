@@ -129,8 +129,8 @@ class GetThreadTest(APITestCase):
 class MarkReadTest(APITestCase):
 
     def setUp(self):
-        self.message=MessageFactory()
-        self.me = users_factories.ProfileFactory()
+        self.message = MessageFactory()
+        self.me = self.message.sender 
         self.client.force_authenticate(user=self.me.user)
 
     def tearDown(self):

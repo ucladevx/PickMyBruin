@@ -27,7 +27,7 @@ def websockets_notify_user(user):
         resp = requests.post(url, json=json_body)
     except requests.exceptions.ConnectionError as e:
         import pprint
-        pprint(e)
+        pprint.pprint(e)
         return None
     return resp
         
