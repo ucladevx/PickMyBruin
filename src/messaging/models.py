@@ -18,7 +18,9 @@ class Thread(models.Model):
     def get_other_user(self, user):
         if self.profile_1 == user or self.profile_1.id == user:
             return self.profile_2
-        return self.profile_1
+        if self.profile_2 == user or self.profile_2.id == user:
+            return self.profile_1
+        return None
 
 
 class Message(models.Model):
@@ -27,4 +29,3 @@ class Message(models.Model):
     body = models.TextField(null=False, default = '')
     timestamp = models.DateTimeField(auto_now_add=True)
     unread = models.BooleanField(default=True)
-

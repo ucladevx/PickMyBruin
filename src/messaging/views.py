@@ -23,7 +23,15 @@ def websockets_notify_user(user):
     json_body = {
         'TYPE': 'MESSAGE_UPDATE',
     }
-    return requests.post(url, json=json_body)
+    try:
+        resp = requests.post(url, json=json_body)
+    except requests.exceptions.ConnectionError as e:
+        import pprint
+        pprint(e)
+        return None
+    return resp
+        
+
 
 # Create your views here.
 
