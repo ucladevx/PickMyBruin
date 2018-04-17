@@ -59,6 +59,12 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+class MinorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows majors to be viewed or edited.
+    """
+    queryset = Major.objects.all()
+    serializer_class = MajorSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     """

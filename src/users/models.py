@@ -16,6 +16,7 @@ class Profile(models.Model):
         ('2nd', '2nd'),
         ('3rd', '3rd'),
         ('4th', '4th'),
+        ##('4th', '4th'), update with celery?
     )
 
     VERIFICATION_CHAR_NUM = 10
@@ -48,6 +49,12 @@ class Major(models.Model):
     def __str__(self):
         return self.name
 
+class Minor(models.Model):
+    name = models.CharField(max_length=100, null=False)
+
+    def __str__(self):
+        return self.name
+
 class Course(models.Model):
     name = models.CharField(max_length=100, null=False)
 
@@ -60,6 +67,8 @@ class Course(models.Model):
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
+    #second_major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
+    minor = models.ForeignKey(Minor, null=True, on_delete=models.SET_NULL)
     bio = models.CharField(max_length=5000, null=False, blank=True, default='')
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
