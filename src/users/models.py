@@ -52,6 +52,8 @@ class Minor(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        ordering = ('name',)
 
 class Course(models.Model):
     name = models.CharField(max_length=100, null=False)
@@ -65,6 +67,7 @@ class Course(models.Model):
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
+    #major = models.ManyToManyField(Major, blank=True)
     minor = models.ManyToManyField(Minor, blank=True)
     bio = models.CharField(max_length=5000, null=False, blank=True, default='')
     active = models.BooleanField(default=True)

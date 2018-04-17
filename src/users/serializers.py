@@ -65,6 +65,7 @@ class CourseSerializer(serializers.ModelSerializer):
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
     major = MajorSerializer()
+    minor = MinorSerializer(many=True)
     courses = CourseSerializer(many=True)
     class Meta:
         model = Mentor

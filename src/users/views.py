@@ -236,20 +236,24 @@ class MentorsSearchView(generics.ListAPIView):
 
         major = 'all'
         year = 'all'
+        minor = 'all'
         
         if 'major' in self.request.GET:
             major = self.request.GET['major']
         if 'year' in self.request.GET:
             year = self.request.GET['year']
+        if 'minor' in self.request.GET:
+            minor = self.request.GET['minor']
 
         q = Q()
         if major != 'all':
             q &= Q(major__name=major)
         if year != 'all':
             q &= Q(profile__year=year)
+        if minor != 'all':
+              q &= Q(minor__name=minor)
 
         queryset = queryset.filter(q)
-        
         
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
