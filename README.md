@@ -2,7 +2,7 @@
 
 ## Setup
 1. Install `docker` and `docker-compose`. 
-2. run `git submodule init && git submodule update` (for websockets)
+2. run `git submodule init && git submodule update` in root (for websockets)
 3. run `make build && make run` in the root directory (this one)
 4. In another window, run `make init_db` to set up some default values for everything
 
