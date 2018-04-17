@@ -18,9 +18,9 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
 
-from .models import Profile, Major, Mentor, Course
+from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
-    UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
+    UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, MinorSerializer,
     MentorSerializer, CourseSerializer,
 )
 
@@ -63,8 +63,8 @@ class MinorViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows majors to be viewed or edited.
     """
-    queryset = Major.objects.all()
-    serializer_class = MajorSerializer
+    queryset = Minor.objects.all()
+    serializer_class = MinorSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     """

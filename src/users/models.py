@@ -9,14 +9,12 @@ from django.contrib.auth.models import User
 
 from django.core.validators import RegexValidator
 
-# Create your models here.
 class Profile(models.Model):
     YEAR_CHOICES = (
         ('1st', '1st'),
         ('2nd', '2nd'),
         ('3rd', '3rd'),
         ('4th', '4th'),
-        ##('4th', '4th'), update with celery?
     )
 
     VERIFICATION_CHAR_NUM = 10
@@ -67,8 +65,7 @@ class Course(models.Model):
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
-    #second_major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
-    minor = models.ForeignKey(Minor, null=True, on_delete=models.SET_NULL)
+    minor = models.ManyToManyField(Minor, blank=True)
     bio = models.CharField(max_length=5000, null=False, blank=True, default='')
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
