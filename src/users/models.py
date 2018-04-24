@@ -9,7 +9,9 @@ from django.contrib.auth.models import User
 
 from django.core.validators import RegexValidator
 
-# Create your models here.
+from django.db.models.signals import m2m_changed
+from django.core.exceptions import ValidationError
+
 class Profile(models.Model):
     YEAR_CHOICES = (
         ('1st', '1st'),
@@ -48,8 +50,16 @@ class Major(models.Model):
     def __str__(self):
         return self.name
 
-class Course(models.Model):
+class Minor(models.Model):
     name = models.CharField(max_length=100, null=False)
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        ordering = ('name',)
+
+class Course(models.Model):
+    name = models.CharField(max_length=200, null=False)
 
     def __str__(self):
         return self.name
@@ -59,7 +69,9 @@ class Course(models.Model):
 
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
+    #major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
+    major = models.ManyToManyField(Major, blank=True)
+    minor = models.ManyToManyField(Minor, blank=True)
     bio = models.CharField(max_length=5000, null=False, blank=True, default='')
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
@@ -72,5 +84,15 @@ class Mentor(models.Model):
     	ordering = ('profile',)
     def __str__(self):
         return '%s (%s)' % (self.profile, self.major)
+    
+def minor_changed(sender, **kwargs):
+    if kwargs['instance'].minor.count() > 3:
+        raise ValidationError("You can't assign more than three minors")
+m2m_changed.connect(minor_changed, sender=Mentor.minor.through)
+
+def major_changed(sender, **kwargs):
+    if kwargs['instance'].major.count() > 3:
+        raise ValidationError("You can't assign more than three majors")
+m2m_changed.connect(major_changed, sender=Mentor.major.through)
 
 

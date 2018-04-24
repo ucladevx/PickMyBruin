@@ -20,6 +20,10 @@ class MajorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Major
 
+class MinorFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Minor
+
 class CourseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Course

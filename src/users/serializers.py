@@ -4,7 +4,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
-from .models import Profile, Major, Mentor, Course
+from .models import Profile, Major, Mentor, Minor, Course
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,6 +50,12 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
         read_only_fields = ('id',)
 
+class MinorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Minor
+        fields = ('id', 'name')
+        read_only_fields = ('id',)
+
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -59,10 +65,11 @@ class CourseSerializer(serializers.ModelSerializer):
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
     major = MajorSerializer()
+    minor = MinorSerializer(many=True)
     courses = CourseSerializer(many=True)
     class Meta:
         model = Mentor
-        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
+        fields = ('id', 'profile', 'active', 'major', 'minor', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
         read_only_fields = ('id',)
 
 
