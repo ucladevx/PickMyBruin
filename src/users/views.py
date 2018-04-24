@@ -237,6 +237,7 @@ class MentorsSearchView(generics.ListAPIView):
         major = 'all'
         year = 'all'
         minor = 'all'
+        course = 'all'
         
         if 'major' in self.request.GET:
             major = self.request.GET['major']
@@ -244,6 +245,8 @@ class MentorsSearchView(generics.ListAPIView):
             year = self.request.GET['year']
         if 'minor' in self.request.GET:
             minor = self.request.GET['minor']
+        if 'course' in self.request.GET:
+            course = self.request.GET['course']
 
         q = Q()
         if major != 'all':
@@ -251,7 +254,9 @@ class MentorsSearchView(generics.ListAPIView):
         if year != 'all':
             q &= Q(profile__year=year)
         if minor != 'all':
-              q &= Q(minor__name=minor)
+            q &= Q(minor__name=minor)
+        if course != 'all':
+            q &= Q(courses__name=course)
 
         queryset = queryset.filter(q)
         
