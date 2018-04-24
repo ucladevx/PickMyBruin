@@ -32,22 +32,22 @@ class Command(BaseCommand):
                 except IntegrityError:
                     pass
 
-    # def _create_courses(self):
-    #     base_path = path.dirname(__file__)
-    #     courses_path = path.abspath(path.join(base_path, "..", "..", "minors.json"))
+    def _create_courses(self):
+        base_path = path.dirname(__file__)
+        courses_path = path.abspath(path.join(base_path, "..", "..", "courses.json"))
 
-    #     with open(courses_path) as courses_file:
-    #         courses = json.load(courses_file)
-    #         for course in courses:
-    #             course_entry = Course(name=course)
-    #             try:
-    #                 course_entry.save()
-    #             except IntegrityError:
-    #                 pass
+        with open(courses_path) as courses_file:
+            courses = json.load(courses_file)
+            for course in courses:
+                course_entry = Course(name=course)
+                try:
+                    course_entry.save()
+                except IntegrityError:
+                    pass
 
 
     def handle(self, *args, **kwargs):
         self._create_majors()
         self._create_minors()
-        # self._create_courses()
+        self._create_courses()
 
