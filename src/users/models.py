@@ -59,7 +59,7 @@ class Minor(models.Model):
         ordering = ('name',)
 
 class Course(models.Model):
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=200, null=False)
 
     def __str__(self):
         return self.name
@@ -76,7 +76,7 @@ class Mentor(models.Model):
     active = models.BooleanField(default=True)
     gpa = models.DecimalField(default=0.00, max_digits=4, decimal_places=2)
     clubs = models.CharField(max_length=500, null=False, blank=True, default='')
-    courses = models.ManyToManyField(Course, blank=True, max_length = 200)
+    courses = models.ManyToManyField(Course, blank=True)
     pros =  models.CharField(max_length=5000, null=False, blank=True, default='')
     cons =  models.CharField(max_length=5000, null=False, blank=True, default='')
     
