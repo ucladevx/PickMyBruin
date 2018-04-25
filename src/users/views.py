@@ -18,10 +18,10 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
 
-from .models import Profile, Major, Mentor, Course
+from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
-    MentorSerializer, CourseSerializer,
+    MinorSerializer, MentorSerializer, CourseSerializer,
 )
 
 import sendgrid
@@ -59,6 +59,12 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+class MinorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows majors to be viewed or edited.
+    """
+    queryset = Minor.objects.all()
+    serializer_class = MinorSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     """
