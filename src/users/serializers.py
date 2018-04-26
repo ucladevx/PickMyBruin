@@ -87,7 +87,7 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'minor' in validated_data:
             instance.minor.clear()
             minor_obj = validated_data.pop('minor')
-            for mnr in courses_obj:
+            for mnr in minor_obj:
                 dict(mnr)
                 m, _ = Minor.objects.get_or_create(name=mnr['name'])
                 instance.minor.add(m)

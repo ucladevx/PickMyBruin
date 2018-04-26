@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from django.contrib.auth.models import User
-from .models import Profile, Mentor, Major, Course
+from .models import Profile, Mentor, Minor, Major, Course
 from . import factories
 
 # Create your tests here.
@@ -520,3 +520,51 @@ class CourseEdittingTest(APITestCase):
         self.assertEqual(len(courses), 1)
         self.assertEqual(courses[0].name, 'New_Course')
 
+class MinorEdittingTest(APITestCase):
+    mentors_update_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+
+    def test_update_new_minor(self):
+        user_params = {
+            'minor': [
+                { 'name' : 'Minor' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, 'Minor')
+
+    def test_update_removes_old_minor(self):
+        old_minor = Minor(name='Old Minor')
+        old_minor.save()
+        self.mentor.minor.add(old_minor)
+
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, old_minor.name)
+
+        user_params = {
+            'minor': [
+                { 'name' : 'New_Minor' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, 'New_Minor')
