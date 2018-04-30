@@ -129,16 +129,22 @@ class GetThreadTest(APITestCase):
 class MarkReadTest(APITestCase):
 
     def setUp(self):
-        self.message=MessageFactory()
         self.me = users_factories.ProfileFactory()
         self.client.force_authenticate(user=self.me.user)
+        self.thread1 = ThreadFactory(profile_1 = self.me)
+        self.thread2 = ThreadFactory(profile_1 = self.me)
+        self.message=MessageFactory(thread=self.thread1)
+        self.message1=MessageFactory(thread=self.thread2)
+        self.message2=MessageFactory(thread=self.thread2)
+        self.message3=MessageFactory(thread=self.thread2)
 
     def tearDown(self):
-        self.message.delete()
+        Message.objects.all().delete()
+        Thread.objects.all().delete()
         self.me.user.delete()
 
     def test_read_message(self):
-        create_url = reverse('messaging:read_message', kwargs={'message_id': self.message.id})
+        create_url = reverse('messaging:read_thread', kwargs={'thread_id': self.thread1.id})
 
         self.assertTrue(self.message.unread)
 
@@ -146,9 +152,28 @@ class MarkReadTest(APITestCase):
             create_url,
         )
 
-        self.message = Message.objects.get(id=self.message.id)
+        self.db_message = Message.objects.get(id=self.message.id)
         
-        self.assertFalse(self.message.unread)
+        self.assertFalse(self.db_message.unread)
+
+    def test_read_multiple(self):
+        create_url = reverse('messaging:read_thread', kwargs={'thread_id': self.thread2.id})
+
+        self.assertTrue(self.message1.unread)
+        self.assertTrue(self.message2.unread)
+        self.assertTrue(self.message3.unread)
+
+        resp = self.client.patch(
+            create_url,
+        )
+
+        self.db_message1 = Message.objects.get(id=self.message1.id)
+        self.db_message2 = Message.objects.get(id=self.message2.id)
+        self.db_message3 = Message.objects.get(id=self.message3.id)
+        
+        self.assertFalse(self.db_message1.unread)
+        self.assertFalse(self.db_message2.unread)
+        self.assertFalse(self.db_message3.unread)
 
 
 class CheckHistoryTest(APITestCase):

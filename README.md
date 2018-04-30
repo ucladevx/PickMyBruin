@@ -352,14 +352,14 @@ Simplified tree diagram
       }
   ```
 
-### Mark a message as read
-  PATCH /messaging/read/<MESSAGE_ID>/  
+### Mark a thread as read
+  PATCH /messaging/read/<THREAD_ID>/  
   ```
       {
           <DOESN'T MATTER>
       }
   ```
-  returns the specified Message object
+  returns the specified Thread object
 
 ### Check if a thread exists between two users
   GET /messaging/check/<PROFILE_ID>

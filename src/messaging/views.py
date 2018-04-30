@@ -15,21 +15,22 @@ from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 
 # Create your views here.
 
-class ReadMessageView(generics.UpdateAPIView):
+class ReadThreadView(generics.UpdateAPIView):
     """
-    View for marking a specified message as read
+    View for marking a specified thread as read
     """
-    serializer_class = MessageSerializer
+    serializer_class = OwnThreadSerializer
 
     def patch(self, request, *args, **kwargs):
-        message_id = int(self.kwargs['message_id'])
-        message = get_object_or_404(Message, id=message_id)
+        thread_id = int(self.kwargs['thread_id'])
+        thread = get_object_or_404(Thread, id=thread_id)
+        unread_messages = Message.objects.filter(Q(thread=thread) & Q(unread=True))
 
-        message.unread = False
+        for message in unread_messages:
+            message.unread = False
+            message.save()
 
-        message.save()
-
-        return Response(MessageSerializer(message).data)
+        return Response(OwnThreadSerializer(thread, context = {'request': self.request}).data)
 
 
 class CheckHistoryView(APIView):
