@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
+    url(r'^data/', include('data_collection.urls', namespace='data_collection')),
 ]
