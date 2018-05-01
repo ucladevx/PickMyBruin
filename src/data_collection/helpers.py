@@ -3,7 +3,6 @@ from django.db.models import Q
 from rest_framework.response import Response
 from .models import Data
 
-#Master
 def logger(cls, data):
 	new_data = Data(data_type=cls, log=data)
 	new_data.save()
