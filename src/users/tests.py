@@ -125,6 +125,50 @@ class VerifyUserTest(APITestCase):
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.verified, True)
 
+class ResetPasswordTest(APITestCase):
+    reset_url = reverse('users:password_reset')
+
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.profile.password_reset_code = Profile.generate_password_reset_code()
+        self.profile.save()
+
+    def tearDown(self):
+        User.objects.all().delete()
+        Profile.objects.all().delete()
+
+    def test_reset_changes_password(self):
+        old_password = self.profile.user.password
+        user_params = {
+            'code' : self.profile.password_reset_code,
+            'password' : 'new_'+old_password,
+            'userid' : self.profile.user.id,
+        }
+
+        resp = self.client.post(
+            self.reset_url,
+            data=user_params,
+        )
+
+        self.assertEqual(self.profile.user.password, old_password)
+        self.profile.user.refresh_from_db()
+        self.assertNotEqual(self.profile.user.password, old_password)
+
+    def test_reset_code_only_works_once(self):
+        old_password = self.profile.user.password
+        user_params = {
+            'code' : self.profile.password_reset_code,
+            'password' : 'new_'+old_password,
+            'userid' : self.profile.user.id,
+        }
+
+        resp = self.client.post(
+            self.reset_url,
+            data=user_params,
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.password_reset_code, None)
+
 class OwnProfileViewTest(APITestCase):
     own_profile_url = reverse('users:me')
     def setUp(self):
@@ -176,6 +220,10 @@ class MentorsSearchTest(APITestCase):
         self.major1 = factories.MajorFactory(name='Test_Major')
         self.profile1 = factories.ProfileFactory(year='1st')
         self.mentor1 = factories.MentorFactory(major=self.major1, profile=self.profile1)
+
+        self.major2 = factories.MajorFactory(name='Test_Major2')
+        self.profile2 = factories.ProfileFactory(year='2nd')
+        self.mentor2 = factories.MentorFactory(major=self.major2, profile=self.profile2)
 
         self.client.force_authenticate(user=self.mentor.profile.user)
 
@@ -261,8 +309,9 @@ class MentorsSearchTest(APITestCase):
             data={
             },
         )
-        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['count'], 2)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
 
     def test_filter_by_all(self):
         resp = self.client.get(
@@ -274,7 +323,36 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_more_random_than_available(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'random': 100,
+            },
+        )
+        self.assertEqual(resp.data['count'], 2)
+
+    def test_random_with_other_filters(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'major': self.major1.name,
+                'year': self.profile1.year,
+                'random': 1,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
+    def test_random_with_no_args(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'random': '',
+            },
+        )
+        self.assertEqual(resp.data['count'], 2)
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')

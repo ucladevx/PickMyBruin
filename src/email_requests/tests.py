@@ -106,7 +106,7 @@ class ListRequestsTest(APITestCase):
 
      
         self.assertEqual(self.request1_json, resp_request1)
-        self.assertEqual(self.request1_json, resp_request1)
+        self.assertEqual(self.request2_json, resp_request2)
 
     def test_mentee_mentor_requests(self):
         

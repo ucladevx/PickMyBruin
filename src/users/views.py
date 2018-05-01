@@ -16,6 +16,7 @@ from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
+from django.http import HttpResponse
 
 from .models import Profile, Major, Mentor, Course
 from .serializers import (
@@ -25,8 +26,7 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-from pickmybruin.settings import USER_VERIFICATION_TEMPLATE
-from data_collection.views import DataLogView
+from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -59,6 +59,7 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+
 class CourseViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows courses to be viewed or edited.
@@ -73,6 +74,7 @@ class MentorViewSet(viewsets.ModelViewSet):
     """
     queryset = Mentor.objects.all()
     serializer_class = MentorSerializer
+
 
 class CreateUser(generics.CreateAPIView):
     """
@@ -124,7 +126,7 @@ class CreateUser(generics.CreateAPIView):
 
 
 class ResendVerifyUser(APIView):
-    def get (self, request):
+    def post (self, request):
         email = self.request.user.email
         verification_code = self.request.user.profile.verification_code
 
@@ -142,7 +144,7 @@ class ResendVerifyUser(APIView):
         sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
         response = sg.client.mail.send.post(request_body=mail.get())
         if not (200 <= response.status_code < 300):
-            raise ValidationError({'status_code': response.status_code})
+            raise ValidationError({'sendgrid_status_code': response.status_code})
         return Response(ProfileSerializer(self.request.user.profile).data)
 
 class VerifyUser(APIView):
@@ -158,6 +160,51 @@ class VerifyUser(APIView):
         profile.verified = True
         profile.save()
         return Response({'profile_id': profile_id})
+
+class SendPasswordReset(APIView):
+    permission_classes = tuple()
+    def post (self, request):
+        email = request.data['username']
+        user = User.objects.get(username=email)
+
+        profile_id = user.profile.id
+        profile = Profile.objects.get(id=profile_id)
+        profile.password_reset_code = Profile.generate_password_reset_code()
+        profile.save()
+        url = 'https://bquest.ucladevx.com/password'
+        if settings.DEBUG:
+            url = 'http://localhost:8000/password'
+        
+        from_email =  Email('noreply@bquest.ucladevx.com')
+        to_email = Email(email)
+        subject = 'BQuest User Password Reset'
+        reset_link = "{}?code={}&userid={}".format(url, profile.password_reset_code, user.id)
+        content = Content('text/html', 'N/A')
+        mail = Mail(from_email, subject, to_email, content)
+        mail.personalizations[0].add_substitution(Substitution('password_reset_link', reset_link))
+        mail.template_id = PASSWORD_RESET_TEMPLATE
+
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'sendgrid_status_code': response.status_code})
+        return HttpResponse(status=200)
+
+class PasswordReset(APIView):
+    permission_classes = tuple()
+    def post(self, request):
+        code = request.data['code']
+        userid = request.data['userid']
+        profile = Profile.objects.get(password_reset_code=code)
+        user = User.objects.get(profile=profile)
+        if userid != str(user.id):
+            return HttpResponse(status=400)
+        user.set_password(request.data['password'])
+        profile.password_reset_code = None
+        user.save()
+        profile.save()
+        return HttpResponse(status=200)
+        
 
 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
@@ -179,21 +226,34 @@ class MentorsSearchView(generics.ListAPIView):
 
 
     def filter_queryset(self, queryset):
+        queryset = queryset.exclude(profile__user=self.request.user) 
+
         major = 'all'
         year = 'all'
+        
         if 'major' in self.request.GET:
             major = self.request.GET['major']
         if 'year' in self.request.GET:
             year = self.request.GET['year']
-
-        #DataLogView(self)
 
         q = Q()
         if major != 'all':
             q &= Q(major__name=major)
         if year != 'all':
             q &= Q(profile__year=year)
-        return queryset.filter(q).exclude(profile__user=self.request.user)
+
+        queryset = queryset.filter(q)
+        
+        
+        if 'random' in self.request.GET:
+            num_random = self.request.GET['random']
+            if isinstance(num_random, int):
+                num_random = int(num_random)
+            else:
+                num_random = queryset.count()
+            queryset = queryset.order_by('?')[:num_random]
+
+        return queryset
 
 
 class MentorView(generics.RetrieveAPIView):

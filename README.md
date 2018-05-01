@@ -1,9 +1,10 @@
-# Pick My Bruin
+# BQuest
 
 ## Setup
 1. Install `docker` and `docker-compose`. 
-2. run `make build && make run` in the root directory (this one)
-3. In another window, run `make init_db` to set up some default values for everything
+2. run `git submodule init && git submodule update` in root (for websockets)
+3. run `make build && make run` in the root directory (this one)
+4. In another window, run `make init_db` to set up some default values for everything
 
 
 ## Project Organization
@@ -131,11 +132,38 @@ Simplified tree diagram
           "refresh_token": "<REFRESH_TOKEN>"
       }
   ```
-
 ### Authorization
   Authorization done over headers  
   Authorization: "Bearer <ACCESS_TOKEN>"
 
+### Password
+  POST /password_link (get password reset link)
+  ```
+      {
+          "username" : <USERNAME>
+      }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+  ```
+  sends a verification email with a link:
+    "https://bquest.ucladevx.com/password?code=<PASSWORD_RESET_CODE>&userid=<USERID>" or 
+    "http://localhost:8000/users/password?code=<PASSWORD_RESET_CODE>&userid=<USERID>" in development
+  
+  POST /password (reset password)
+  ```
+      {
+          "userid" : <USERID>
+          "code" : <PASSWORD_RESET_CODE>
+          "password" : <NEW_PASSWORD>
+      }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+    
+  ```
 ### Get own user
   GET /users/me/  
   returns
@@ -220,9 +248,11 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>
+  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>&random=<NUM>
     - if any query_param is missing, it defaults to 'all' for that parameter
-      (both params are optional)
+      (all params are optional)
+    - random is only called when included
+      (if there is not arg given, it returns all applicable mentors in a random order)
     - only returns active mentors
     - excludes yourself
     - no pagination for now
@@ -273,6 +303,72 @@ Simplified tree diagram
             }
             ...
           ]
+      }
+  ```
+
+### Get all threads for a user
+  GET /messaging/me/
+  GET /messaging/
+
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_THREADS>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_THREADS> [
+          {
+            'other_profile': <DATA_OF_OTHER_PROFILE>
+            'recent_message': <MOST_RECENT_MESSAGE_DATA>
+            }]
+      }
+  ```
+
+### Send a message
+  POST /messaging/<PROFILE_ID>/  
+  ```
+      {
+          "body": "<MESSAGE_BODY>"
+      }
+  ```
+  returns a Message object
+
+### Get all messages between user and someone else
+  GET /messaging/<PROFILE_ID>/
+
+  returns
+  ```
+      {
+          "count": <NUMBER_OF_MESSAGES>
+          "next": null
+          "prev": null
+          "results": <LIST_OF_MESSAGES> [
+          {
+            'id':'<MESSAGE_ID>'
+            'sender':<PROFILE_OF_SENDER>
+            'body':'<MESSAGE_BODY>'
+            'timestamp':'TIME_SENT'
+            'unread': <BOOLEAN>
+            }]
+      }
+  ```
+
+### Mark a message as read
+  PATCH /messaging/read/<MESSAGE_ID>/  
+  ```
+      {
+          <DOESN'T MATTER>
+      }
+  ```
+  returns the specified Message object
+
+### Check if a thread exists between two users
+  GET /messaging/check/<PROFILE_ID>
+
+  returns
+  ```
+      {
+          'exists': <True/False>
       }
   ```
 
