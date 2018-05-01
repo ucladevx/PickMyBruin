@@ -8,8 +8,15 @@ from . import helpers
 
 # Create your views here.
 class DataLogView(generics.CreateAPIView):
-	serializer_class = DataSerializer
+    serializer_class = DataSerializer
 
-	def post(self):
-		result = helpers.logger(self);
-		return result
+    def post (self,request):
+        result = helpers.logger(request.data['data_type'], request.data['log'])
+
+        new_data = Data(
+                data_type = request.data['data_type'],
+                log = request.data['log'],
+        )
+        new_data.save()
+        
+        return Response(DataSerializer(result).data)
