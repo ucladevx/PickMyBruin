@@ -354,6 +354,45 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 2)
 
+class UpdateYearTest(APITestCase):
+    update_year_url = reverse('users:update_year')
+
+    def setUp(self):
+        self.profile0 = factories.ProfileFactory(year='Incoming')
+        self.profile1 = factories.ProfileFactory(year='1st')
+        self.profile2 = factories.ProfileFactory(year='2nd')
+        self.profile3 = factories.ProfileFactory(year='3rd')
+        self.profile4 = factories.ProfileFactory(year='4th')
+        self.profile5 = factories.ProfileFactory(year='5th+')
+
+    def tearDown(self):
+        Profile.objects.all().delete()
+
+
+    def test_update(self):
+        resp = self.client.post(
+            self.update_year_url,
+        )
+        self.assertEqual(self.profile0.year, 'Incoming')
+        self.assertEqual(self.profile1.year, '1st')
+        self.assertEqual(self.profile2.year, '2nd')
+        self.assertEqual(self.profile3.year, '3rd')
+        self.assertEqual(self.profile4.year, '4th')
+        self.assertEqual(self.profile5.year, '5th+')
+        self.profile0.refresh_from_db()
+        self.profile1.refresh_from_db()
+        self.profile2.refresh_from_db()
+        self.profile3.refresh_from_db()
+        self.profile4.refresh_from_db()
+        self.profile5.refresh_from_db()
+        self.assertEqual(self.profile0.year, '1st')
+        self.assertEqual(self.profile1.year, '2nd')
+        self.assertEqual(self.profile2.year, '3rd')
+        self.assertEqual(self.profile3.year, '4th')
+        self.assertEqual(self.profile4.year, '5th+')
+        self.assertEqual(self.profile5.year, '5th+')
+
+
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):

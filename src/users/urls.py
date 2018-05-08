@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^verify_link/?$', views.ResendVerifyUser.as_view(), name='verify_link'),
     url(r'^password/?$', views.PasswordReset.as_view(), name='password_reset'),
     url(r'^password_link/?$', views.SendPasswordReset.as_view(), name='password_reset_link'),
+    url(r'^update_year/?$', views.UpdateProfileYearAWS.as_view(), name='update_year'),
 ]
