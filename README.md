@@ -272,6 +272,11 @@ Simplified tree diagram
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
 
+### Update Year for All Profiles (for AWS cronjob)
+  POST /update_year 
+  ```
+      {
+      }
 
 ### Send mentor a request
   POST /requests/<MENTOR_ID>/  
