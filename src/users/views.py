@@ -228,30 +228,29 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
-        major = 'all'
-        year = 'all'
-        
-        if 'major' in self.request.GET:
-            major = self.request.GET['major']
-        if 'year' in self.request.GET:
-            year = self.request.GET['year']
+        query = self.request.GET['query']
+        query = query.split(' ')
 
-        q = Q()
-        if major != 'all':
-            q &= Q(major__name=major)
-        if year != 'all':
-            q &= Q(profile__year=year)
+        # major, year, name(minor, courses,)
+        # change read me, change tests
+        
+        for item in query:
+            queryset = queryset.filter(
+                Q(major__name__contains = item) | 
+                Q(profile__year__contains = item) | 
+                Q(profile__user__first_name__contains = item) |
+                Q(profile__user__last_name__contains = item)
+            )
 
-        queryset = queryset.filter(q)
         
-        
-        if 'random' in self.request.GET:
-            num_random = self.request.GET['random']
-            if isinstance(num_random, int):
-                num_random = int(num_random)
-            else:
-                num_random = queryset.count()
-            queryset = queryset.order_by('?')[:num_random]
+        # do we still want this
+        # if 'random' in self.request.GET:
+        #     num_random = self.request.GET['random']
+        #     if isinstance(num_random, int):
+        #         num_random = int(num_random)
+        #     else:
+        #         num_random = queryset.count()
+        #     queryset = queryset.order_by('?')[:num_random]
 
         return queryset
 
