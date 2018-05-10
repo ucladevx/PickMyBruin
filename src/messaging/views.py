@@ -26,10 +26,10 @@ class ReadThreadView(generics.UpdateAPIView):
         thread = get_object_or_404(Thread, id=thread_id)
         unread_messages = Message.objects.filter(Q(thread=thread) & Q(unread=True))
 
-        for message in unread_messages:
-            message.unread = False
-            message.save()
+        unread_messages.update(unread=False)
 
+        my_profile = get_object_or_404(Profile, user=self.request.user)
+        other_user = thread.get_other_user(my_profile)
         return Response(OwnThreadSerializer(thread, context = {'request': self.request}).data)
 
 
