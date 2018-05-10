@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from datetime import datetime
+import pytz
 
 # Create your models here.
 
@@ -9,4 +11,4 @@ class Data(models.Model):
 	log = JSONField()
 
 	def __str__(self):
-		return '%s: %s' % (self.data_type, self.log)
+		return '%s: %s %s' % (self.data_type, self.log, datetime.now(pytz.timezone('US/Pacific')))

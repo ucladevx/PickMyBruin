@@ -11,7 +11,7 @@ class DataLogView(generics.CreateAPIView):
     serializer_class = DataSerializer
 
     def post (self,request):
-        result = helpers.logger(request.data['data_type'], request.data['log'])
+        result = helpers.log(request.data['data_type'], request.data['log'])
 
         new_data = Data(
                 data_type = request.data['data_type'],

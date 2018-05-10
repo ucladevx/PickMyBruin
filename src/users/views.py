@@ -27,7 +27,7 @@ from .serializers import (
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
-from data_collection.helpers import logger
+from data_collection.helpers import log
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -237,7 +237,7 @@ class MentorsSearchView(generics.ListAPIView):
         if 'year' in self.request.GET:
             year = self.request.GET['year']
 
-        logger('Majors', {'major': major})
+        log('Majors', {'major': major})
 
         q = Q()
         if major != 'all':
