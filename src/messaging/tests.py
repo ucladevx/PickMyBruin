@@ -129,7 +129,8 @@ class GetThreadTest(APITestCase):
 class MarkReadTest(APITestCase):
 
     def setUp(self):
-        self.me = users_factories.ProfileFactory()
+
+        self.me = users_factories.ProfileFactory() 
         self.client.force_authenticate(user=self.me.user)
         self.thread1 = ThreadFactory(profile_1 = self.me)
         self.thread2 = ThreadFactory(profile_1 = self.me)
