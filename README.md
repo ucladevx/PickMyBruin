@@ -277,6 +277,7 @@ Simplified tree diagram
   ```
       {
       }
+  ```
 
 ### Send mentor a request
   POST /requests/<MENTOR_ID>/  

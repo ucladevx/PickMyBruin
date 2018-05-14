@@ -11,13 +11,19 @@ from django.core.validators import RegexValidator
 
 # Create your models here.
 class Profile(models.Model):
+    INCOMING = 'Incoming'
+    FRESHMAN = '1st'
+    SOPHOMORE = '2nd'
+    JUNIOR = '3rd'
+    SENIOR = '4th'
+    SUPERSENIOR = '5th+'
     YEAR_CHOICES = (
-        ('Incoming', 'Incoming'),
-        ('1st', '1st'),
-        ('2nd', '2nd'),
-        ('3rd', '3rd'),
-        ('4th', '4th'),
-        ('5th+', '5th+'),
+        (INCOMING, 'Incoming'),
+        (FRESHMAN, '1st'),
+        (SOPHOMORE, '2nd'),
+        (JUNIOR, '3rd'),
+        (SENIOR, '4th'),
+        (SUPERSENIOR, '5th+'),
     )
 
     VERIFICATION_CHAR_NUM = 10
