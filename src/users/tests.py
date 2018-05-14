@@ -532,7 +532,7 @@ class MinorEdittingTest(APITestCase):
     def test_update_new_minor(self):
         user_params = {
             'minor': [
-                { 'name' : 'Minor' },
+                { 'name' : 'Test_Minor' },
             ],
         }
         resp = self.client.patch(
@@ -543,7 +543,7 @@ class MinorEdittingTest(APITestCase):
         self.mentor.refresh_from_db()
         minor = self.mentor.minor.all()
         self.assertEqual(len(minor), 1)
-        self.assertEqual(minor[0].name, 'Minor')
+        self.assertEqual(minor[0].name, 'Test_Minor')
 
     def test_update_removes_old_minor(self):
         old_minor = Minor(name='Old Minor')
