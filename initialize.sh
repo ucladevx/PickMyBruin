@@ -4,9 +4,9 @@
 
 
 
-if [ ! -f src/pickmybruin/keys.py ]; then
-  echo "SECRET_KEY = '"$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"'" > src/pickmybruin/keys.py
-  echo $(pwd)"/src/pickmybruin/keys.py generated"
+if [ ! -f src/bquest/keys.py ]; then
+  echo "SECRET_KEY = '"$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"'" > src/bquest/keys.py
+  echo $(pwd)"/src/bquest/keys.py generated"
 fi
 
 

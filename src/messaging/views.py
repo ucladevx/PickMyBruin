@@ -8,7 +8,7 @@ from .serializers import MessageSerializer, OwnThreadSerializer
 from users.models import Profile, User
 from rest_framework import generics
 from rest_framework.views import APIView
-from pickmybruin.settings import MESSAGING_TEMPLATE
+from bquest.settings import MESSAGING_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail

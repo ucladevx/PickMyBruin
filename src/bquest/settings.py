@@ -1,5 +1,5 @@
 """
-Django settings for pickmybruin project.
+Django settings for bquest project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -64,9 +64,9 @@ MIDDLEWARE = (
     'corsheaders.middleware.CorsMiddleware',
 )
 
-ROOT_URLCONF = 'pickmybruin.urls'
+ROOT_URLCONF = 'bquest.urls'
 
-WSGI_APPLICATION = 'pickmybruin.wsgi.application'
+WSGI_APPLICATION = 'bquest.wsgi.application'
 
 
 # Database
@@ -113,7 +113,7 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-DEFAULT_FILE_STORAGE = 'pickmybruin.storage_backends.MediaStorage'
+DEFAULT_FILE_STORAGE = 'bquest.storage_backends.MediaStorage'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None # ignores number of parameters sent
 
 TEMPLATES = [
@@ -148,7 +148,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        'pickmybruin.middleware.CsrfExemptSessionAuthentication',
+        'bquest.middleware.CsrfExemptSessionAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,

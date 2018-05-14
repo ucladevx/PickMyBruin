@@ -26,7 +26,7 @@ from .serializers import (
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
-from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
+from bquest.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
 class UserViewSet(viewsets.ModelViewSet):
     """

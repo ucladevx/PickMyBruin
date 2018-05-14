@@ -4,12 +4,12 @@ services:
   db:
     image: postgres:10.1-alpine
   websockets:
-    image: pickmybruin/websockets:latest
+    image: bquest/websockets:latest
     build: websockets
     ports:
       - "8001:80"
   web:
-    image: pickmybruin/backend:latest
+    image: bquest/backend:latest
     build: .
     command: bash initialize.sh
     environment:

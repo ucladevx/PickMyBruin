@@ -13,11 +13,11 @@ Simplified tree diagram
 ``` /usr/bin/tree
 .  # Contains docker setup and Makefile
 ├── docker-compose.yml  # defines setup of PostgreSQL and Django
-├── Dockerfile  # defines pickmybruin/backend Docker image
+├── Dockerfile  # defines bquest/backend Docker image
 ├── initialize.sh  # sets up Django container (runs migrations and then boots server)
 ├── Makefile  # contains very useful helper commands
 └── src  # Contains all Django code
-    ├── pickmybruin  # Contains code relating to the entire website
+    ├── bquest  # Contains code relating to the entire website
     │   ├── keys.py  # put confidential info in here
     │   ├── settings.py  # global settings (please keep confidential info out of here)
     │   ├── urls.py  # global URLs (usually imports app URLs too)
@@ -31,7 +31,7 @@ Simplified tree diagram
 ```
 
 ## Makefile commands
-- `make build` creates the `pickmybruin/backend` image
+- `make build` creates the `bquest/backend` image
 - `make run` starts up the PostgreSQL and Django containers
 - `make restart` restarts the Django container (useful when you edit code)
 - `make ssh` starts a bash session in the latest Django container
@@ -44,12 +44,12 @@ Simplified tree diagram
 ## How to add a new app
 1. Run `make run_command cmd="src/manage.py startapp $APPNAME`
     - This creates a new skeleton folder for your new app
-2. YOU MUST ADD THIS APP TO `src/pickmybruin/settings.py` `INSTALLED_APPS` FOR THE APP TO BE DISCOVEREDR
+2. YOU MUST ADD THIS APP TO `src/bquest/settings.py` `INSTALLED_APPS` FOR THE APP TO BE DISCOVEREDR
     - `'users',` adds the `users` app to the Django project.  Big surprise.
 3. Add your code
 4. Add tests to `tests.py`
 5. Add your models to `admin.py`
-6. Import your urls.py in `src/pickmybruin/urls.py`
+6. Import your urls.py in `src/bquest/urls.py`
 7. Run the tests
 8. Submit a PR
 
