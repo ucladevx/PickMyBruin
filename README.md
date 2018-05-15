@@ -200,7 +200,12 @@ Simplified tree diagram
           "id": "<MENTOR_ID>",
           "profile": <PROFILE>,
           "active": "<MENTOR_STATE>",
-          "major": <MAJOR>,
+          "major": [
+              <MAJOR> ...
+          ],
+          "minor": [
+              <MINOR> ...
+          ],
           "gpa": "<GPA",
           "bio": <BIO>,
           "clubs": "<CLUBS>"
@@ -225,8 +230,21 @@ Simplified tree diagram
   PATCH /mentors/me/  
   schema is same as /mentors/me/, but will update subfields (don't change the id please) 
   Note: Use this when setting mentor to inactive 
-  Note: Format to update courses is as follows:
+  Note: Format to update major, minor, and courses is as follows:
+    (Majors are limited to Max 2 and Minors are limited to Max 3)
   ```
+    {
+      "major": [
+        { "name" : "<MAJOR>" },
+        { "name" : "<MAJOR2>" }
+      ]
+    }
+    {
+      "minor": [
+        { "name" : "<MINOR>" },
+        { "name" : "<MINOR2>" }
+      ]
+    }
     {
       "courses": [
         { "name" : "<COURSE>" },
