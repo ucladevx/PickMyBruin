@@ -61,7 +61,7 @@ class MajorViewSet(viewsets.ModelViewSet):
 
 class MinorViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows majors to be viewed or edited.
+    API endpoint that allows minors to be viewed or edited.
     """
     queryset = Minor.objects.all()
     serializer_class = MinorSerializer
@@ -236,17 +236,27 @@ class MentorsSearchView(generics.ListAPIView):
 
         major = 'all'
         year = 'all'
+        minor = 'all'
+        course = 'all'
         
         if 'major' in self.request.GET:
             major = self.request.GET['major']
         if 'year' in self.request.GET:
             year = self.request.GET['year']
+        if 'minor' in self.request.GET:
+            minor = self.request.GET['minor']
+        if 'course' in self.request.GET:
+            course = self.request.GET['course']
 
         q = Q()
         if major != 'all':
             q &= Q(major__name=major)
         if year != 'all':
             q &= Q(profile__year=year)
+        if minor != 'all':
+            q &= Q(minor__name=minor)
+        if course != 'all':
+            q &= Q(courses__name=course)
 
         queryset = queryset.filter(q)
         

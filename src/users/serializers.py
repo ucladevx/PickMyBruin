@@ -65,7 +65,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
-    major = MajorSerializer()
+    major = MajorSerializer(many=True)
     minor = MinorSerializer(many=True)
     courses = CourseSerializer(many=True)
     class Meta:
@@ -78,10 +78,10 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'courses' in validated_data:
             instance.courses.clear()
             courses_obj = validated_data.pop('courses')
-            for klass in courses_obj:
-                dict(klass)
-                c, _ = Course.objects.get_or_create(name=klass['name'])
-                instance.courses.add(c)
+            for crs in courses_obj:
+                dict(crs)
+                co, _ = Course.objects.get_or_create(name=crs['name'])
+                instance.courses.add(co)
                 instance.save()
 
         if 'minor' in validated_data:
@@ -89,15 +89,24 @@ class MentorSerializer(WritableNestedModelSerializer):
             minor_obj = validated_data.pop('minor')
             for mnr in minor_obj:
                 dict(mnr)
-                m, _ = Minor.objects.get_or_create(name=mnr['name'])
-                instance.minor.add(m)
+                mi, _ = Minor.objects.get_or_create(name=mnr['name'])
+                instance.minor.add(mi)
                 instance.save()
 
         if 'major' in validated_data:
+            instance.major.clear()
             major_obj = validated_data.pop('major')
-            major_text = major_obj['name']
-            major_object = get_object_or_404(Major, name=major_text)
-            instance.major = major_object
-            instance.save()
+            for mjr in major_obj:
+                dict(mjr)
+                ma, _ = Major.objects.get_or_create(name=mjr['name'])
+                instance.major.add(ma)
+                instance.save()
+
+        # if 'major' in validated_data:
+        #     major_obj = validated_data.pop('major')
+        #     major_text = major_obj['name']
+        #     major_object = get_object_or_404(Major, name=major_text)
+        #     instance.major = major_object
+        #     instance.save()
         return super().update(instance, validated_data)
 
