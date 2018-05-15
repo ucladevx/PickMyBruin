@@ -9,6 +9,8 @@ from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 from .models import Profile, Mentor, Minor, Major, Course
 from . import factories
+from django.db import transaction
+from django.core.exceptions import ValidationError
 
 # Create your tests here.
 
@@ -359,7 +361,6 @@ class MentorsUpdateTest(APITestCase):
     def setUp(self):
         self.mentor = factories.MentorFactory()
         self.client.force_authenticate(user=self.mentor.profile.user)
-        self.major = factories.MajorFactory(name='Test Major')
     
     def tearDown(self):
         User.objects.all().delete()
@@ -383,8 +384,6 @@ class MentorsUpdateTest(APITestCase):
         )
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
-
-
 
 class CreateMentorTest(APITestCase):
     mentors_create_url = reverse('users:mentors_me')
@@ -482,6 +481,130 @@ class MajorEdittingTest(APITestCase):
         self.assertEqual(len(major), 1)
         self.assertEqual(major[0].name, 'New_Major')
 
+    def test_add_multiple_majors(self):
+        user_params = {
+            'major': [
+                { 'name' : 'Test_Major' },
+                { 'name' : 'Test_Major2' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        major = self.mentor.major.all()
+        self.assertEqual(len(major), 2)
+        self.assertEqual(major[0].name, 'Test_Major')
+        self.assertEqual(major[1].name, 'Test_Major2')
+
+    def test_limit_majors_to_two(self):
+        user_params = {
+            'major': [
+                { 'name' : 'Test_Major' },
+                { 'name' : 'Test_Major2' },
+                { 'name' : 'Test_Major3' },
+            ],
+        }
+        try:
+            with transaction.atomic():
+                resp = self.client.patch(
+                    self.mentors_update_url,
+                    data=user_params,
+                    format='json',
+                )
+        except ValidationError as e:
+            self.assertEquals('invalid', e.code)
+        
+
+class MinorEdittingTest(APITestCase):
+    mentors_update_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+
+    def test_update_new_minor(self):
+        user_params = {
+            'minor': [
+                { 'name' : 'Test_Minor' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, 'Test_Minor')
+
+    def test_update_removes_old_minor(self):
+        old_minor = Minor(name='Old Minor')
+        old_minor.save()
+        self.mentor.minor.add(old_minor)
+
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, old_minor.name)
+
+        user_params = {
+            'minor': [
+                { 'name' : 'New_Minor' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 1)
+        self.assertEqual(minor[0].name, 'New_Minor')
+
+    def test_add_multiple_minors(self):
+        user_params = {
+            'minor': [
+                { 'name' : 'Test_Minor' },
+                { 'name' : 'Test_Minor2' },
+                { 'name' : 'Test_Minor3' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        minor = self.mentor.minor.all()
+        self.assertEqual(len(minor), 3)
+        self.assertEqual(minor[0].name, 'Test_Minor')
+        self.assertEqual(minor[1].name, 'Test_Minor2')
+        self.assertEqual(minor[2].name, 'Test_Minor3')
+
+    def test_limit_minors_to_three(self):
+        user_params = {
+            'minor': [
+                { 'name' : 'Test_Minor' },
+                { 'name' : 'Test_Minor2' },
+                { 'name' : 'Test_Minor3' },
+                { 'name' : 'Test_Minor4' },
+            ],
+        }
+        try:
+            with transaction.atomic():
+                resp = self.client.patch(
+                    self.mentors_update_url,
+                    data=user_params,
+                    format='json',
+                )
+        except ValidationError as e:
+            self.assertEquals('invalid', e.code)
 
 class CourseEdittingTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
@@ -532,19 +655,12 @@ class CourseEdittingTest(APITestCase):
         self.assertEqual(len(courses), 1)
         self.assertEqual(courses[0].name, 'New_Course')
 
-class MinorEdittingTest(APITestCase):
-    mentors_update_url = reverse('users:mentors_me')
-    def setUp(self):
-        self.mentor = factories.MentorFactory()
-        self.client.force_authenticate(user=self.mentor.profile.user)
-    
-    def tearDown(self):
-        User.objects.all().delete()
-
-    def test_update_new_minor(self):
+    def test_add_multiple_courses(self):
         user_params = {
-            'minor': [
-                { 'name' : 'Test_Minor' },
+            'courses': [
+                { 'name' : 'Test_Course' },
+                { 'name' : 'Test_Course2' },
+                { 'name' : 'Test_Course3' },
             ],
         }
         resp = self.client.patch(
@@ -553,30 +669,8 @@ class MinorEdittingTest(APITestCase):
             format='json',
         )
         self.mentor.refresh_from_db()
-        minor = self.mentor.minor.all()
-        self.assertEqual(len(minor), 1)
-        self.assertEqual(minor[0].name, 'Test_Minor')
-
-    def test_update_removes_old_minor(self):
-        old_minor = Minor(name='Old Minor')
-        old_minor.save()
-        self.mentor.minor.add(old_minor)
-
-        minor = self.mentor.minor.all()
-        self.assertEqual(len(minor), 1)
-        self.assertEqual(minor[0].name, old_minor.name)
-
-        user_params = {
-            'minor': [
-                { 'name' : 'New_Minor' },
-            ],
-        }
-        resp = self.client.patch(
-            self.mentors_update_url,
-            data=user_params,
-            format='json',
-        )
-        self.mentor.refresh_from_db()
-        minor = self.mentor.minor.all()
-        self.assertEqual(len(minor), 1)
-        self.assertEqual(minor[0].name, 'New_Minor')
+        courses = self.mentor.courses.all()
+        self.assertEqual(len(courses), 3)
+        self.assertEqual(courses[0].name, 'Test_Course')
+        self.assertEqual(courses[1].name, 'Test_Course2')
+        self.assertEqual(courses[2].name, 'Test_Course3')

@@ -89,10 +89,10 @@ class Mentor(models.Model):
 
 def minor_changed(sender, **kwargs):
     if kwargs['instance'].minor.count() > 3:
-        raise ValidationError("You can't assign more than three minors")
+        raise ValidationError("You can't assign more than three minors", code='invalid')
 m2m_changed.connect(minor_changed, sender=Mentor.minor.through)
 
 def major_changed(sender, **kwargs):
     if kwargs['instance'].major.count() > 2:
-        raise ValidationError("You can't assign more than two majors")
+        raise ValidationError("You can't assign more than two majors", code='invalid')
 m2m_changed.connect(major_changed, sender=Mentor.major.through)
