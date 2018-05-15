@@ -35,4 +35,28 @@ class MentorFactory(factory.django.DjangoModelFactory):
     profile = factory.SubFactory(ProfileFactory)
     active = True
 
+    @factory.post_generation
+    def major(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for major in extracted:
+                self.major.add(major)
+
+    @factory.post_generation
+    def minor(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for minor in extracted:
+                self.minor.add(minor)
+
+    @factory.post_generation
+    def courses(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for courses in extracted:
+                self.courses.add(courses)
+
 

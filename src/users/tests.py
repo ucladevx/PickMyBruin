@@ -211,21 +211,21 @@ class OwnProfileViewTest(APITestCase):
         resp = self.client.patch(self.own_profile_url, data=data)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.phone_number, old_phone)
-'''
+
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
 
         self.major = factories.MajorFactory(name='Major')
-        self.mentor = factories.MentorFactory(major=self.major)
+        self.mentor = factories.MentorFactory(major=[self.major])
 
         self.major1 = factories.MajorFactory(name='Test_Major')
         self.profile1 = factories.ProfileFactory(year='1st')
-        self.mentor1 = factories.MentorFactory(major=self.major1, profile=self.profile1)
+        self.mentor1 = factories.MentorFactory(major=[self.major1], profile=self.profile1)
 
         self.major2 = factories.MajorFactory(name='Test_Major2')
         self.profile2 = factories.ProfileFactory(year='2nd')
-        self.mentor2 = factories.MentorFactory(major=self.major2, profile=self.profile2)
+        self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
 
         self.client.force_authenticate(user=self.mentor.profile.user)
 
@@ -243,109 +243,109 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 0)
 
-    def test_correct_major_name_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
-                'year': 'all',
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+    # def test_correct_major_name_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': self.major1.name,
+    #             'year': 'all',
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
 
-    def test_incorrect_major_name_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name + 'wonrg',
-                'year': 'all',
-            },
-        )
-        self.assertEqual(resp.data['count'], 0)
+    # def test_incorrect_major_name_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': self.major1.name + 'wonrg',
+    #             'year': 'all',
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 0)
 
-    def test_only_major_name_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+    # def test_only_major_name_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': self.major1.name,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
         
-    def test_correct_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': 'all',
-                'year': self.profile1.year,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    # def test_correct_year_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': 'all',
+    #             'year': self.profile1.year,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
 
-    def test_incorrect_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': 'all',
-                'year': self.profile1.year + 'wonrg',
-            },
-        )
-        self.assertEqual(resp.data['count'], 0)
+    # def test_incorrect_year_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': 'all',
+    #             'year': self.profile1.year + 'wonrg',
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 0)
 
-    def test_only_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'year': self.profile1.year,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    # def test_only_year_filtering(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'year': self.profile1.year,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
 
-    def test_filter_by_none(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-            },
-        )
-        self.assertEqual(resp.data['count'], 2)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+    # def test_filter_by_none(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 2)
+    #     self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    #     self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
 
-    def test_filter_by_all(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
-                'year': self.profile1.year,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    # def test_filter_by_all(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': self.major1.name,
+    #             'year': self.profile1.year,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
 
-    def test_more_random_than_available(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'random': 100,
-            },
-        )
-        self.assertEqual(resp.data['count'], 2)
+    # def test_more_random_than_available(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'random': 100,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 2)
 
-    def test_random_with_other_filters(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
-                'year': self.profile1.year,
-                'random': 1,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    # def test_random_with_other_filters(self):
+    #     resp = self.client.get(
+    #         self.mentors_search_url,
+    #         data={
+    #             'major': self.major1.name,
+    #             'year': self.profile1.year,
+    #             'random': 1,
+    #         },
+    #     )
+    #     self.assertEqual(resp.data['count'], 1)
+    #     self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
     def test_random_with_no_args(self):
         resp = self.client.get(
@@ -355,7 +355,7 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 2)
-'''
+
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):
@@ -517,7 +517,6 @@ class MajorEdittingTest(APITestCase):
         except ValidationError as e:
             self.assertEquals('invalid', e.code)
         
-
 class MinorEdittingTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):
