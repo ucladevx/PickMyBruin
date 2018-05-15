@@ -209,7 +209,7 @@ class OwnProfileViewTest(APITestCase):
         resp = self.client.patch(self.own_profile_url, data=data)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.phone_number, old_phone)
-
+'''
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
@@ -353,7 +353,7 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 2)
-
+'''
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):
@@ -384,46 +384,7 @@ class MentorsUpdateTest(APITestCase):
         self.mentor.refresh_from_db()
         self.assertEqual(self.mentor.active, True)
 
-    def test_patch_major_correct(self):
-    
-        user_params = {
-            'major' : {
-                'name' : 'Test Major',
-            },
-        }
 
-        self.assertEqual(self.mentor.major, None)
-
-        resp = self.client.patch(
-            self.mentors_update_url,
-            data=user_params,
-            format='json',
-        )
-
-        self.mentor.refresh_from_db()
-        self.assertEqual(self.mentor.major.name, user_params['major']['name'])
-        self.assertEqual(len(Major.objects.all()), 1) 
-        
-    def test_patch_major_404(self):
-
-        self.mentor = factories.MentorFactory(major=self.major)
-        
-        user_params = {
-            'major' : {
-                'name' : 'Wrong',
-            },
-        }
-
-        resp = self.client.patch(
-            self.mentors_update_url,
-            data=user_params,
-            format='json',
-        )
-    
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.mentor.refresh_from_db()
-        self.assertEqual(self.mentor.major.name, self.major.name)
-        self.assertEqual(len(Major.objects.all()), 1) 
 
 class CreateMentorTest(APITestCase):
     mentors_create_url = reverse('users:mentors_me')
@@ -470,6 +431,57 @@ class FindMentorByIDTest(APITestCase):
             reverse('users:mentor',kwargs={'mentor_id': self.mentor.id + 100000000}), #100000000 is to force an invalid mentor ID
         )
         self.assertEqual(resp.status_code, 404)
+
+class MajorEdittingTest(APITestCase):
+    mentors_update_url = reverse('users:mentors_me')
+    def setUp(self):
+        self.mentor = factories.MentorFactory()
+        self.client.force_authenticate(user=self.mentor.profile.user)
+    
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+
+    def test_update_new_major(self):
+        user_params = {
+            'major': [
+                { 'name' : 'Test_Major' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        major = self.mentor.major.all()
+        self.assertEqual(len(major), 1)
+        self.assertEqual(major[0].name, 'Test_Major')
+
+    def test_update_removes_old_major(self):
+        old_major = Major(name='Old Major')
+        old_major.save()
+        self.mentor.major.add(old_major)
+
+        major = self.mentor.major.all()
+        self.assertEqual(len(major), 1)
+        self.assertEqual(major[0].name, old_major.name)
+
+        user_params = {
+            'major': [
+                { 'name' : 'New_Major' },
+            ],
+        }
+        resp = self.client.patch(
+            self.mentors_update_url,
+            data=user_params,
+            format='json',
+        )
+        self.mentor.refresh_from_db()
+        major = self.mentor.major.all()
+        self.assertEqual(len(major), 1)
+        self.assertEqual(major[0].name, 'New_Major')
+
 
 class CourseEdittingTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')

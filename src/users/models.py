@@ -72,7 +72,6 @@ class Course(models.Model):
 
 class Mentor(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    #major = models.ForeignKey(Major, null=True, on_delete=models.SET_NULL)
     major = models.ManyToManyField(Major, blank=True)
     minor = models.ManyToManyField(Minor, blank=True)
     bio = models.CharField(max_length=5000, null=False, blank=True, default='')
