@@ -231,26 +231,26 @@ class MentorsSearchView(generics.ListAPIView):
         query = self.request.GET['query']
         query = query.split(' ')
 
-        # major, year, name(minor, courses,)
+        # major, year, name(minor, courses,club,bio)
         # change read me, change tests
         
         for item in query:
             queryset = queryset.filter(
-                Q(major__name__contains = item) | 
-                Q(profile__year__contains = item) | 
-                Q(profile__user__first_name__contains = item) |
-                Q(profile__user__last_name__contains = item)
+                Q(major__name__icontains = item) | 
+                Q(profile__year__icontains = item) | 
+                Q(profile__user__first_name__icontains = item) |
+                Q(profile__user__last_name__icontains = item) |
+                Q(profile__bio__icontains = item) |
+                Q(profile__clubs__icontains = item)
             )
 
-        
-        # do we still want this
-        # if 'random' in self.request.GET:
-        #     num_random = self.request.GET['random']
-        #     if isinstance(num_random, int):
-        #         num_random = int(num_random)
-        #     else:
-        #         num_random = queryset.count()
-        #     queryset = queryset.order_by('?')[:num_random]
+        if 'random' in self.request.GET:
+            num_random = self.request.GET['random']
+            if isinstance(num_random, int):
+                num_random = int(num_random)
+            else:
+                num_random = queryset.count()
+            queryset = queryset.order_by('?')[:num_random]
 
         return queryset
 
