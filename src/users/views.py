@@ -314,5 +314,4 @@ class ReportUser(APIView):
         if not (200 <= response.status_code < 300):
             raise ValidationError({'sendgrid_status_code': response.status_code})
         return HttpResponse(status=200)
-        return Response(ProfileSerializer(self.request.user.profile).data)
         

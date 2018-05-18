@@ -267,7 +267,19 @@ Simplified tree diagram
           ]
       }
   ```
-
+### Report User
+  POST /report_user/
+    -sends email to 'noreply@bquest.ucladevx.com'
+  ```
+    {
+      "reported_id": <REPORTED_USER_ID>,
+      "reason": <MESSAGE>
+    }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+  ```
 ### Get specific mentor
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
