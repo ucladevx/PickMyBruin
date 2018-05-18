@@ -248,11 +248,12 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>&random=<NUM>
-    - if any query_param is missing, it defaults to 'all' for that parameter
+  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
+    - if no query is given, it defaults to return all 
       (all params are optional)
     - random is only called when included
-      (if there is not arg given, it returns all applicable mentors in a random order)
+      (if there is no/invalid arg given, it returns all applicable mentors in a random order)
+    - case insentitive
     - only returns active mentors
     - excludes yourself
     - no pagination for now

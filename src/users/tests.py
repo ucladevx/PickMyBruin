@@ -214,16 +214,21 @@ class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
 
-        self.major = factories.MajorFactory(name='Major')
+        self.major = factories.MajorFactory(name='Test_Major0')
         self.mentor = factories.MentorFactory(major=self.major)
 
-        self.major1 = factories.MajorFactory(name='Test_Major')
-        self.profile1 = factories.ProfileFactory(year='1st')
+        self.user1 = factories.UserFactory(first_name='Unique_First', last_name='Unique_Last')
+        self.major1 = factories.MajorFactory(name='Test_Major1')
+        self.profile1 = factories.ProfileFactory(year='1st', user=self.user1)
         self.mentor1 = factories.MentorFactory(major=self.major1, profile=self.profile1)
 
         self.major2 = factories.MajorFactory(name='Test_Major2')
         self.profile2 = factories.ProfileFactory(year='2nd')
         self.mentor2 = factories.MentorFactory(major=self.major2, profile=self.profile2)
+
+        self.major3 = factories.MajorFactory(name='Test_Major3')
+        self.profile3 = factories.ProfileFactory(year='2nd')
+        self.mentor3 = factories.MentorFactory(major=self.major3, profile=self.profile3)
 
         self.client.force_authenticate(user=self.mentor.profile.user)
 
@@ -235,95 +240,132 @@ class MentorsSearchTest(APITestCase):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.major.name,
-                'year': 'all',
+                'query': self.major.name,
             },
         )
         self.assertEqual(resp.data['count'], 0)
 
-    def test_correct_major_name_filtering(self):
+
+    # test quert hits name, test query hits last anem, test query hits major, test query hits year
+    
+    def test_query_is_non_exact(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.major1.name,
-                'year': 'all',
+                'query': 'Major',
+            },
+        )
+        self.assertEqual(resp.data['count'], 3)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
+
+    def test_query_is_case_insensitive(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'mAjOr',
+            },
+        )
+        self.assertEqual(resp.data['count'], 3)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
+
+    def test_no_duplicates_in_queryset(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': '1',
             },
         )
         self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
 
-    def test_incorrect_major_name_filtering(self):
+    def test_query_checks_first_names(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.major1.name + 'wonrg',
-                'year': 'all',
-            },
-        )
-        self.assertEqual(resp.data['count'], 0)
-
-    def test_only_major_name_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
+                'query': 'Unique_First',
             },
         )
         self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['major']['name'], self.mentor1.major.name)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    
+    def test_query_checks_first_names(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'Unique_Last',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    
+    def test_query_checks_majors(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'Major',
+            },
+        )
+        self.assertEqual(resp.data['count'], 3)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
+    
+    def test_query_checks_years(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': '1st',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_query_handles_spaces(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': '3 nd',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile3.year)
         
-    def test_correct_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': 'all',
-                'year': self.profile1.year,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-
-    def test_incorrect_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': 'all',
-                'year': self.profile1.year + 'wonrg',
-            },
-        )
-        self.assertEqual(resp.data['count'], 0)
-
-    def test_only_year_filtering(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'year': self.profile1.year,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-
     def test_filter_by_none(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
             },
         )
-        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(resp.data['count'], 3)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
         self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
 
-    def test_filter_by_all(self):
+    def test_random_with_query(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'major': self.major1.name,
-                'year': self.profile1.year,
+                'query': self.major1.name,
+                'random': 1,
             },
         )
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
 
+    def test_random_limits_queryset_size(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'Major',
+                'random': 1,
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+   
     def test_more_random_than_available(self):
         resp = self.client.get(
             self.mentors_search_url,
@@ -331,20 +373,8 @@ class MentorsSearchTest(APITestCase):
                 'random': 100,
             },
         )
-        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(resp.data['count'], 3)
 
-    def test_random_with_other_filters(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'major': self.major1.name,
-                'year': self.profile1.year,
-                'random': 1,
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-    
     def test_random_with_no_args(self):
         resp = self.client.get(
             self.mentors_search_url,
@@ -352,7 +382,7 @@ class MentorsSearchTest(APITestCase):
                 'random': '',
             },
         )
-        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(resp.data['count'], 3)
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
