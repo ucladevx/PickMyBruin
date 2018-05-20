@@ -79,7 +79,6 @@ class MentorSerializer(WritableNestedModelSerializer):
             instance.courses.clear()
             courses_obj = validated_data.pop('courses')
             for crs in courses_obj:
-                dict(crs)
                 co, _ = Course.objects.get_or_create(name=crs['name'])
                 instance.courses.add(co)
                 instance.save()
@@ -88,7 +87,6 @@ class MentorSerializer(WritableNestedModelSerializer):
             instance.minor.clear()
             minor_obj = validated_data.pop('minor')
             for mnr in minor_obj:
-                dict(mnr)
                 mi, _ = Minor.objects.get_or_create(name=mnr['name'])
                 instance.minor.add(mi)
                 instance.save()
@@ -97,11 +95,11 @@ class MentorSerializer(WritableNestedModelSerializer):
             instance.major.clear()
             major_obj = validated_data.pop('major')
             for mjr in major_obj:
-                dict(mjr)
                 ma, _ = Major.objects.get_or_create(name=mjr['name'])
                 instance.major.add(ma)
                 instance.save()
 
 
         return super().update(instance, validated_data)
+
 
