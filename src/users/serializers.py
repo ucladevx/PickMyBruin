@@ -4,7 +4,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from django.shortcuts import render, get_object_or_404
 
 from django.contrib.auth.models import User, Group
-from .models import Profile, Major, Mentor, Course
+from .models import Profile, Major, Minor, Mentor, Course
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,6 +50,13 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
         read_only_fields = ('id',)
 
+class MinorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Minor
+        fields = ('id', 'name')
+        read_only_fields = ('id',)
+
+
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -58,11 +65,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class MentorSerializer(WritableNestedModelSerializer):
     profile = ProfileSerializer()
-    major = MajorSerializer()
+    major = MajorSerializer(many=True)
+    minor = MinorSerializer(many=True)
     courses = CourseSerializer(many=True)
     class Meta:
         model = Mentor
-        fields = ('id', 'profile', 'active', 'major', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
+        fields = ('id', 'profile', 'active', 'major', 'minor', 'bio', 'gpa', 'clubs', 'courses', 'pros', 'cons',)
         read_only_fields = ('id',)
 
 
@@ -70,17 +78,28 @@ class MentorSerializer(WritableNestedModelSerializer):
         if 'courses' in validated_data:
             instance.courses.clear()
             courses_obj = validated_data.pop('courses')
-            for klass in courses_obj:
-                dict(klass)
-                c, _ = Course.objects.get_or_create(name=klass['name'])
-                instance.courses.add(c)
+            for crs in courses_obj:
+                co, _ = Course.objects.get_or_create(name=crs['name'])
+                instance.courses.add(co)
+                instance.save()
+
+        if 'minor' in validated_data:
+            instance.minor.clear()
+            minor_obj = validated_data.pop('minor')
+            for mnr in minor_obj:
+                mi, _ = Minor.objects.get_or_create(name=mnr['name'])
+                instance.minor.add(mi)
                 instance.save()
 
         if 'major' in validated_data:
+            instance.major.clear()
             major_obj = validated_data.pop('major')
-            major_text = major_obj['name']
-            major_object = get_object_or_404(Major, name=major_text)
-            instance.major = major_object
-            instance.save()
+            for mjr in major_obj:
+                ma, _ = Major.objects.get_or_create(name=mjr['name'])
+                instance.major.add(ma)
+                instance.save()
+
+
         return super().update(instance, validated_data)
+
 
