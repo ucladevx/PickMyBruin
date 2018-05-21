@@ -249,7 +249,7 @@ class MentorsSearchView(generics.ListAPIView):
             query = self.request.GET['query']
             query = query.split(' ')
 
-            # query = [trans_dict.get(word.lower(),word) for word in query]
+            
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
                 queryset = queryset.filter(

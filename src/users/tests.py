@@ -225,9 +225,9 @@ class MentorsSearchTest(APITestCase):
         self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
         self.mentor1 = factories.MentorFactory(major=[self.major1], profile=self.profile1)
 
-
+        self.user2 = factories.UserFactory(first_name='third')
         self.major2 = factories.MajorFactory(name='Test_Major2')
-        self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE)
+        self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user2)
         self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
 
         self.major3 = factories.MajorFactory(name='Test_Major3')
@@ -329,6 +329,37 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_query_handles_dictionary_aliases(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'second',
+            },
+        )
+        self.assertEqual(resp.data['count'], 2)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile3.year)
+
+    def test_query_aliases_do_not_exclude_original_query(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'third',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile2.year)
+
+    def test_query_aliasing_is_case_insensitive(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'tHiRd',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile2.year)
 
     def test_query_handles_spaces(self):
         resp = self.client.get(

@@ -276,6 +276,8 @@ Simplified tree diagram
     - only returns active mentors
     - excludes yourself
     - no pagination for now
+    - Provides some leeway in certain keywords
+        i.e ('first' becomes 'first' OR '1st')
   returns   
   ```
       {
