@@ -302,3 +302,32 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
         mentor.save()
 
         return Response(MentorSerializer(mentor).data)
+
+class ReportUser(APIView):
+    def post (self, request):
+        email = self.request.user.email
+
+        reported_id = int(request.data['reported_id'])
+        reason = request.data['reason']
+        reported_profile = get_object_or_404(Profile, id=reported_id)
+        
+        message = 'User {} {} ({}) has reported {} {} ({}) for the following reason:\n{}'.format(
+            self.request.user.first_name,
+            self.request.user.last_name,
+            self.request.user.email,
+            reported_profile.user.first_name,
+            reported_profile.user.last_name,
+            reported_profile.user.email,
+            reason)
+        from_email =  Email(email)
+        to_email = Email('noreply@bquest.ucladevx.com')
+        subject = '[URGENT] BQuest Reported User'
+        content = Content('text/html', message)
+        mail = Mail(from_email, subject, to_email, content)
+
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'sendgrid_status_code': response.status_code})
+        return HttpResponse(status=200)
+        
