@@ -234,36 +234,38 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
-        major = 'all'
-        year = 'all'
-        minor = 'all'
-        course = 'all'
-        
-        if 'major' in self.request.GET:
-            major = self.request.GET['major']
-        if 'year' in self.request.GET:
-            year = self.request.GET['year']
-        if 'minor' in self.request.GET:
-            minor = self.request.GET['minor']
-        if 'course' in self.request.GET:
-            course = self.request.GET['course']
+        trans_dict = {
+            'first' : '1st', 
+            'second' : '2nd',
+            'third' : '3rd', 
+            'fourth' : '4th',
+            'freshman' : '1st', 
+            'sophomore' : '2nd',
+            'junior' : '3rd', 
+            'senior' : '4th',
+        }
 
-        q = Q()
-        if major != 'all':
-            q &= Q(major__name=major)
-        if year != 'all':
-            q &= Q(profile__year=year)
-        if minor != 'all':
-            q &= Q(minor__name=minor)
-        if course != 'all':
-            q &= Q(courses__name=course)
+        if 'query' in self.request.GET:
+            query = self.request.GET['query']
+            query = query.split(' ')
 
-        queryset = queryset.filter(q)
-        
-        
+            
+            for item in query:
+                item_alias = trans_dict.get(item.lower(),item)
+                queryset = queryset.filter(
+                    Q(major__name__icontains = item) | 
+                    Q(profile__year__icontains = item) | 
+                    Q(profile__user__first_name__icontains = item) |
+                    Q(profile__user__last_name__icontains = item)|
+                    Q(major__name__icontains = item_alias) | 
+                    Q(profile__year__icontains = item_alias) | 
+                    Q(profile__user__first_name__icontains = item_alias) |
+                    Q(profile__user__last_name__icontains = item_alias)
+                )
+
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
-            if isinstance(num_random, int):
+            if num_random.isdigit():
                 num_random = int(num_random)
             else:
                 num_random = queryset.count()
