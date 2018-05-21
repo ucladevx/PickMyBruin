@@ -234,19 +234,33 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
-
+        trans_dict = {
+            'first' : '1st', 
+            'second' : '2nd',
+            'third' : '3rd', 
+            'fourth' : '4th',
+            'freshman' : '1st', 
+            'sophomore' : '2nd',
+            'junior' : '3rd', 
+            'senior' : '4th',
+        }
 
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
 
-        
+            # query = [trans_dict.get(word.lower(),word) for word in query]
             for item in query:
+                item_alias = trans_dict.get(item.lower(),item)
                 queryset = queryset.filter(
                     Q(major__name__icontains = item) | 
                     Q(profile__year__icontains = item) | 
                     Q(profile__user__first_name__icontains = item) |
-                    Q(profile__user__last_name__icontains = item)
+                    Q(profile__user__last_name__icontains = item)|
+                    Q(major__name__icontains = item_alias) | 
+                    Q(profile__year__icontains = item_alias) | 
+                    Q(profile__user__first_name__icontains = item_alias) |
+                    Q(profile__user__last_name__icontains = item_alias)
                 )
 
         if 'random' in self.request.GET:
