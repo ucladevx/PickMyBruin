@@ -15,12 +15,20 @@ from django.core.validators import RegexValidator
 
 # Create your models here.
 class Profile(models.Model):
+    INCOMING = 'Incoming'
+    FRESHMAN = '1st'
+    SOPHOMORE = '2nd'
+    JUNIOR = '3rd'
+    SENIOR = '4th'
+    SUPERSENIOR = '5th+'
     YEAR_CHOICES = (
-        ('1st', '1st'),
-        ('2nd', '2nd'),
-        ('3rd', '3rd'),
-        ('4th', '4th'),
-    )
+        (INCOMING, 'Incoming'),
+        (FRESHMAN, '1st'),
+        (SOPHOMORE, '2nd'),
+        (JUNIOR, '3rd'),
+        (SENIOR, '4th'),
+        (SUPERSENIOR, '5th+'),
+     )
 
     VERIFICATION_CHAR_NUM = 10
     PASSWORD_RESET_CHAR_NUM = 20
@@ -29,7 +37,7 @@ class Profile(models.Model):
     verified = models.BooleanField(default=False)
     verification_code = models.CharField(max_length=VERIFICATION_CHAR_NUM, null=True, default=None, blank=True)
     picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True, default='profile_pictures/default_pic.jpg')
-    year = models.CharField(max_length=15, choices=YEAR_CHOICES, default='1st')
+    year = models.CharField(max_length=15, choices=YEAR_CHOICES, default=INCOMING)
     notifications_enabled = models.BooleanField(default=True)
     phone_regex = RegexValidator(regex=r'^\([0-9]{3}\)[0-9]{3}[-][0-9]{4}$', message='Phone number must be entered in the format: (012)345-6789')
     phone_number = models.CharField(validators=[phone_regex], max_length=13, blank=True) 

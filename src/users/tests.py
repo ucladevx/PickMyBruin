@@ -222,16 +222,16 @@ class MentorsSearchTest(APITestCase):
 
         self.user1 = factories.UserFactory(first_name='Unique_First', last_name='Unique_Last')
         self.major1 = factories.MajorFactory(name='Test_Major1')
-        self.profile1 = factories.ProfileFactory(year='1st', user=self.user1)
+        self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
         self.mentor1 = factories.MentorFactory(major=[self.major1], profile=self.profile1)
 
 
         self.major2 = factories.MajorFactory(name='Test_Major2')
-        self.profile2 = factories.ProfileFactory(year='2nd')
+        self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE)
         self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
 
         self.major3 = factories.MajorFactory(name='Test_Major3')
-        self.profile3 = factories.ProfileFactory(year='2nd')
+        self.profile3 = factories.ProfileFactory(year=Profile.SOPHOMORE)
         self.mentor3 = factories.MentorFactory(major=[self.major3], profile=self.profile3)
 
         self.client.force_authenticate(user=self.mentor.profile.user)
