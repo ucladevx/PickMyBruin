@@ -979,7 +979,7 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 --
 
 COPY oauth2_provider_application (id, client_id, redirect_uris, client_type, authorization_grant_type, client_secret, name, user_id, skip_authorization, created, updated) FROM stdin;
-1	web		confidential	password	sMXrq4RV2muu07ERhrllW1uCfH12U4ZNeqyM0L8bmaF9P59prjkIe5mhJJAt47Kod14yhRdg96gEf1m183sblRzyC175eLd7NzsyWS9w6QTyVPdczvTmeHiGBJJPjhGf	pickmybruin web access	\N	f	2017-10-26 00:16:28.897+00	2017-11-02 07:56:52.99572+00
+1	web		confidential	password	sMXrq4RV2muu07ERhrllW1uCfH12U4ZNeqyM0L8bmaF9P59prjkIe5mhJJAt47Kod14yhRdg96gEf1m183sblRzyC175eLd7NzsyWS9w6QTyVPdczvTmeHiGBJJPjhGf	bquest web access	\N	f	2017-10-26 00:16:28.897+00	2017-11-02 07:56:52.99572+00
 \.
 
 

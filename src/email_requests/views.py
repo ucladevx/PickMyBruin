@@ -7,7 +7,7 @@ from .serializers import RequestSerializer
 from users.models import Profile, Mentor, User
 from .models import Request
 from rest_framework import generics
-from pickmybruin.settings import REQUEST_TEMPLATE
+from bquest.settings import REQUEST_TEMPLATE
 
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
