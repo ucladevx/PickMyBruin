@@ -321,7 +321,7 @@ class ReportUser(APIView):
             reason)
         from_email =  Email(email)
         to_email = Email('noreply@bquest.ucladevx.com')
-        subject = '[URGENT] Reported User'
+        subject = '[URGENT] BQuest Reported User'
         content = Content('text/html', message)
         mail = Mail(from_email, subject, to_email, content)
 
