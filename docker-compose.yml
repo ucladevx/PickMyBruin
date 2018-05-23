@@ -3,11 +3,15 @@ version: '3.3'
 services:
   db:
     image: postgres:10.1-alpine
+    volumes:
+      - data:/var/lib/postgresql
+
   websockets:
     image: pickmybruin/websockets:latest
     build: websockets
     ports:
       - "8001:80"
+
   web:
     image: pickmybruin/backend:latest
     build: .
@@ -21,4 +25,6 @@ services:
     depends_on:
       - db
       - websockets
+volumes:
+  data:
 

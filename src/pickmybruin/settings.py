@@ -20,8 +20,11 @@ from .keys import *
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
+#URL_PREFIX = '/api'
+URL_PREFIX = ''
+FORCE_SCRIPT_NAME = URL_PREFIX
 
 ALLOWED_HOSTS = ['*']
 
@@ -106,7 +109,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
 )
 
-STATIC_ROOT = '/static/';
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AWS_STORAGE_BUCKET_NAME = 'bequest-dev'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
