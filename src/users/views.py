@@ -18,10 +18,10 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
 
-from .models import Profile, Major, Mentor, Course
+from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
-    MentorSerializer, CourseSerializer,
+    MinorSerializer, MentorSerializer, CourseSerializer,
 )
 
 import sendgrid
@@ -59,6 +59,12 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+class MinorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows minors to be viewed or edited.
+    """
+    queryset = Minor.objects.all()
+    serializer_class = MinorSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     """
@@ -247,26 +253,38 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
-        major = 'all'
-        year = 'all'
-        
-        if 'major' in self.request.GET:
-            major = self.request.GET['major']
-        if 'year' in self.request.GET:
-            year = self.request.GET['year']
+        trans_dict = {
+            'first' : '1st', 
+            'second' : '2nd',
+            'third' : '3rd', 
+            'fourth' : '4th',
+            'freshman' : '1st', 
+            'sophomore' : '2nd',
+            'junior' : '3rd', 
+            'senior' : '4th',
+        }
 
-        q = Q()
-        if major != 'all':
-            q &= Q(major__name=major)
-        if year != 'all':
-            q &= Q(profile__year=year)
+        if 'query' in self.request.GET:
+            query = self.request.GET['query']
+            query = query.split(' ')
 
-        queryset = queryset.filter(q)
-        
-        
+            
+            for item in query:
+                item_alias = trans_dict.get(item.lower(),item)
+                queryset = queryset.filter(
+                    Q(major__name__icontains = item) | 
+                    Q(profile__year__icontains = item) | 
+                    Q(profile__user__first_name__icontains = item) |
+                    Q(profile__user__last_name__icontains = item)|
+                    Q(major__name__icontains = item_alias) | 
+                    Q(profile__year__icontains = item_alias) | 
+                    Q(profile__user__first_name__icontains = item_alias) |
+                    Q(profile__user__last_name__icontains = item_alias)
+                )
+
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
-            if isinstance(num_random, int):
+            if num_random.isdigit():
                 num_random = int(num_random)
             else:
                 num_random = queryset.count()
@@ -305,3 +323,32 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
         mentor.save()
 
         return Response(MentorSerializer(mentor).data)
+
+class ReportUser(APIView):
+    def post (self, request):
+        email = self.request.user.email
+
+        reported_id = int(request.data['reported_id'])
+        reason = request.data['reason']
+        reported_profile = get_object_or_404(Profile, id=reported_id)
+        
+        message = 'User {} {} ({}) has reported {} {} ({}) for the following reason:\n{}'.format(
+            self.request.user.first_name,
+            self.request.user.last_name,
+            self.request.user.email,
+            reported_profile.user.first_name,
+            reported_profile.user.last_name,
+            reported_profile.user.email,
+            reason)
+        from_email =  Email(email)
+        to_email = Email('noreply@bquest.ucladevx.com')
+        subject = '[URGENT] BQuest Reported User'
+        content = Content('text/html', message)
+        mail = Mail(from_email, subject, to_email, content)
+
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'sendgrid_status_code': response.status_code})
+        return HttpResponse(status=200)
+        

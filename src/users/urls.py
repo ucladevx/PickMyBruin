@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^password/?$', views.PasswordReset.as_view(), name='password_reset'),
     url(r'^password_link/?$', views.SendPasswordReset.as_view(), name='password_reset_link'),
     url(r'^update_year/?$', views.UpdateProfileYearAWS.as_view(), name='update_year'),
+    url(r'^report_user/?$', views.ReportUser.as_view(), name='report_user'),
 ]

@@ -5,6 +5,7 @@
 2. run `git submodule init && git submodule update` in root (for websockets)
 3. run `make build && make run` in the root directory (this one)
 4. In another window, run `make init_db` to set up some default values for everything
+5. (opt) Run `make run_command "cmd=python src/manage.py populate_tables"` to load values into Major, Minor, Course tables
 
 
 ## Project Organization
@@ -199,7 +200,12 @@ Simplified tree diagram
           "id": "<MENTOR_ID>",
           "profile": <PROFILE>,
           "active": "<MENTOR_STATE>",
-          "major": <MAJOR>,
+          "major": [
+              <MAJOR> ...
+          ],
+          "minor": [
+              <MINOR> ...
+          ],
           "gpa": "<GPA",
           "bio": <BIO>,
           "clubs": "<CLUBS>"
@@ -224,8 +230,21 @@ Simplified tree diagram
   PATCH /mentors/me/  
   schema is same as /mentors/me/, but will update subfields (don't change the id please) 
   Note: Use this when setting mentor to inactive 
-  Note: Format to update courses is as follows:
+  Note: Format to update major, minor, and courses is as follows:
+    (Majors are limited to Max 2 and Minors are limited to Max 3)
   ```
+    {
+      "major": [
+        { "name" : "<MAJOR>" },
+        { "name" : "<MAJOR2>" }
+      ]
+    }
+    {
+      "minor": [
+        { "name" : "<MINOR>" },
+        { "name" : "<MINOR2>" }
+      ]
+    }
     {
       "courses": [
         { "name" : "<COURSE>" },
@@ -248,14 +267,17 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?major=<MAJOR_ID>&year=<YEAR>&random=<NUM>
-    - if any query_param is missing, it defaults to 'all' for that parameter
+  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
+    - if no query is given, it defaults to return all 
       (all params are optional)
     - random is only called when included
-      (if there is not arg given, it returns all applicable mentors in a random order)
+      (if there is no/invalid arg given, it returns all applicable mentors in a random order)
+    - case insentitive
     - only returns active mentors
     - excludes yourself
     - no pagination for now
+    - Provides some leeway in certain keywords
+        i.e ('first' becomes 'first' OR '1st')
   returns   
   ```
       {
@@ -267,7 +289,19 @@ Simplified tree diagram
           ]
       }
   ```
-
+### Report User
+  POST /report_user/
+    -sends email to 'noreply@bquest.ucladevx.com'
+  ```
+    {
+      "reported_id": <REPORTED_USER_ID>,
+      "reason": <MESSAGE>
+    }
+  ```
+  returns 
+  ```
+      HTTPResponse 200
+  ```
 ### Get specific mentor
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
@@ -359,14 +393,14 @@ Simplified tree diagram
       }
   ```
 
-### Mark a message as read
-  PATCH /messaging/read/<MESSAGE_ID>/  
+### Mark a thread as read
+  PATCH /messaging/read/<THREAD_ID>/  
   ```
       {
           <DOESN'T MATTER>
       }
   ```
-  returns the specified Message object
+  returns the specified Thread object
 
 ### Check if a thread exists between two users
   GET /messaging/check/<PROFILE_ID>
