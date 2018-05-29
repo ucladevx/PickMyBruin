@@ -269,6 +269,7 @@ Simplified tree diagram
 ### Search for mentors
   GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
 - if no query is given, it defaults to return all (all params are optional)
+- checks user's name, major, minor, courses, and year for matches
 - random is only called when included (if there is no/invalid arg given, it returns all applicable mentors in a random order)
 - case insentitive
 - only returns active mentors
