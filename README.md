@@ -268,16 +268,13 @@ Simplified tree diagram
 
 ### Search for mentors
   GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
-    - if no query is given, it defaults to return all 
-      (all params are optional)
-    - random is only called when included
-      (if there is no/invalid arg given, it returns all applicable mentors in a random order)
-    - case insentitive
-    - only returns active mentors
-    - excludes yourself
-    - no pagination for now
-    - Provides some leeway in certain keywords
-        i.e ('first' becomes 'first' OR '1st')
+- if no query is given, it defaults to return all (all params are optional)
+- random is only called when included (if there is no/invalid arg given, it returns all applicable mentors in a random order)
+- case insentitive
+- only returns active mentors
+- excludes yourself
+- no pagination for now
+- Provides some leeway in certain keywords, i.e ('first' becomes 'first' OR '1st')
   returns   
   ```
       {
@@ -291,7 +288,7 @@ Simplified tree diagram
   ```
 ### Report User
   POST /report_user/
-    -sends email to 'noreply@bquest.ucladevx.com'
+- sends email to 'noreply@bquest.ucladevx.com'
   ```
     {
       "reported_id": <REPORTED_USER_ID>,
