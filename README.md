@@ -289,6 +289,7 @@ Simplified tree diagram
           ]
       }
   ```
+
 ### Report User
   POST /report_user/
     -sends email to 'noreply@bquest.ucladevx.com'
@@ -302,6 +303,7 @@ Simplified tree diagram
   ```
       HTTPResponse 200
   ```
+  
 ### Get specific mentor
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
@@ -409,7 +411,7 @@ Simplified tree diagram
 
 ### Update year field 
   0 0 15 9 * python src/manage.py populate_tables
-  
+
 ## Current Database Schema (Will probably be outdated soon)
 
 ### NOTE: you don't really need to understand this, but this is how Django will create tables for the models
