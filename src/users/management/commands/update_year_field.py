@@ -6,11 +6,11 @@ from users.models import Profile
 class Command(BaseCommand):
     def _update_year(self):
         queryset = Profile.objects.all()
-        queryset.filter(year='4th').update(year='5th+')
-        queryset.filter(year='3rd').update(year='4th')
-        queryset.filter(year='2nd').update(year='3rd')
-        queryset.filter(year='1st').update(year='2nd')
-        queryset.filter(year='Incoming').update(year='1st')
+        queryset.filter(year=SENIOR).update(year=SUPERSENIOR)
+        queryset.filter(year=JUNIOR).update(year=SENIOR)
+        queryset.filter(year=SOPHOMORE).update(year=JUNIOR)
+        queryset.filter(year=FRESHMAN).update(year=SOPHOMORE)
+        queryset.filter(year=INCOMING).update(year=FRESHMAN)
 
 
     def handle(self, *args, **kwargs):

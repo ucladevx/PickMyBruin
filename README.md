@@ -306,12 +306,6 @@ Simplified tree diagram
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
 
-### Update Year for All Profiles (for AWS cronjob)
-  POST /update_year 
-  ```
-      {
-      }
-  ```
 
 ### Send mentor a request
   POST /requests/<MENTOR_ID>/  
@@ -411,7 +405,11 @@ Simplified tree diagram
           'exists': <True/False>
       }
   ```
+## AWS Cronjobs
 
+### Update year field 
+  0 0 15 9 * python src/manage.py populate_tables
+  
 ## Current Database Schema (Will probably be outdated soon)
 
 ### NOTE: you don't really need to understand this, but this is how Django will create tables for the models

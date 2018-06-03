@@ -222,26 +222,6 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return get_object_or_404(Profile, user=self.request.user)
 
-class UpdateProfileYearAWS(generics.ListAPIView):
-    """
-    View for AWS to update profile year field yearly
-    """
-    permission_classes = tuple()
-    serializer_class = ProfileSerializer
-
-    def post(self,  request):
-        UpdateProfileYearAWS.filter_queryset(self, Profile.objects.all())
-        return HttpResponse(status=200)
-
-    def filter_queryset(self, queryset):
-        queryset.filter(year='4th').update(year='5th+')
-        queryset.filter(year='3rd').update(year='4th')
-        queryset.filter(year='2nd').update(year='3rd')
-        queryset.filter(year='1st').update(year='2nd')
-        queryset.filter(year='Incoming').update(year='1st')
-        return queryset
-
-
 class MentorsSearchView(generics.ListAPIView):
     """
     View for finding a mentor by major, year
