@@ -248,18 +248,21 @@ class MentorsSearchView(generics.ListAPIView):
             query = self.request.GET['query']
             query = query.split(' ')
 
-            
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
                 queryset = queryset.filter(
                     Q(major__name__icontains = item) | 
                     Q(profile__year__icontains = item) | 
                     Q(profile__user__first_name__icontains = item) |
-                    Q(profile__user__last_name__icontains = item)|
+                    Q(profile__user__last_name__icontains = item) |
+                    Q(minor__name__icontains = item) |
+                    Q(courses__name__icontains = item) |
                     Q(major__name__icontains = item_alias) | 
                     Q(profile__year__icontains = item_alias) | 
                     Q(profile__user__first_name__icontains = item_alias) |
-                    Q(profile__user__last_name__icontains = item_alias)
+                    Q(profile__user__last_name__icontains = item_alias) |
+                    Q(minor__name__icontains = item_alias) |
+                    Q(courses__name__icontains = item_alias)
                 )
 
         if 'random' in self.request.GET:
