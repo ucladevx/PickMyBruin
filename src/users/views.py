@@ -222,7 +222,6 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return get_object_or_404(Profile, user=self.request.user)
 
-
 class MentorsSearchView(generics.ListAPIView):
     """
     View for finding a mentor by major, year
