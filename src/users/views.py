@@ -28,6 +28,8 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
+from difflib import SequenceMatcher
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -244,12 +246,19 @@ class MentorsSearchView(generics.ListAPIView):
             'senior' : '4th',
         }
 
+        major_dict = {
+
+                'cs' : 'computer science',
+                'bio' : 'biology'
+        }
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
+                major_alias = major_dict.get(item.lower(),item)
                 queryset = queryset.filter(
                     Q(major__name__icontains = item) | 
                     Q(profile__year__icontains = item) | 
@@ -262,7 +271,8 @@ class MentorsSearchView(generics.ListAPIView):
                     Q(profile__user__first_name__icontains = item_alias) |
                     Q(profile__user__last_name__icontains = item_alias) |
                     Q(minor__name__icontains = item_alias) |
-                    Q(courses__name__icontains = item_alias)
+                    Q(courses__name__icontains = item_alias) |
+                    Q(major__name__icontains = major_alias)
                 )
 
         if 'random' in self.request.GET:
@@ -272,9 +282,13 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-
+        else:
+            queryset.annotate(similarity=similar(query,major__name)).order_by('similarity')
+            
         return queryset
 
+def similar(a,b):
+    return SequenceMatcher(None, a, b).ratio()
 
 class MentorView(generics.RetrieveAPIView):
     """
