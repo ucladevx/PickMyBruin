@@ -17,6 +17,9 @@ from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Greatest
+
 
 from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
@@ -242,7 +245,9 @@ class MentorsSearchView(generics.ListAPIView):
             'sophomore' : '2nd',
             'junior' : '3rd', 
             'senior' : '4th',
-        }
+            'cs' : 'computer science',
+            'computer science' : 'CS'
+        }  
 
         if 'query' in self.request.GET:
             query = self.request.GET['query']
@@ -250,20 +255,47 @@ class MentorsSearchView(generics.ListAPIView):
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                queryset = queryset.filter(
-                    Q(major__name__icontains = item) | 
-                    Q(profile__year__icontains = item) | 
-                    Q(profile__user__first_name__icontains = item) |
-                    Q(profile__user__last_name__icontains = item) |
-                    Q(minor__name__icontains = item) |
-                    Q(courses__name__icontains = item) |
-                    Q(major__name__icontains = item_alias) | 
-                    Q(profile__year__icontains = item_alias) | 
-                    Q(profile__user__first_name__icontains = item_alias) |
-                    Q(profile__user__last_name__icontains = item_alias) |
-                    Q(minor__name__icontains = item_alias) |
-                    Q(courses__name__icontains = item_alias)
-                )
+                # queryset = queryset.annotate(
+                # similarity=TrigramSimilarity('major__name', item),
+                # ).filter(similarity__gt=0.3).order_by('-similarity')
+                # queryset = queryset.annotate(
+                # similarity=Greatest(
+                # TrigramSimilarity('major__name', item_alias), 
+                # TrigramSimilarity('bio', item)
+                # )).filter(similarity__gte=0.05).order_by('-similarity')
+
+                queryset = queryset.annotate(
+                    similarity=Greatest(
+                        TrigramSimilarity('major__name', item_alias),
+                        TrigramSimilarity('bio', item),
+                        TrigramSimilarity('profile__year', item),
+                        TrigramSimilarity('profile__user__first_name', item),
+                        TrigramSimilarity('profile__user__last_name', item),
+                        TrigramSimilarity('minor__name', item),
+                        TrigramSimilarity('courses__name', item),
+                    )
+                ).filter(similarity__gte=0.00).order_by('-similarity')
+
+                # Q(TrigramSimilarity('major__name', item_alias), 
+                # TrigramSimilarity('bio', item)
+                # )).filter(similarity__gte=0.05).order_by('-similarity')
+
+
+                # queryset = queryset.filter(
+                #     Q(major__name__icontains = item_alias) | 
+                #     Q(profile__year__icontains = item) | 
+                #     Q(profile__user__first_name__icontains = item) |
+                #     Q(profile__user__last_name__icontains = item) |
+                #     Q(minor__name__icontains = item) |
+                #     Q(courses__name__icontains= item) |
+                #     Q(major__name__icontains = item) | 
+                #     Q(profile__year__icontains = item_alias) | 
+                #     Q(profile__user__first_name__icontains = item_alias) |
+                #     Q(profile__user__last_name__icontains = item_alias) |
+                #     Q(minor__name__icontains = item) |
+                #     Q(courses__name__icontains = item_alias) |
+                #     Q(bio__icontains = item)
+                # )
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -274,6 +306,7 @@ class MentorsSearchView(generics.ListAPIView):
             queryset = queryset.order_by('?')[:num_random]
 
         return queryset
+    
 
 
 class MentorView(generics.RetrieveAPIView):
