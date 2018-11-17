@@ -450,4 +450,33 @@ id | name
 --- | --- 
 1 | CS31 
 
+# Code Profiling For Python
+
+# Why it's important
+- Identify bottlenecks
+- Unearth insight into performance
+- Future-proof code
+
+# Profile Hooks & cProfile!
+
+- cProfile is a built in profiler for python
+```sh
+$ python cProfile method.py
+```
+- Using this, we can see the breakdown of function calls and dependencies across multiple files! Awesome!
+- What about functions that aren't inherently run? For example, a class method that is only run when it's called dynamically?
+- Profile hooks is the answer!
+```sh
+from profilehooks import profile
+
+class ExampleClass():
+@profile
+def exampleFunc():
+\\..
+\\..
+
+```
+- We're set! Now we have an easy and succinct way to test performance of new features!
+- Look for results in the docker terminal!
+
 
