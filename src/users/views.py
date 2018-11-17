@@ -31,6 +31,8 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
+from difflib import SequenceMatcher
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -249,20 +251,19 @@ class MentorsSearchView(generics.ListAPIView):
             'computer science' : 'CS'
         }  
 
+        major_dict = {
+
+                'cs' : 'computer science',
+                'bio' : 'biology'
+        }
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                # queryset = queryset.annotate(
-                # similarity=TrigramSimilarity('major__name', item),
-                # ).filter(similarity__gt=0.3).order_by('-similarity')
-                # queryset = queryset.annotate(
-                # similarity=Greatest(
-                # TrigramSimilarity('major__name', item_alias), 
-                # TrigramSimilarity('bio', item)
-                # )).filter(similarity__gte=0.05).order_by('-similarity')
+
 
                 queryset = queryset.annotate(
                     similarity=Greatest(
@@ -276,26 +277,7 @@ class MentorsSearchView(generics.ListAPIView):
                     )
                 ).filter(similarity__gte=0.00).order_by('-similarity')
 
-                # Q(TrigramSimilarity('major__name', item_alias), 
-                # TrigramSimilarity('bio', item)
-                # )).filter(similarity__gte=0.05).order_by('-similarity')
 
-
-                # queryset = queryset.filter(
-                #     Q(major__name__icontains = item_alias) | 
-                #     Q(profile__year__icontains = item) | 
-                #     Q(profile__user__first_name__icontains = item) |
-                #     Q(profile__user__last_name__icontains = item) |
-                #     Q(minor__name__icontains = item) |
-                #     Q(courses__name__icontains= item) |
-                #     Q(major__name__icontains = item) | 
-                #     Q(profile__year__icontains = item_alias) | 
-                #     Q(profile__user__first_name__icontains = item_alias) |
-                #     Q(profile__user__last_name__icontains = item_alias) |
-                #     Q(minor__name__icontains = item) |
-                #     Q(courses__name__icontains = item_alias) |
-                #     Q(bio__icontains = item)
-                # )
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -304,10 +286,14 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-
+        else:
+            queryset.annotate(similarity=similar(query,major__name)).order_by('similarity')
+            
         return queryset
     
 
+def similar(a,b):
+    return SequenceMatcher(None, a, b).ratio()
 
 class MentorView(generics.RetrieveAPIView):
     """
