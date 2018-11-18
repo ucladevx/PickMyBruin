@@ -286,8 +286,6 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-        else:
-            queryset.annotate(similarity=similar(query,major__name)).order_by('similarity')
             
         return queryset
     
