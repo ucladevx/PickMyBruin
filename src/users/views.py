@@ -249,6 +249,12 @@ class MentorsSearchView(generics.ListAPIView):
             'computer science' : 'CS'
         }  
 
+        major_dict = {
+
+                'cs' : 'computer science',
+                'bio' : 'biology'
+        }
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
@@ -274,10 +280,9 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-
+            
         return queryset
     
-
 
 class MentorView(generics.RetrieveAPIView):
     """
