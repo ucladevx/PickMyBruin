@@ -255,15 +255,6 @@ class MentorsSearchView(generics.ListAPIView):
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                # queryset = queryset.annotate(
-                # similarity=TrigramSimilarity('major__name', item),
-                # ).filter(similarity__gt=0.3).order_by('-similarity')
-                # queryset = queryset.annotate(
-                # similarity=Greatest(
-                # TrigramSimilarity('major__name', item_alias), 
-                # TrigramSimilarity('bio', item)
-                # )).filter(similarity__gte=0.05).order_by('-similarity')
-
                 queryset = queryset.annotate(
                     similarity=Greatest(
                         TrigramSimilarity('major__name', item_alias),
@@ -275,27 +266,6 @@ class MentorsSearchView(generics.ListAPIView):
                         TrigramSimilarity('courses__name', item),
                     )
                 ).filter(similarity__gte=0.00).order_by('-similarity')
-
-                # Q(TrigramSimilarity('major__name', item_alias), 
-                # TrigramSimilarity('bio', item)
-                # )).filter(similarity__gte=0.05).order_by('-similarity')
-
-
-                # queryset = queryset.filter(
-                #     Q(major__name__icontains = item_alias) | 
-                #     Q(profile__year__icontains = item) | 
-                #     Q(profile__user__first_name__icontains = item) |
-                #     Q(profile__user__last_name__icontains = item) |
-                #     Q(minor__name__icontains = item) |
-                #     Q(courses__name__icontains= item) |
-                #     Q(major__name__icontains = item) | 
-                #     Q(profile__year__icontains = item_alias) | 
-                #     Q(profile__user__first_name__icontains = item_alias) |
-                #     Q(profile__user__last_name__icontains = item_alias) |
-                #     Q(minor__name__icontains = item) |
-                #     Q(courses__name__icontains = item_alias) |
-                #     Q(bio__icontains = item)
-                # )
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
