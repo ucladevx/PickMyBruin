@@ -31,8 +31,6 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
-from difflib import SequenceMatcher
-
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -289,9 +287,6 @@ class MentorsSearchView(generics.ListAPIView):
             
         return queryset
     
-
-def similar(a,b):
-    return SequenceMatcher(None, a, b).ratio()
 
 class MentorView(generics.RetrieveAPIView):
     """
