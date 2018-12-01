@@ -26,9 +26,13 @@ test:
 	docker exec -i -t `docker ps -q --filter status=running --filter ancestor=pickmybruin/backend:latest` /bin/bash -c "cd /code/src && ./manage.py test --no-input --parallel $(args)" 
 
 clean_db:
-	docker-compose exec db psql -U postgres -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public; CREATE EXTENSION IF NOT EXISTS pg_trgm;'
+	docker-compose exec db psql -U postgres -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
 
-init_db: clean_db 
+#Activate extensions
+activate_db:
+	docker-compose exec db psql -U postgres -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
+
+init_db: clean_db activate_db
 	cat init_db.sql | docker exec -i `docker-compose ps -q db` psql -U postgres 
 	docker-compose exec web /bin/bash -c "cd /code/src && ./manage.py migrate"
 
