@@ -3,6 +3,9 @@ version: '3.3'
 services:
   db:
     image: postgres:10.1-alpine
+    volumes:
+      - data:/var/lib/postgresql
+
   websockets:
     image: pickmybruin/websockets:latest
     build: websockets
@@ -21,4 +24,5 @@ services:
     depends_on:
       - db
       - websockets
-
+volumes:
+data:
