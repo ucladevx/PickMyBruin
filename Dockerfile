@@ -1,4 +1,4 @@
-FROM python:3-slim
+FROM python:3.6-slim
 
 # Enable production settings by default; for development, this can be set to 
 # `false` in `docker run --env`
