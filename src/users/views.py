@@ -17,6 +17,9 @@ from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Greatest
+
 
 from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
@@ -242,6 +245,14 @@ class MentorsSearchView(generics.ListAPIView):
             'sophomore' : '2nd',
             'junior' : '3rd', 
             'senior' : '4th',
+            'cs' : 'computer science',
+            'computer science' : 'CS',
+        }  
+
+        major_dict = {
+
+                'cs' : 'computer science',
+                'bio' : 'biology'
         }
 
         if 'query' in self.request.GET:
@@ -250,20 +261,28 @@ class MentorsSearchView(generics.ListAPIView):
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                queryset = queryset.filter(
-                    Q(major__name__icontains = item) | 
-                    Q(profile__year__icontains = item) | 
-                    Q(profile__user__first_name__icontains = item) |
-                    Q(profile__user__last_name__icontains = item) |
-                    Q(minor__name__icontains = item) |
-                    Q(courses__name__icontains = item) |
-                    Q(major__name__icontains = item_alias) | 
-                    Q(profile__year__icontains = item_alias) | 
-                    Q(profile__user__first_name__icontains = item_alias) |
-                    Q(profile__user__last_name__icontains = item_alias) |
-                    Q(minor__name__icontains = item_alias) |
-                    Q(courses__name__icontains = item_alias)
-                )
+                queryset = queryset.annotate( 
+                    similarity=Greatest(
+                        TrigramSimilarity('major__name', item),
+                        TrigramSimilarity('bio', item),
+                        TrigramSimilarity('profile__year', item),
+                        TrigramSimilarity('profile__user__first_name', item),
+                        TrigramSimilarity('profile__user__last_name', item),
+                        TrigramSimilarity('minor__name', item),
+                        TrigramSimilarity('profile__year', item),
+                        TrigramSimilarity('courses__name', item),
+                        TrigramSimilarity('major__name', item_alias),
+                        TrigramSimilarity('bio', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('profile__user__first_name', item_alias),
+                        TrigramSimilarity('profile__user__last_name', item_alias),
+                        TrigramSimilarity('minor__name', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('courses__name', item_alias),
+                    )
+                ).filter(similarity__gte=0.10).order_by('-similarity')
+
+                
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -272,9 +291,9 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-
+            
         return queryset
-
+    
 
 class MentorView(generics.RetrieveAPIView):
     """
