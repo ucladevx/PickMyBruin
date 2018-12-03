@@ -28,7 +28,8 @@ class Profile(models.Model):
         (JUNIOR, '3rd'),
         (SENIOR, '4th'),
         (SUPERSENIOR, '5th+'),
-     )
+    )
+
 
     VERIFICATION_CHAR_NUM = 10
     PASSWORD_RESET_CHAR_NUM = 20

@@ -27,4 +27,3 @@ services:
       - websockets
 volumes:
   data:
-

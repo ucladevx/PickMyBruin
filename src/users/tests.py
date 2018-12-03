@@ -222,8 +222,11 @@ class MentorsSearchTest(APITestCase):
 
         self.user1 = factories.UserFactory(first_name='Unique_First', last_name='Unique_Last')
         self.major1 = factories.MajorFactory(name='Test_Major1')
+        self.minor1 = factories.MinorFactory(name='Unique_Minor')
+        self.courses1 = factories.CourseFactory(name='Unique_Course')
         self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
-        self.mentor1 = factories.MentorFactory(major=[self.major1], profile=self.profile1)
+        self.mentor1 = factories.MentorFactory(major=[self.major1], minor=[self.minor1], 
+                courses=[self.courses1], profile=self.profile1)
 
         self.user2 = factories.UserFactory(first_name='third')
         self.major2 = factories.MajorFactory(name='Test_Major2')
@@ -247,10 +250,8 @@ class MentorsSearchTest(APITestCase):
                 'query': self.major.name,
             },
         )
-        self.assertEqual(resp.data['count'], 0)
+        self.assertEqual(resp.data['count'], 3)
 
-
-    
     def test_query_is_non_exact(self):
         resp = self.client.get(
             self.mentors_search_url,
@@ -263,7 +264,6 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
         self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
         self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
-
 
     def test_query_is_case_insensitive(self):
         resp = self.client.get(
@@ -298,7 +298,7 @@ class MentorsSearchTest(APITestCase):
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
     
-    def test_query_checks_first_names(self):
+    def test_query_checks_last_names(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
@@ -329,6 +329,27 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+    
+    def test_query_checks_minors(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'Unique_Minor',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
+    def test_query_checks_courses(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'query': 'Unique_Course',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+
 
     def test_query_handles_dictionary_aliases(self):
         resp = self.client.get(
@@ -365,10 +386,10 @@ class MentorsSearchTest(APITestCase):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'query': '3 nd',
+                'query': '2 nd',
             },
         )
-        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['count'], 2)
         self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile3.year)
         
     def test_filter_by_none(self):
@@ -391,7 +412,7 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        
 
     def test_random_limits_queryset_size(self):
         resp = self.client.get(

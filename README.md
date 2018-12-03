@@ -268,16 +268,14 @@ Simplified tree diagram
 
 ### Search for mentors
   GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
-    - if no query is given, it defaults to return all 
-      (all params are optional)
-    - random is only called when included
-      (if there is no/invalid arg given, it returns all applicable mentors in a random order)
-    - case insentitive
-    - only returns active mentors
-    - excludes yourself
-    - no pagination for now
-    - Provides some leeway in certain keywords
-        i.e ('first' becomes 'first' OR '1st')
+- if no query is given, it defaults to return all (all params are optional)
+- checks user's name, major, minor, courses, and year for matches
+- random is only called when included (if there is no/invalid arg given, it returns all applicable mentors in a random order)
+- case insentitive
+- only returns active mentors
+- excludes yourself
+- no pagination for now
+- Provides some leeway in certain keywords, i.e ('first' becomes 'first' OR '1st')
   returns   
   ```
       {
@@ -289,9 +287,10 @@ Simplified tree diagram
           ]
       }
   ```
+
 ### Report User
   POST /report_user/
-    -sends email to 'noreply@bquest.ucladevx.com'
+- sends email to 'noreply@bquest.ucladevx.com'
   ```
     {
       "reported_id": <REPORTED_USER_ID>,
@@ -302,6 +301,7 @@ Simplified tree diagram
   ```
       HTTPResponse 200
   ```
+  
 ### Get specific mentor
   GET /mentors/<MENTOR_ID>/  
   return is same as /mentors/me/  
@@ -405,6 +405,10 @@ Simplified tree diagram
           'exists': <True/False>
       }
   ```
+## AWS Cronjobs
+
+### Update year field 
+  0 0 15 9 * python src/manage.py populate_tables
 
 ## Current Database Schema (Will probably be outdated soon)
 
@@ -445,5 +449,34 @@ id | profile_id | major_id | bio
 id | name 
 --- | --- 
 1 | CS31 
+
+# Code Profiling For Python
+
+# Why it's important
+- Identify bottlenecks
+- Unearth insight into performance
+- Future-proof code
+
+# Profile Hooks & cProfile!
+
+- cProfile is a built in profiler for python
+```sh
+$ python cProfile method.py
+```
+- Using this, we can see the breakdown of function calls and dependencies across multiple files! Awesome!
+- What about functions that aren't inherently run? For example, a class method that is only run when it's called dynamically?
+- Profile hooks is the answer!
+```sh
+from profilehooks import profile
+
+class ExampleClass():
+@profile
+def exampleFunc():
+\\..
+\\..
+
+```
+- We're set! Now we have an easy and succinct way to test performance of new features!
+- Look for results in the docker terminal!
 
 
