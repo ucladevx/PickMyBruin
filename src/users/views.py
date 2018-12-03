@@ -246,7 +246,7 @@ class MentorsSearchView(generics.ListAPIView):
             'junior' : '3rd', 
             'senior' : '4th',
             'cs' : 'computer science',
-            'computer science' : 'CS'
+            'computer science' : 'CS',
         }  
 
         major_dict = {
@@ -261,17 +261,28 @@ class MentorsSearchView(generics.ListAPIView):
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                queryset = queryset.annotate(
+                queryset = queryset.annotate( 
                     similarity=Greatest(
-                        TrigramSimilarity('major__name', item_alias),
+                        TrigramSimilarity('major__name', item),
                         TrigramSimilarity('bio', item),
                         TrigramSimilarity('profile__year', item),
                         TrigramSimilarity('profile__user__first_name', item),
                         TrigramSimilarity('profile__user__last_name', item),
                         TrigramSimilarity('minor__name', item),
+                        TrigramSimilarity('profile__year', item),
                         TrigramSimilarity('courses__name', item),
+                        TrigramSimilarity('major__name', item_alias),
+                        TrigramSimilarity('bio', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('profile__user__first_name', item_alias),
+                        TrigramSimilarity('profile__user__last_name', item_alias),
+                        TrigramSimilarity('minor__name', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('courses__name', item_alias),
                     )
-                ).filter(similarity__gte=0.00).order_by('-similarity')
+                ).filter(similarity__gte=0.10).order_by('-similarity')
+
+                
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
