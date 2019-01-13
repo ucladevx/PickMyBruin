@@ -25,4 +25,4 @@ services:
       - db
       - websockets
 volumes:
-data:
+  data:
