@@ -269,13 +269,12 @@ Simplified tree diagram
 ### Search for mentors
   GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
 - if no query is given, it defaults to return all (all params are optional)
-- checks user's name, major, minor, courses, and year for matches
-- random is only called when included (if there is no/invalid arg given, it returns all applicable mentors in a random order)
+- checks user's name, major, minor, courses, bio, and year for Trigram Simularity
+- random returns <NUM> number of applicable mentors in a random order
 - case insentitive
-- only returns active mentors
-- excludes yourself
-- no pagination for now
-- Provides some leeway in certain keywords, i.e ('first' becomes 'first' OR '1st')
+- only returns active mentors, excluding self
+- search term aliases, i.e ('first' becomes "'first' OR '1st'"")
+
   returns   
   ```
       {
