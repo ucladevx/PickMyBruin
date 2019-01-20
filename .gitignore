@@ -7,4 +7,3 @@ supervisord.pid
 keys.py
 .DS_Store
 pickmybruin*.sql
-venv
