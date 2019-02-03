@@ -16,7 +16,7 @@ class BlogPicture(models.Model):
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=250)
-    author = models.ForeignKey(User, related_name='blog_posts')
+    author = models.ForeignKey(User, related_name='author')
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
