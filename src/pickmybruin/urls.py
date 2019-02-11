@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
-    url(r'^blogs/', include('blog.urls', namespace='blogs')),
+    url(r'', include('blog.urls', namespace='blogs')),
 ]

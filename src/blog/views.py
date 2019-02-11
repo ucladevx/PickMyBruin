@@ -1,12 +1,14 @@
 from django.shortcuts import render
-
+from rest_framework import generics
+from .models import BlogPost, BlogPicture
+from django.http import HttpResponse
 # Create your views here.
 
 #Create blog
 
-def CreateBlogView(generics.CreateAPIView):
+class CreateBlogView(generics.CreateAPIView):
 
-    def post(self, request):
+    def post(self, request, username):
         #add check for username and url match, else return 400
         new_blog = BlogPost.objects.create(
                     title=request.data['title'],
@@ -21,4 +23,6 @@ def CreateBlogView(generics.CreateAPIView):
                     )
             picture.save()
         new_blog.save()
+
+        return HttpResponse(status=200)
 
