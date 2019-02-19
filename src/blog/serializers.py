@@ -5,7 +5,8 @@ from rest_framework import serializers
 class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
-        fields = ('author','body','title','publish','created','updated','images')
+        fields = ('id','author','body','title','publish','created','updated','images')
+        read_only_fields = ('id',)
 
 
 class BlogPictureSerializer(serializers.ModelSerializer):

@@ -34,8 +34,12 @@ class CreateBlogView(generics.CreateAPIView):
 #View that implements retrieve update and destroy
 class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
 
-    def update(self,request,username):
-        return HttpResponse(status=400)
+    def get(self,request,username):
+        return get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+
+#Return all API Views or any number, 10, 20 , 50 random blogs
+class BlogView(generics.ListAPIView):
+
 
 
 #Need to implement get all blogposts
