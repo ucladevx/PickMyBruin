@@ -15,7 +15,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
     images = BlogPictureSerializer(many=True)
     class Meta:
         model = BlogPost
-        fields = ('id','author','profile','body','title','images','publish','created','updated')
+        fields = ('id','author','user','body','title','images','publish','created','updated')
         read_only_fields = ('id',)
 
 

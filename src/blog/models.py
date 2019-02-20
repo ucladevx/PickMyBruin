@@ -8,7 +8,7 @@ from users.models import Profile
 class BlogPost(models.Model):
     title = models.CharField(max_length=250)
     author = models.CharField(max_length=60)
-    profile = models.ForeignKey(Profile, related_name='profile',
+    user = models.ForeignKey(User, related_name='user',
             on_delete=models.CASCADE, null=True, blank=True)
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)

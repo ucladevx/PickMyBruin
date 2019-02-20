@@ -1,10 +1,12 @@
 #Python
 from itertools import chain
+import re
 
 #Django Rest Framework Files
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
 
 #Django Files
 from django.http import HttpResponse
@@ -29,7 +31,7 @@ class CreateBlogView(generics.CreateAPIView):
                         title=request.data['title'],
                         author=self.request.user.first_name + ' ' +
                         request.user.last_name,
-                        profile = self.request.user.profile,
+                        user = self.request.user,
                         body=request.data['body'],
                     )
             #Cycles through keys in files for multiple image upload
@@ -46,13 +48,34 @@ class CreateBlogView(generics.CreateAPIView):
         else:
             return HttpResponse(status=400)
 #View that implements retrieve update and destroy
-class RUDBlogView(generics.RetrieveAPIView):
+class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogPostSerializer
 
     #Gets specific blog by id
     def get_object(self):
         return get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
 
+    def update(self,request,*args,**kwargs):
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        if(self.request.user == blog.user):
+            if 'tile' in request.data:
+                blog.title=request.data['title']
+            if 'body' in request.data:
+                blog.body=request.data['body']
+
+            blog.save()
+            #Cycles through keys in files for multiple image upload
+
+            regex = r"\[im[^\]]*\](.*?)\[/im\]"
+            print('WORKING WORKING')
+            for match in re.finditer(regex, request.data['body']):
+                print(match)
+
+
+            return Response(BlogPostSerializer(blog).data)
+        else:
+            return HttpResponse(status=400)
+#
 
 #Return all Blog Posts or any number, 10, 20 , 50 random blogs
 class BlogView(generics.ListAPIView):
