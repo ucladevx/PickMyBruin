@@ -63,14 +63,31 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
             if 'body' in request.data:
                 blog.body=request.data['body']
 
+            imageset = blog.images.all()
+
+            #Check array against image set
+            #Compare two arrays and find entries that are missing
+            if 'images' in request.data:
+                #Cycle through current blogimages
+                for blogimage in imageset:
+                    #Check if image is in array
+                    if blogimage.id not in request.data['images']:
+                        imageset.filter(id=blogimage.id).delete()
+            for key in request.FILES:
+                picture = BlogPicture.objects.create(
+                            filename = request.FILES[key].name,
+                            blog = blog,
+                            picture = request.FILES[key],
+                        )
+                picture.save()
             blog.save()
             #Cycles through keys in files for multiple image upload
-
+            '''
             regex = r"\[im[^\]]*\](.*?)\[/im\]"
             print('WORKING WORKING')
             for match in re.finditer(regex, request.data['body']):
                 print(match)
-
+            '''
 
             return Response(BlogPostSerializer(blog).data)
         else:

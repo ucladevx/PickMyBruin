@@ -7,7 +7,7 @@ from rest_framework import serializers
 class BlogPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPicture
-        fields = ('filename','blog', 'picture')
+        fields = ('id','filename','blog', 'picture')
 
 
 
