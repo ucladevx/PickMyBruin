@@ -46,7 +46,7 @@ class CreateBlogView(generics.CreateAPIView):
 
             return Response(BlogPostSerializer(new_blog).data,status=200)
         else:
-            return HttpResponse(status=400)
+            return Response(status=400)
 #View that implements retrieve update and destroy
 class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogPostSerializer
@@ -92,15 +92,15 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
 
             return Response(BlogPostSerializer(blog).data)
         else:
-            return HttpResponse(status=400)
+            return Response(status=400)
 
     def delete(self,request, *args, **kwargs):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
         if(self.request.user == blog.user):
             self.queryset.filter(id=self.kwargs['blog_id']).delete()
-            return HttpResponse(status=200)
+            return Response(status=200)
         else:
-            return HttpResponse(status=400)
+            return Response(status=400)
 #
 
 #Return all Blog Posts or any number, 10, 20 , 50 random blogs
