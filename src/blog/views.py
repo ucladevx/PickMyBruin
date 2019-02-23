@@ -44,12 +44,13 @@ class CreateBlogView(generics.CreateAPIView):
                 picture.save()
             new_blog.save()
 
-            return HttpResponse(status=200)
+            return Response(BlogPostSerializer(new_blog).data,status=200)
         else:
             return HttpResponse(status=400)
 #View that implements retrieve update and destroy
 class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogPostSerializer
+    queryset = BlogPost.objects.all()
 
     #Gets specific blog by id
     def get_object(self):
@@ -58,7 +59,7 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     def update(self,request,*args,**kwargs):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
         if(self.request.user == blog.user):
-            if 'tile' in request.data:
+            if 'title' in request.data:
                 blog.title=request.data['title']
             if 'body' in request.data:
                 blog.body=request.data['body']
@@ -92,6 +93,14 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
             return Response(BlogPostSerializer(blog).data)
         else:
             return HttpResponse(status=400)
+
+    def delete(self,request, *args, **kwargs):
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        if(self.request.user == blog.user):
+            self.queryset.filter(id=self.kwargs['blog_id']).delete()
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
 #
 
 #Return all Blog Posts or any number, 10, 20 , 50 random blogs
@@ -119,7 +128,3 @@ class BlogView(generics.ListAPIView):
 
         return queryset
 
-
-
-#Need to implement get all blogposts
-#Get specific blog view
