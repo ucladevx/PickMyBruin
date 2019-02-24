@@ -1,9 +1,11 @@
 from django.db import models
-
 from django.utils import timezone
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User
 
 from users.models import Profile
+
+from pickmybruin import keys,settings
+import boto3
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=250)
@@ -19,7 +21,7 @@ class BlogPost(models.Model):
         ordering = ('-publish',)
 
     def __str__(self):
-        return self.title# Create your models here.
+        return self.title
 
 class BlogPicture(models.Model):
     filename = models.CharField(max_length=250)
@@ -32,4 +34,16 @@ class BlogPicture(models.Model):
     def __str__(self):
         return self.filename
 
+    #delete S3 reference
+    def delete(self):
+        #pictureid = str(self.picture).split('/')[1]
+        pictureid = "media/" + str(self.picture)
+        session = boto3.Session(
+            aws_access_key_id=keys.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=keys.AWS_SECRET_ACCESS_KEY,
+            region_name="us-west-2",
+        )
+
+        s3 = session.resource("s3")
+        s3.Object(settings.AWS_STORAGE_BUCKET_NAME, pictureid).delete()
 

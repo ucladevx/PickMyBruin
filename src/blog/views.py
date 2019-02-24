@@ -14,11 +14,14 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
+from django.conf import settings
+
 
 
 #Source Files
 from .models import BlogPost, BlogPicture
 from .serializers import *
+
 
 
 class CreateBlogView(generics.CreateAPIView):
@@ -41,6 +44,7 @@ class CreateBlogView(generics.CreateAPIView):
                             blog = new_blog,
                             picture = request.FILES[key],
                         )
+                print(picture.picture)
                 picture.save()
             new_blog.save()
 
@@ -82,6 +86,7 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
                         )
                 picture.save()
             blog.save()
+
             #Cycles through keys in files for multiple image upload
             '''
             regex = r"\[im[^\]]*\](.*?)\[/im\]"
@@ -97,7 +102,11 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self,request, *args, **kwargs):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
         if(self.request.user == blog.user):
+            blogimages = blog.images.all()
+            for item in blogimages:
+                get_object_or_404(BlogPicture,id=item.id).delete()
             self.queryset.filter(id=self.kwargs['blog_id']).delete()
+
             return Response(status=200)
         else:
             return Response(status=400)
