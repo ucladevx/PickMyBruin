@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'django_extensions',
     'storages',
+    'rest_framework_swagger',
 
     # Pick My Bruin Apps
     'users',

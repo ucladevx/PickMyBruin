@@ -6,6 +6,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 from users.urls import router as users_router
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='BQuest API Documentation')
 
 
 router = routers.DefaultRouter()
@@ -21,4 +24,5 @@ urlpatterns = [
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
     url(r'', include('blog.urls', namespace='blog')),
+    url(r'^doc/$', schema_view),
 ]
