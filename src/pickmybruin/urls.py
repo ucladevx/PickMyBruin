@@ -7,7 +7,6 @@ admin.autodiscover()
 
 from users.urls import router as users_router
 
-
 router = routers.DefaultRouter()
 
 router.registry.extend(users_router.registry)
