@@ -25,6 +25,7 @@ from .serializers import *
 
 
 class CreateBlogView(generics.CreateAPIView):
+    serializer_class = BlogPost
 
     #Need to add check for duplicate blog titles and content
     def post(self, request, username):
