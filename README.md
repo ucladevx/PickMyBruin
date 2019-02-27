@@ -444,7 +444,7 @@ Simplified tree diagram
   ```
 
 ### Retrieve blogpost by id
-  GET /blog/id/<BLOG_ID>/
+  GET /blog/<BLOG_ID>/
 
   returns 
   ```
@@ -471,7 +471,7 @@ Simplified tree diagram
  } 
   ```
 ### Delete blogpost by id
-    DELETE /blog/id/<BLOG_ID>/
+    DELETE /blog/<BLOG_ID>/
 
     returns
     ```
@@ -480,7 +480,7 @@ Simplified tree diagram
 
 ### Patch blogpost by id
 
-    PATCH /blog/id/<BLOG_ID>/
+    PATCH /blog/<BLOG_ID>/
   ```
       {
           "title": <UPDATED_TITLE>,
