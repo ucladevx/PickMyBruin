@@ -404,6 +404,138 @@ Simplified tree diagram
           'exists': <True/False>
       }
   ```
+
+### Create blogpost
+  POST /blog/<USERNAME>/
+  ```
+      {
+          "title": <TITLE>,
+          "body": <BODY>,
+          <FILENAME>:<FILE>,
+          <FILE...
+          .
+          .
+      }
+  ```
+  returns 
+  ```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "title": TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "publish": time.current,
+    "created": time.current,
+    "updated": time.current, 
+ } 
+ 
+  ```
+
+### Retrieve blogpost by id
+  GET /blog/id/<BLOG_ID>/
+
+  returns 
+  ```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "title": TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "publish": time.current,
+    "created": time.current,
+    "updated": time.current, 
+ } 
+  ```
+### Delete blogpost by id
+    DELETE /blog/id/<BLOG_ID>/
+
+    returns
+    ```
+    HTTP_RESPONSE_200_OK
+    ```
+
+### Patch blogpost by id
+
+    PATCH /blog/id/<BLOG_ID>/
+  ```
+      {
+          "title": <UPDATED_TITLE>,
+          "body": <UPDATED_BODY>,
+          "images": [IMAGE1.ID, IMAGE2.ID,...]
+          <FILENAME>:<NEW_FILE>,
+          <FILE...
+          .
+          .
+      }
+  ```
+  returns 
+  ```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": UPDATED_BODY,
+    "title": UPDATED_TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+ 
+    "publish": time.publish,
+    "created": time.publish,
+    "updated": time.current, 
+} 
+  ```
+### Search for Blog Posts 
+  GET /blogs/?query=<STRING>&num=<INT>
+- if no query is given, it defaults to return all (all params are optional)
+- checks title and body for Trigram Simularity
+- case insentitive
+
+  returns   
+  ```
+      {
+          "count": <NUMBER OF RESULTS>,
+          "next": null,
+          "previous": null,
+          "results": [
+              <BLOG_POST> ... // blogs/<blog_id>/ format
+          ]
+      }
+  ```
+
+ 
 ## AWS Cronjobs
 
 ### Update year field 
