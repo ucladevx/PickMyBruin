@@ -1,7 +1,12 @@
+
+#Django Files
 from django.contrib.auth.models import User
-from .models import BlogPost, BlogPicture
+
+#DRF files
 from rest_framework import serializers
 
+#Source files
+from .models import BlogPost, BlogPicture
 
 
 class BlogPictureSerializer(serializers.ModelSerializer):

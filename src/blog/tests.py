@@ -1,23 +1,29 @@
+
+#Django Files
 from django.test import TestCase
 from django.shortcuts import get_object_or_404
-
 from django.core.urlresolvers import reverse
 
+#DRF Files
 from rest_framework import status
-
-from .models import *
-
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from rest_framework.response import Response
+
+#Source Files
 from users import factories
 from . import factories as blogfactory
+from .models import *
+
+#System Files
 import os
 import io
 
+#Third Party Files
 from PIL import Image
 
 # Create your tests here.
+#Creates random photo for image upload
 def generate_photo_file():
     file = io.BytesIO()
     image = Image.new('RGBA', size=(100, 100), color=(155, 0, 0))
@@ -26,6 +32,7 @@ def generate_photo_file():
     file.seek(0)
     return file
 
+#Test for create, patch, and delete
 class CUDBlogPostTest(APITestCase):
     def setUp(self):
         self.profile = factories.ProfileFactory()
@@ -90,6 +97,7 @@ class CUDBlogPostTest(APITestCase):
 
         self.assertFalse(BlogPost.objects.filter(user__username__iexact = self.profile.user.username).exists())
 
+#Tests for retrieving single blog post
 class RetrieveBlogPostTest(APITestCase):
     def setUp(self):
         self.profile = factories.ProfileFactory()
@@ -119,7 +127,7 @@ class RetrieveBlogPostTest(APITestCase):
                 )
 
         self.assertFalse(resp.status_code==200)
-
+#Test for query name and number
 class QueryBlogsTest(APITestCase):
     get_url = reverse('blog:blogs')
 
