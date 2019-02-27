@@ -11,6 +11,7 @@ from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from rest_framework.response import Response
 from users import factories
+from . import factories as blogfactory
 import os
 import io
 
@@ -25,7 +26,7 @@ def generate_photo_file():
     file.seek(0)
     return file
 
-class CreateBlogPostTest(APITestCase):
+class CUDBlogPostTest(APITestCase):
     def setUp(self):
         self.profile = factories.ProfileFactory()
         self.client.force_authenticate(user=self.profile.user)
@@ -34,7 +35,7 @@ class CreateBlogPostTest(APITestCase):
         BlogPost.objects.all().delete()
         BlogPicture.objects.all().delete()
 
-    def test_create_post(self):
+    def test_create_update_destroy_post(self):
         create_url = reverse('blog:createview',kwargs={'username':self.profile.get_username()})
         img = generate_photo_file()
 
@@ -55,6 +56,23 @@ class CreateBlogPostTest(APITestCase):
         for item in blog.images.all():
             get_object_or_404(BlogPicture,id=item.id).delete()
 
+        update_url = reverse('blog:RUD', kwargs={'blog_id':blog.id})
+        blog_params = {
+                'title' : 'updated title',
+                'body' : 'updated body',
+                }
+        resp = self.client.patch(
+                update_url,
+                data = blog_params,
+                )
+        self.assertTrue(resp.data['title'] == blog_params['title'])
+
+        resp = self.client.delete(
+                update_url,
+                )
+
+        self.assertTrue(resp.status_code == 200)
+
     def test_create_invalid_user_blog(self):
         profile2 = factories.ProfileFactory()
         create_url = reverse('blog:createview',kwargs={'username':profile2.get_username()})
@@ -72,4 +90,74 @@ class CreateBlogPostTest(APITestCase):
 
         self.assertFalse(BlogPost.objects.filter(user__username__iexact = self.profile.user.username).exists())
 
+class RetrieveBlogPostTest(APITestCase):
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.client.force_authenticate(user=self.profile.user)
+        self.blog = blogfactory.BlogFactory()
+
+    def tearDown(self):
+        Profile.objects.all().delete()
+        BlogPost.objects.all().delete()
+        BlogPicture.objects.all().delete()
+
+    def test_get_post(self):
+        create_url = reverse('blog:RUD', kwargs={'blog_id':self.blog.id})
+
+        resp = self.client.get(
+                create_url
+                )
+
+        self.assertTrue(resp.status_code==200)
+
+    def test_invalid_post(self):
+        post2 = blogfactory.BlogFactory()
+        create_url = reverse('blog:RUD', kwargs={'blog_id':999999})
+
+        resp = self.client.get(
+                create_url
+                )
+
+        self.assertFalse(resp.status_code==200)
+
+class QueryBlogsTest(APITestCase):
+    get_url = reverse('blog:blogs')
+
+    def setUp(self):
+        self.profile = factories.ProfileFactory()
+        self.client.force_authenticate(user=self.profile.user)
+        self.blog = blogfactory.BlogFactory()
+        self.blog1 = blogfactory.BlogFactory()
+        self.blog2 = blogfactory.BlogFactory()
+
+    def tearDown(self):
+        Profile.objects.all().delete()
+        BlogPost.objects.all().delete()
+
+    def test_get_all_posts(self):
+
+        resp = self.client.get(
+                self.get_url
+                )
+
+        self.assertTrue(resp.data['count'] == 3)
+
+    def test_get_single_post(self):
+
+        resp = self.client.get(
+                self.get_url,
+                data={
+                    'num' : 1,
+                    },
+
+                )
+        self.assertTrue(resp.data['count'] == 1)
+
+    def test_get_title_post(self):
+        resp = self.client.get(
+                self.get_url,
+                data={
+                    'query': self.blog.title,
+                    },
+                )
 
