@@ -406,7 +406,8 @@ Simplified tree diagram
   ```
 
 ### Create blogpost
-  POST /blog/<USERNAME>/
+  - username@ucla.edu
+  POST /blog/<USER_NAME>/
   ```
       {
           "title": <TITLE>,
