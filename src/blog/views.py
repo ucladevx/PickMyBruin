@@ -37,6 +37,7 @@ class CreateBlogView(generics.CreateAPIView):
                         request.user.last_name,
                         user = self.request.user,
                         body=request.data['body'],
+                        anonymous=request.data['anonymous'],
                     )
             #Cycles through keys in files for multiple image upload
             for key in request.FILES:
@@ -68,6 +69,8 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
                 blog.title=request.data['title']
             if 'body' in request.data:
                 blog.body=request.data['body']
+            if 'anonymous' in request.data:
+                blog.anonymous=request.data['anonymous']
 
             imageset = blog.images.all()
 

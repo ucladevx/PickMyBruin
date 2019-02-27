@@ -50,6 +50,7 @@ class CUDBlogPostTest(APITestCase):
                 'title' : 'test title',
                 'body' : 'test body',
                 'test.png' : img,
+                'anonymous' : False,
                 }
 
         resp = self.client.post(
@@ -67,6 +68,7 @@ class CUDBlogPostTest(APITestCase):
         blog_params = {
                 'title' : 'updated title',
                 'body' : 'updated body',
+                'anonymous' : False
                 }
         resp = self.client.patch(
                 update_url,
@@ -87,6 +89,7 @@ class CUDBlogPostTest(APITestCase):
         blog_params = {
                 'title' : 'test title',
                 'body' : 'test body',
+                'anonymous' : False
                 }
 
         resp = self.client.post(
@@ -99,10 +102,12 @@ class CUDBlogPostTest(APITestCase):
 
 #Tests for retrieving single blog post
 class RetrieveBlogPostTest(APITestCase):
+
     def setUp(self):
         self.profile = factories.ProfileFactory()
         self.client.force_authenticate(user=self.profile.user)
         self.blog = blogfactory.BlogFactory()
+        self.ablog = blogfactory.AnonymousBlogFactory()
 
     def tearDown(self):
         Profile.objects.all().delete()
@@ -127,6 +132,15 @@ class RetrieveBlogPostTest(APITestCase):
                 )
 
         self.assertFalse(resp.status_code==200)
+
+    def test_anonymous_post(self):
+        create_url = reverse('blog:RUD', kwargs={'blog_id':self.ablog.id})
+        resp = self.client.get(
+                create_url
+                )
+
+        self.assertTrue(resp.data['anonymous'])
+
 #Test for query name and number
 class QueryBlogsTest(APITestCase):
     get_url = reverse('blog:blogs')

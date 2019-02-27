@@ -23,6 +23,7 @@ class BlogPost(models.Model):
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    anonymous = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('-publish',)
