@@ -283,9 +283,7 @@ class MentorsSearchView(generics.ListAPIView):
                     )
                 ).filter(similarity__gte=0.10).order_by('-similarity')
 
-                
 
->>>>>>> origin/master
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
             if num_random.isdigit():
@@ -293,9 +291,7 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-            
         return queryset
-    
 
 class MentorView(generics.RetrieveAPIView):
     """
