@@ -30,6 +30,7 @@ from .serializers import (
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
+from data_collection.helpers import log
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -282,7 +283,6 @@ class MentorsSearchView(generics.ListAPIView):
                     )
                 ).filter(similarity__gte=0.10).order_by('-similarity')
 
-                
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -291,9 +291,7 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-            
         return queryset
-    
 
 class MentorView(generics.RetrieveAPIView):
     """
