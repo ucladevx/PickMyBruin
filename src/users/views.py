@@ -237,27 +237,6 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
-<<<<<<< HEAD
-        major = 'all'
-        year = 'all'
-        
-        if 'major' in self.request.GET:
-            major = self.request.GET['major']
-        if 'year' in self.request.GET:
-            year = self.request.GET['year']
-
-        log('Majors', {'major': major})
-
-        q = Q()
-        if major != 'all':
-            q &= Q(major__name=major)
-        if year != 'all':
-            q &= Q(profile__year=year)
-
-        queryset = queryset.filter(q)
-        
-        
-=======
         trans_dict = {
             'first' : '1st', 
             'second' : '2nd',
