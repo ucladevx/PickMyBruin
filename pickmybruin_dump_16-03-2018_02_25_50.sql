@@ -1128,12 +1128,11 @@ COPY auth_user (id, password, last_login, is_superuser, username, first_name, la
 47	pbkdf2_sha256$36000$9KEvS2AuFaE6$rCmLYUhZhMnhWsge5u5J0IgEC4K9UBZePpPdAel9OWM=	\N	f	dwchen@g.ucla.edu	David	Chen	dwchen@g.ucla.edu	f	t	2018-03-02 04:16:24.740893+00
 48	pbkdf2_sha256$36000$X1NwFMYgu62e$cGA2KtGH0jtpIVK/fYiTKN+6NZ6olWWu9JzltNsY+lY=	\N	f	jpalmanzasoto@g.ucla.edu	Juan-Pablo	Almanza-Soto	jpalmanzasoto@g.ucla.edu	f	t	2018-03-02 05:30:31.075036+00
 53	pbkdf2_sha256$36000$OaF0s3i0qLp1$tHSX4qjZr6mZLgtirvMiVL3gK8Yy0t0QGtccgKb6Ipo=	\N	f	ram@g.ucla.edu			ram@g.ucla.edu	f	t	2018-03-15 01:19:40.995979+00
-1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2018-03-24 09:04:35.873057+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
+1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2018-03-07 03:37:45.70487+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
 49	pbkdf2_sha256$36000$rdAWgD5oHsuc$jC3KqwJ6DGKucSmBq/FyenWp6Drx7R2vyvyjOPZsJXg=	\N	f	eric1997@g.ucla.edu			eric1997@g.ucla.edu	f	t	2018-03-14 18:57:11.903158+00
 59	pbkdf2_sha256$36000$tO7Gx3IR7dTz$O8HpQkInoS8kepZY13n7WeUMajTYmy1BgdFnObd2yoA=	\N	f	katiecai@g.ucla.edu	Katie	Cai	katiecai@g.ucla.edu	f	t	2018-03-15 01:47:36.221675+00
 60	pbkdf2_sha256$36000$XwGBCDGAeZDW$qjaan4Ty5qmOvRVIdMzU4JNVbUQ69ubVSP9sV4pv/DI=	\N	f	kfann285@g.ucla.edu	Karen	Fann	kfann285@g.ucla.edu	f	t	2018-03-15 01:51:03.193819+00
 61	pbkdf2_sha256$36000$E18K4kiUyh1m$W9g1t9BkH1qeyMBGHO7XVNMh6++o4WVDnHWmEo6DUhc=	\N	f	mitrikyle@g.ucla.edu	Dmitri	Brereton	mitrikyle@g.ucla.edu	f	t	2018-03-15 02:17:33.814483+00
-62	pbkdf2_sha256$36000$tBUS855UlhY4$2Pxh41ObZVkm753/b+inPHjLO22wQ/efFdDRs9OcWHw=	\N	f	rdeamici@g.ucla.edu	Richard	DeAmicis	rdeamici@g.ucla.edu	f	t	2018-03-29 16:56:24.646037+00
 \.
 
 
@@ -1277,8 +1276,6 @@ g1ic33xdb0di4zrkyqlpndjfqtimxxcd	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGM
 gcacwn405dx5esclw2j0o7snb98gaeuw	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-03-14 03:46:04.632399+00
 sudn0j5y9hcvm848154l02g3dlgfh56g	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-03-16 16:40:50.902813+00
 m2ysra04mhvqvhvwfxlzdfvjldq1lq12	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-03-21 03:37:45.707688+00
-6rnyegn38nax6178ykqe2b15z35ffnqh	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-05 03:14:03.210259+00
-757n8xgeueas2kjewoz4ypqvqhohuvuu	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-07 09:04:35.876935+00
 \.
 
 
@@ -1322,7 +1319,6 @@ COPY email_requests_request (id, email_body, preferred_mentee_email, phone, date
 33		lineaba@gmail.com		2018-03-15 02:13:42.965994+00	11	8
 34	please teach me oh legendary one	lineaba@gmail.com		2018-03-15 02:15:22.719818+00	11	8
 35	sedfrjukol	lineaba@gmail.com		2018-03-15 02:39:31.317927+00	11	21
-36	Test for changing the sendgrid account on the deployed server. We have over 100 emails/day now!	alexlongerbeam@g.ucla.edu		2018-03-16 02:30:22.516091+00	22	8
 \.
 
 
@@ -1445,13 +1441,6 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 144	5nQg3rcmREp47TrkUzKmyWOMaR6rRY	2018-03-15 12:17:34.127708+00	read write groups	1	61	2018-03-15 02:17:34.128055+00	2018-03-15 02:17:34.128069+00
 145	OucTleY3P8ORUEyjyjqHtc9EpmkCaP	2018-03-15 12:18:20.308769+00	read write groups	1	61	2018-03-15 02:18:20.309059+00	2018-03-15 02:18:20.309077+00
 146	ocgubPiJMVQt1V1DB1x215odBGVrYq	2018-03-15 12:18:54.605596+00	read write groups	1	17	2018-03-15 02:18:54.605936+00	2018-03-15 02:18:54.605951+00
-147	B3zxhzbuF33l1QUhc4uwDHKTt2Eufk	2018-03-16 12:28:10.575545+00	read write groups	1	32	2018-03-16 02:28:10.576099+00	2018-03-16 02:28:10.576115+00
-148	wGzCPX8rmflkAg0A1Iww8LhHBFc6QF	2018-03-16 12:29:33.568968+00	read write groups	1	32	2018-03-16 02:29:33.56929+00	2018-03-16 02:29:33.569305+00
-149	u8qQLCimG8zmXnThitd7Wo2d9FZEYm	2018-03-30 02:56:26.008627+00	read write groups	1	62	2018-03-29 16:56:26.009037+00	2018-03-29 16:56:26.009052+00
-150	QG8W3pmp8jgNzD9xkhqQMx3E813LAn	2018-03-30 09:33:48.866731+00	read write groups	1	16	2018-03-29 23:33:48.86704+00	2018-03-29 23:33:48.867055+00
-151	x9zZ5aMZYx1jzRhuExTSWeePquhsIt	2018-03-31 10:44:11.316625+00	read write groups	1	17	2018-03-31 00:44:11.316989+00	2018-03-31 00:44:11.317003+00
-152	ZsXA7PtGGXZoAzN5L30XQC0RlbUiIT	2018-03-31 10:44:11.327258+00	read write groups	1	17	2018-03-31 00:44:11.327497+00	2018-03-31 00:44:11.327511+00
-153	2UCNWNt2tJMQ74XOx1kYPbmttWG7jM	2018-03-31 10:44:24.282023+00	read write groups	1	17	2018-03-31 00:44:24.282352+00	2018-03-31 00:44:24.282366+00
 \.
 
 
@@ -1575,13 +1564,6 @@ COPY oauth2_provider_refreshtoken (id, token, access_token_id, application_id, u
 144	dVVUkoSPQLbAdiv9iQf0e2doSV9XXN	144	1	61	2018-03-15 02:17:34.129022+00	2018-03-15 02:17:34.129041+00
 145	HROeK5grRE0WknR0ytMfvexNqf7xRH	145	1	61	2018-03-15 02:18:20.310036+00	2018-03-15 02:18:20.310053+00
 146	mdTksoo3QUQBpzuBy013Jdk3yJnt6w	146	1	17	2018-03-15 02:18:54.606968+00	2018-03-15 02:18:54.606988+00
-147	gUu6JNJW3LdvArOGSSjwNUrw2b1XdS	147	1	32	2018-03-16 02:28:10.586444+00	2018-03-16 02:28:10.586461+00
-148	9ouXb97fttkqJxuswzeB41lICmckW7	148	1	32	2018-03-16 02:29:33.570277+00	2018-03-16 02:29:33.570294+00
-149	7kqToujfdTHUbTkyivu1ZnG0oB30tD	149	1	62	2018-03-29 16:56:26.010361+00	2018-03-29 16:56:26.01038+00
-150	tpNAEGQlJS0jV0yhCZVJ5iGFyULuXU	150	1	16	2018-03-29 23:33:48.868004+00	2018-03-29 23:33:48.868023+00
-151	56dZx7suXCpis2CoHCmTLQcaNy5nDt	151	1	17	2018-03-31 00:44:11.318618+00	2018-03-31 00:44:11.318637+00
-152	GN6KWFZE09nM7fViRtDsLn2Gy35T8U	152	1	17	2018-03-31 00:44:11.328473+00	2018-03-31 00:44:11.328492+00
-153	1xqEyhbofoOSy26qS9OvJTTIwm7T0o	153	1	17	2018-03-31 00:44:24.283397+00	2018-03-31 00:44:24.283416+00
 \.
 
 
@@ -1655,30 +1637,6 @@ COPY users_course (id, name) FROM stdin;
 63	Math 31b,32A/B,33A
 64	MAE 82,101,102,105A
 65	Physics 1ABC
-66	introduction to linguistics ling 20
-67	introduction to phonetics ling 103
-68	experimental phonetics ling 104
-69	Phonology I ling 119A
-70	syntax 1 ling 120A
-71	Semantics 1 ling 120C
-72	syntax 2 ling 165B
-73	Computational Linguistics ling 185A
-74	computer science 31
-75	Computer Science 32
-76	Computer science 35L
-77	Computer Science 31
-78	Ling 20 - Intro to linguistics
-79	Ling 103 - intro to phonetics
-80	Ling 104 - Expermintal Phonetics
-81	Ling 119A - Phonology 1
-82	Ling 120B - Syntax 1
-83	Ling 120C - semantics 1
-84	Ling 165B - Syntax 2
-85	Ling 185A - Computational Linguistics
-86	Math 31B - calculus 2
-87	Philosophy 31 - symbolic logic
-88	Psych 100A - Psychological statistics
-89	Psych 85 - Intro to Cognitive Science
 \.
 
 
@@ -1878,10 +1836,9 @@ COPY users_mentor (id, bio, major_id, profile_id, active, clubs, cons, gpa, pros
 17	Hello world	100	26	t			0.00	
 26		34	49	t			0.00	
 22		106	36	t			0.00	
-28	I am  a 32 year old non traditional student. I transferred to UCLA from San Francisco city College.  I originally was a film major but changed to linguistics.  While taking prerequisites at my community college I took a computer science class and found I really enjoyed the coursework.  This is when I decided to add the CS portion of my degree. \n\nOutside of schoolwork I enjoy staying fit and recently comleted UCLAs ironbruin sprint triathlon.  I am a member of the running club and the environmental student network.  I hope to go to graduate school for something related to computer science and urban/transportation planning.	92	51	t			0.00	
-5	My name is Linea, I am majoring in Linguistics. I would love to meet with you, if you would like to hear about my love for linguistics, and I'll try and answer any question you might have! I am an exchange student from Denmark, studying in Sweden, and currently enjoying L.A. Also, I am the PM for BQuest. If you have any questions or comments about our platform, please feel free to reach out to us at bquest.ucla@gmail.com	100	11	t			0.00	
 27		35	50	t			0.00	
 6	I can code, somewhat.	35	14	t			0.00	
+5	My name is Linea, I am majoring in Linguistics. I would love to meet with you, if you would like to hear about my love for linguistics, and I'll try and answer any question you might have! I am an exchange student from Denmark, studying in Sweden, and currently enjoying L.A. Also, I am the PM for BQuest. If you have any questions or comments about our platform, please feel free to reach out to us at bquest.ucla@gmail.com	100	11	t			0.00	
 8	I'm a second year CS major working at DevX on the BQuest team!	35	10	t			0.00	
 24	HMU I'm friendly	117	38	t			0.00	
 23		34	37	f			0.00	
@@ -1926,21 +1883,6 @@ COPY users_mentor_courses (id, mentor_id, course_id) FROM stdin;
 133	24	64
 134	24	63
 135	24	65
-147	28	75
-148	28	76
-149	28	77
-150	28	78
-151	28	79
-152	28	80
-153	28	81
-154	28	82
-155	28	83
-156	28	84
-157	28	85
-158	28	86
-159	28	87
-160	28	88
-161	28	89
 \.
 
 
@@ -1979,7 +1921,6 @@ COPY users_profile (id, user_id, verification_code, verified, picture, year, pho
 48	59	F5BEOUYBA6	t	profile_pictures/default_pic.jpg	2nd		t
 49	60	SVJTVW5JZA	t	profile_pictures/17E6F50F-A36E-4C6C-AC3B-394F09ABA31D.jpeg	2nd		t
 50	61	IUCG9WFO8U	t	profile_pictures/default_pic.jpg	2nd		t
-51	62	H8DA9FNDAY	t	profile_pictures/default_pic.jpg	4th		t
 \.
 
 
@@ -2015,7 +1956,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 62, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 61, true);
 
 
 --
@@ -2057,7 +1998,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 49, true);
 -- Name: email_requests_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('email_requests_request_id_seq', 36, true);
+SELECT pg_catalog.setval('email_requests_request_id_seq', 35, true);
 
 
 --
@@ -2078,7 +2019,7 @@ SELECT pg_catalog.setval('messaging_thread_id_seq', 1, false);
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 153, true);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 146, true);
 
 
 --
@@ -2099,14 +2040,14 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 153, true);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 146, true);
 
 
 --
 -- Name: users_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_classes_id_seq', 89, true);
+SELECT pg_catalog.setval('users_classes_id_seq', 65, true);
 
 
 --
@@ -2120,21 +2061,21 @@ SELECT pg_catalog.setval('users_major_id_seq', 171, true);
 -- Name: users_mentor_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_mentor_classes_id_seq', 161, true);
+SELECT pg_catalog.setval('users_mentor_classes_id_seq', 135, true);
 
 
 --
 -- Name: users_mentor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_mentor_id_seq', 28, true);
+SELECT pg_catalog.setval('users_mentor_id_seq', 27, true);
 
 
 --
 -- Name: users_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_profile_id_seq', 51, true);
+SELECT pg_catalog.setval('users_profile_id_seq', 50, true);
 
 
 --

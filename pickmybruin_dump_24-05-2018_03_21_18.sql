@@ -715,7 +715,7 @@ ALTER TABLE oauth2_provider_refreshtoken OWNER TO postgres;
 
 CREATE TABLE users_course (
     id integer NOT NULL,
-    name character varying(100) NOT NULL
+    name character varying(200) NOT NULL
 );
 
 
@@ -784,7 +784,6 @@ ALTER SEQUENCE users_major_id_seq OWNED BY users_major.id;
 CREATE TABLE users_mentor (
     id integer NOT NULL,
     bio character varying(5000) NOT NULL,
-    major_id integer,
     profile_id integer NOT NULL,
     active boolean NOT NULL,
     clubs character varying(500) NOT NULL,
@@ -854,6 +853,110 @@ ALTER SEQUENCE users_mentor_id_seq OWNED BY users_mentor.id;
 
 
 --
+-- Name: users_mentor_major; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE users_mentor_major (
+    id integer NOT NULL,
+    mentor_id integer NOT NULL,
+    major_id integer NOT NULL
+);
+
+
+ALTER TABLE users_mentor_major OWNER TO postgres;
+
+--
+-- Name: users_mentor_major_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_mentor_major_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE users_mentor_major_id_seq OWNER TO postgres;
+
+--
+-- Name: users_mentor_major_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_mentor_major_id_seq OWNED BY users_mentor_major.id;
+
+
+--
+-- Name: users_mentor_minor; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE users_mentor_minor (
+    id integer NOT NULL,
+    mentor_id integer NOT NULL,
+    minor_id integer NOT NULL
+);
+
+
+ALTER TABLE users_mentor_minor OWNER TO postgres;
+
+--
+-- Name: users_mentor_minor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_mentor_minor_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE users_mentor_minor_id_seq OWNER TO postgres;
+
+--
+-- Name: users_mentor_minor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_mentor_minor_id_seq OWNED BY users_mentor_minor.id;
+
+
+--
+-- Name: users_minor; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE users_minor (
+    id integer NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE users_minor OWNER TO postgres;
+
+--
+-- Name: users_minor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_minor_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE users_minor_id_seq OWNER TO postgres;
+
+--
+-- Name: users_minor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_minor_id_seq OWNED BY users_minor.id;
+
+
+--
 -- Name: users_profile; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -865,7 +968,8 @@ CREATE TABLE users_profile (
     picture character varying(100),
     year character varying(15) NOT NULL,
     phone_number character varying(13) NOT NULL,
-    notifications_enabled boolean NOT NULL
+    notifications_enabled boolean NOT NULL,
+    password_reset_code character varying(20)
 );
 
 
@@ -1013,6 +1117,27 @@ ALTER TABLE ONLY users_mentor_courses ALTER COLUMN id SET DEFAULT nextval('users
 
 
 --
+-- Name: users_mentor_major id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_major ALTER COLUMN id SET DEFAULT nextval('users_mentor_major_id_seq'::regclass);
+
+
+--
+-- Name: users_mentor_minor id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_minor ALTER COLUMN id SET DEFAULT nextval('users_mentor_minor_id_seq'::regclass);
+
+
+--
+-- Name: users_minor id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_minor ALTER COLUMN id SET DEFAULT nextval('users_minor_id_seq'::regclass);
+
+
+--
 -- Name: users_profile id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1094,6 +1219,9 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 53	Can add thread	19	add_thread
 54	Can change thread	19	change_thread
 55	Can delete thread	19	delete_thread
+56	Can add minor	20	add_minor
+57	Can change minor	20	change_minor
+58	Can delete minor	20	delete_minor
 \.
 
 
@@ -1104,7 +1232,6 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 29	pbkdf2_sha256$36000$iubTpJc8JUBH$p3zXRHWIOqmup5o1rVtKhAZhagf9z7W0+yH0mp4HNhQ=	\N	f	rishub@g.ucla.edu			rishub@g.ucla.edu	f	t	2018-02-01 04:31:59.045081+00
 30	pbkdf2_sha256$36000$ZI98BHWqGuN6$xatNeFsV3Oh2lvwU6b9Dl7fym6qsNoSs51HbyD6eF44=	\N	f	suntiancheng@g.ucla.edu	Christine	Sun	suntiancheng@g.ucla.edu	f	t	2018-02-01 05:05:36.583424+00
-21	pbkdf2_sha256$36000$KiMCnDxHTPvR$gOg7DmfevNMaEXPtXcR6H3C9qWfayIuQ/ywJb3Ot1Gg=	\N	f	dinkarkhattar@g.ucla.edu	Dinkar	Khattar	dinkarkhattar@g.ucla.edu	f	t	2018-01-30 23:41:53.599157+00
 38	pbkdf2_sha256$36000$FRKIkSMdDaQX$YwDf2lIbUZBEOsOs08YKtmveyEHQLbqSvcfvyHp5AsU=	\N	f	liwei1995@g.ucla.edu	Wei	Li	liwei1995@g.ucla.edu	f	t	2018-02-04 14:38:10.151952+00
 31	pbkdf2_sha256$36000$EQhNAwS5y16m$MyirrLKzjem6Cv0AULthpwOcOlbaQrCYJI9+PZ20HUk=	\N	f	haejinjo@g.ucla.edu	Haejin	Jo	professionalhaejin@gmail.com	f	t	2018-02-01 07:26:39.654487+00
 32	pbkdf2_sha256$36000$jpuvzKOJ6Jf2$qXZrxM2Ti79PHnJH4aAxeNznbJxI9Hy1nInziDsaSbg=	\N	f	alexlongerbeam@g.ucla.edu	Alex	Longerbeam	alexlongerbeam@g.ucla.edu	f	t	2018-02-01 07:37:26.849913+00
@@ -1116,7 +1243,6 @@ COPY auth_user (id, password, last_login, is_superuser, username, first_name, la
 40	pbkdf2_sha256$36000$BbVuYfSEY40S$NFC3FLDZKDEIU9P0Dj4+b5k9ZfXprt0WAY1ukrDflzQ=	\N	f	wdliu@g.ucla.edu	Wandi	Liu	wdliu@g.ucla.edu	f	t	2018-02-07 02:33:22.064857+00
 34	pbkdf2_sha256$36000$6UmOlHl6PU87$WW9iiv+oNBfGsNDFkvBrKh+uLNOFG+86lDek2mGZdzA=	\N	f	laurajane2696@g.ucla.edu	Laura Jane	Yee	laurajane2696@g.ucla.edu	f	t	2018-02-01 08:15:27.643283+00
 35	pbkdf2_sha256$36000$A6kOlJgKkVnp$Xef5R89zG2vG8Nju2hfKHf/hZEFLM1K5n4KmEhu9Gi4=	\N	f	sjmadsen@g.ucla.edu	Sarah	Madsen	sjmadsen@g.ucla.edu	f	t	2018-02-01 17:22:41.675682+00
-41	pbkdf2_sha256$36000$Dfo6M4ooqkv0$3YCJiwb9brllmKLpcl4r5DKEG+OJlIWAzlAHHYQ1uWA=	\N	f	marktai@g.ucla.edu	Mark	Tai	marktai@g.ucla.edu	f	t	2018-02-08 04:28:08.974431+00
 36	pbkdf2_sha256$36000$In4SCuoiFj6X$qZ18JR3JVczC9iaF+yGmKuKHqHOeJyDf/lrGQ2VzoUA=	\N	f	angelicapan@g.ucla.edu	Angelica	Pan	angelicapan@g.ucla.edu	f	t	2018-02-02 00:06:07.594093+00
 37	pbkdf2_sha256$36000$UwifzQy9k8bW$hfgqJJriY/sG20TLlwHSSlYqlkT2VDzXphPxYxBLT28=	\N	f	ucla17ckl@g.ucla.edu	Christian	Klinteberg	ucla17ckl@g.ucla.edu	f	t	2018-02-02 00:36:43.694741+00
 17	pbkdf2_sha256$36000$8gMcBmxbArHT$fsDPZNwX2XdPjv0RU14pWqIRR8zB6aYPS9NvizrwGLA=	\N	f	lineaba@g.ucla.edu	Linea Brink	Andersen	lineaba@gmail.com	f	t	2018-01-24 06:33:54.4572+00
@@ -1128,12 +1254,57 @@ COPY auth_user (id, password, last_login, is_superuser, username, first_name, la
 47	pbkdf2_sha256$36000$9KEvS2AuFaE6$rCmLYUhZhMnhWsge5u5J0IgEC4K9UBZePpPdAel9OWM=	\N	f	dwchen@g.ucla.edu	David	Chen	dwchen@g.ucla.edu	f	t	2018-03-02 04:16:24.740893+00
 48	pbkdf2_sha256$36000$X1NwFMYgu62e$cGA2KtGH0jtpIVK/fYiTKN+6NZ6olWWu9JzltNsY+lY=	\N	f	jpalmanzasoto@g.ucla.edu	Juan-Pablo	Almanza-Soto	jpalmanzasoto@g.ucla.edu	f	t	2018-03-02 05:30:31.075036+00
 53	pbkdf2_sha256$36000$OaF0s3i0qLp1$tHSX4qjZr6mZLgtirvMiVL3gK8Yy0t0QGtccgKb6Ipo=	\N	f	ram@g.ucla.edu			ram@g.ucla.edu	f	t	2018-03-15 01:19:40.995979+00
-1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2018-03-24 09:04:35.873057+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
 49	pbkdf2_sha256$36000$rdAWgD5oHsuc$jC3KqwJ6DGKucSmBq/FyenWp6Drx7R2vyvyjOPZsJXg=	\N	f	eric1997@g.ucla.edu			eric1997@g.ucla.edu	f	t	2018-03-14 18:57:11.903158+00
 59	pbkdf2_sha256$36000$tO7Gx3IR7dTz$O8HpQkInoS8kepZY13n7WeUMajTYmy1BgdFnObd2yoA=	\N	f	katiecai@g.ucla.edu	Katie	Cai	katiecai@g.ucla.edu	f	t	2018-03-15 01:47:36.221675+00
 60	pbkdf2_sha256$36000$XwGBCDGAeZDW$qjaan4Ty5qmOvRVIdMzU4JNVbUQ69ubVSP9sV4pv/DI=	\N	f	kfann285@g.ucla.edu	Karen	Fann	kfann285@g.ucla.edu	f	t	2018-03-15 01:51:03.193819+00
 61	pbkdf2_sha256$36000$E18K4kiUyh1m$W9g1t9BkH1qeyMBGHO7XVNMh6++o4WVDnHWmEo6DUhc=	\N	f	mitrikyle@g.ucla.edu	Dmitri	Brereton	mitrikyle@g.ucla.edu	f	t	2018-03-15 02:17:33.814483+00
 62	pbkdf2_sha256$36000$tBUS855UlhY4$2Pxh41ObZVkm753/b+inPHjLO22wQ/efFdDRs9OcWHw=	\N	f	rdeamici@g.ucla.edu	Richard	DeAmicis	rdeamici@g.ucla.edu	f	t	2018-03-29 16:56:24.646037+00
+63	pbkdf2_sha256$36000$XHruPVpmS93c$K/n7ux4kbKZvNZ31OSabwniR1ThnE1huOZ9u0+BlUsU=	\N	f	Kimeiga@g.ucla.edu	Hakan	Alpay	Kimeiga@g.ucla.edu	f	t	2018-04-05 03:43:49.084336+00
+66	pbkdf2_sha256$36000$rcPtnAke1vsi$OGw8kYgSWL02FX9P59sJfwaZ/rf+sM9Kp3MHRDl4H4M=	\N	f	bad_account@g.ucla.edu			bad_account@g.ucla.edu	f	t	2018-05-04 07:00:01.701505+00
+67	pbkdf2_sha256$36000$y156MWrKvHux$mAcr1B5iV0/nEC22TnLp3byUnHMd5x0bEexCio6dCQw=	\N	f	bad_account_2@g.ucla.edu			bad_account_2@g.ucla.edu	f	t	2018-05-04 07:05:02.48848+00
+65	pbkdf2_sha256$36000$SNAtDodEQ3EC$6GuO5f15Hk63ZMCduC84qI5HYoHSRoxkZZ700v+vixI=	\N	f	jcherian@g.ucla.edu	Jahan Kuruvilla	Cherian	jcherian@g.ucla.edu	f	t	2018-04-12 04:22:54.100489+00
+21	pbkdf2_sha256$36000$KiMCnDxHTPvR$gOg7DmfevNMaEXPtXcR6H3C9qWfayIuQ/ywJb3Ot1Gg=	\N	f	dinkarkhattar@g.ucla.edu	Dinkar	Khattar	dinkarkhattar@g.ucla.edu	f	t	2018-01-30 23:41:53.599157+00
+41	pbkdf2_sha256$36000$Dfo6M4ooqkv0$3YCJiwb9brllmKLpcl4r5DKEG+OJlIWAzlAHHYQ1uWA=	2018-05-24 02:56:11.022096+00	t	marktai@g.ucla.edu	Mark	Tai	marktai@g.ucla.edu	t	t	2018-02-08 04:28:08+00
+1	pbkdf2_sha256$36000$TIguTya1YR2Q$1Qv1eQ0pf+ANE8zGcmKbgMYCbyK8XCIx9FyJvC2sbj8=	2018-05-24 03:05:08.354587+00	t	root	mark	tai	mark@marktai.com	t	t	2017-10-25 23:32:49.234+00
+64	pbkdf2_sha256$36000$Z3oAWjftfWxY$7qCknLv6O+gy3ojZePmgc02sBV3kPmFWpkruH2Yz3fA=	\N	f	kunqian@g.ucla.edu	Kevin	Qian	kunqian@g.ucla.edu	f	t	2018-04-05 03:55:25.815234+00
+76	pbkdf2_sha256$36000$PKp2y0RyVOi7$iHhvMuiiPbGUyXdxRqKGMejq48pdQpOZZhPDBTvmE5I=	\N	f	celiapj@g.ucla.edu	Celia	Janes	celiapj@g.ucla.edu	f	t	2018-05-22 06:49:44.644264+00
+77	pbkdf2_sha256$36000$UgBb7eOUDAi6$Rzp6pN7pgPcorRTxTC4QaByx0W8oplXeM0KroX/La+E=	\N	f	rsimonian@g.ucla.edu			rsimonian@g.ucla.edu	f	t	2018-05-23 16:45:09.153902+00
+78	pbkdf2_sha256$36000$FnecOM9NBXlI$jLE3lt587XzbGozzNhbSuhAQaf1wyiOByDrNKHosoxk=	\N	f	siow98@g.ucla.edu	Leo	Siow	siow98@g.ucla.edu	f	t	2018-05-23 17:32:41.530273+00
+79	pbkdf2_sha256$36000$8sJEvJIhGEJk$BtcRtqdZGN9DyUPphQHYS9N5JQjaPnHZ6buthnbXHQ0=	\N	f	sanderson21@g.ucla.edu	Scott	Anderson	scott.n.anderson98@gmail.com	f	t	2018-05-23 19:39:36.730191+00
+80	pbkdf2_sha256$36000$Xg9FVe3Gzwyf$/+NQ64A3hWI7j1hk6Zia2Xa7IBX2b2o3laaDC5oKbtY=	\N	f	yinmeichan@g.ucla.edu			yinmeichan@g.ucla.edu	f	t	2018-05-23 19:43:05.379841+00
+81	pbkdf2_sha256$36000$24DcQnNaPKOP$CceeGJvTHLVpFoVH4iEy+TQSkrSBo6+7IraCoKlYG84=	\N	f	hwy19960708@g.ucla.edu			hwy19960708@g.ucla.edu	f	t	2018-05-23 19:44:23.022842+00
+82	pbkdf2_sha256$36000$v0aXSeiPtloj$eBMZ6BFP0TUR9N5W/FI/aW89lmuB0YM/qbzGkk399SA=	\N	f	gfaour@g.ucla.edu	George Louis	Faour	gfaour@g.ucla.edu	f	t	2018-05-23 19:45:22.379784+00
+83	pbkdf2_sha256$36000$jqauuDeF5Hr5$8avOInFL2qsq5V2IP9oCnnlzuqJVQPasNaalcHB6uug=	\N	f	aryanr@g.ucla.edu			aryanr@g.ucla.edu	f	t	2018-05-23 19:54:56.226181+00
+86	pbkdf2_sha256$36000$HVkEsUGs5AvM$iSRWOjs7l0L8P2LTok1LWQrlUj+evBhK7QAG2LzxKu0=	\N	f	cindyortiz1127@g.ucla.edu			cindyortiz1127@g.ucla.edu	f	t	2018-05-23 19:55:39.862815+00
+89	pbkdf2_sha256$36000$7uZKAD95Hr2B$aTP+egBdxOerqgpLdGWyIr2QDBApgTj8CVYt/kscsW8=	\N	f	alexmaltsev@g.ucla.edu			alexmaltsev@g.ucla.edu	f	t	2018-05-23 19:57:15.377945+00
+90	pbkdf2_sha256$36000$EV0Zhz7uOX43$STebW8ar2W1fQH3Qx2QmXiMCue/yaLdQBxysZfrqeIg=	\N	f	adrikac@g.ucla.edu			adrikac@g.ucla.edu	f	t	2018-05-23 19:58:04.474989+00
+119	pbkdf2_sha256$36000$Xc2JAGM9KW6q$riKlHLmeNmuhUQh9Bbd2ga32med3vVo8UguBJpnrocQ=	\N	f	jstox@g.ucla.edu			jstox@g.ucla.edu	f	t	2018-05-23 21:40:30.30978+00
+93	pbkdf2_sha256$36000$OaCDglK4dKYq$6Ce4r+/LseLzw0Zt3g0YHRz61sKgAgK02Pm+EskJq68=	\N	f	echou9988@g.ucla.edu			echou9988@g.ucla.edu	f	t	2018-05-23 20:00:30.518422+00
+94	pbkdf2_sha256$36000$yt4dfOpSsu2p$42wbE/YAaNxCKPnsFT28j+CgOv4dITS7KvD/4yEKAHA=	\N	f	brysonlevisay@g.ucla.edu			brysonlevisay@g.ucla.edu	f	t	2018-05-23 20:03:46.863954+00
+95	pbkdf2_sha256$36000$vJeybFDidxZY$43zlok3aoHnC9/P8SSTOvRAXzpkcEDiRiLOb4bxCxVo=	\N	f	korozco@g.ucla.edu			korozco@g.ucla.edu	f	t	2018-05-23 20:05:20.679198+00
+98	pbkdf2_sha256$36000$sRNEyGQMsg2D$nK146MiyrktV8sKnUE+ehnxODC+xL5hPO1BVdW7OoFQ=	\N	f	Lupitatr@g.ucla.edu	Maria Torres	Ramos	Lupitatr@g.ucla.edu	f	t	2018-05-23 20:06:28.132735+00
+91	pbkdf2_sha256$36000$Md5oiZrf1MEw$TsqQCUjnNA/6JM6o85Cb5fJ281xPNqL7mRxZX9lt5Jw=	\N	f	rbax@g.ucla.edu	Rachel Elizabeth	Bax	rbax@g.ucla.edu	f	t	2018-05-23 19:58:19.487445+00
+99	pbkdf2_sha256$36000$ahe3DLTgy35b$cqYwYlWOe7MkCfgPvodzuaYXLr2MiJ/LQB4+kUud+P4=	\N	f	sharonjohn@g.ucla.edu	Sharon	John	sharonjohn@g.ucla.edu	f	t	2018-05-23 20:20:20.399259+00
+100	pbkdf2_sha256$36000$vUIuLILWT9jh$wd6dkSX0ykyVOTQM8//CbhI3rPHNnyudqlqtkPTYH7A=	\N	f	emiao15@g.ucla.edu	Elaine	Miao	emiao15@g.ucla.edu	f	t	2018-05-23 20:26:16.811932+00
+102	pbkdf2_sha256$36000$4dxls1HeQ2kT$WcJAGxZ1DxkiwPPZmm8RAvBptDhUm70jdSlcIesnTeM=	\N	f	chasepage@g.ucla.edu	Chase	Page	chasepage@g.ucla.edu	f	t	2018-05-23 20:40:19.626329+00
+103	pbkdf2_sha256$36000$xXOGQatNj2M3$VK9Rq5e12VBKOylAqZ994FIvoQOYJ6lIScKhSX0nQE0=	\N	f	heysamlee@g.ucla.edu	Samuel J.	Lee	heysamlee@g.ucla.edu	f	t	2018-05-23 20:43:49.83222+00
+104	pbkdf2_sha256$36000$o2oBp1d9npaE$DKowFPG2dz6Q+zsRBRzd9n3YvOBwwvutbkfB7ZDmpw4=	\N	f	epatel6@g.ucla.edu			epatel6@g.ucla.edu	f	t	2018-05-23 20:47:22.564762+00
+106	pbkdf2_sha256$36000$rqcrgenqXJJy$TAWMVoNUSc2jXH5Qa5gwtLQEIpNVNEA2uCPAD/PsCDU=	\N	f	acevans98@g.ucla.edu			acevans98@g.ucla.edu	f	t	2018-05-23 20:51:37.667628+00
+107	pbkdf2_sha256$36000$wi4Fe8wgQLbw$Vn13brQrvI3zca42sYhdm5RcTjZLiwCgcgIzgjQvIQc=	\N	f	Kardia75@g.ucla.edu			Kardia75@g.ucla.edu	f	t	2018-05-23 20:52:22.926396+00
+109	pbkdf2_sha256$36000$ZWwT0vsKsOSW$PO5+gigIRs3h2+JbmBjlVjTBlGG7uliARHoNjBWpB4Y=	\N	f	dianattejeda@g.ucla.edu			dianattejeda@g.ucla.edu	f	t	2018-05-23 20:54:51.915251+00
+111	pbkdf2_sha256$36000$sDmfRGIBuj9O$6T0hwttAPzYZiX2QBbKM+Ny6MjklJygkxHF5nwQNJBg=	\N	f	Ptlee1@g.ucla.edu			Ptlee1@g.ucla.edu	f	t	2018-05-23 20:55:46.631714+00
+110	pbkdf2_sha256$36000$Xxr4t7KomqTE$E9JAKjPze2YVlRAMjHbWuf2NiZBg9qmurRczJfUb5IA=	\N	f	seeratjajj@g.ucla.edu	Seerat	Jajj	seeratjajj@g.ucla.edu	f	t	2018-05-23 20:55:32.291817+00
+105	pbkdf2_sha256$36000$IbKvTLH2RF75$h0LVbZdI1Dj2bumnkngqeA14wEGI6RkVnKbz58dFJRY=	\N	f	clairekillian@g.ucla.edu	Claire	Killian	ckillian113@gmail.com	f	t	2018-05-23 20:50:49.002307+00
+108	pbkdf2_sha256$36000$IgsAPf3PuGzU$+ntHetGz1l1jepf4ZspPqi2eK8X9q3EvsKdjExCze/4=	\N	f	lifeofapancake@g.ucla.edu	Gavino	Marquez	lifeofapancake@g.ucla.edu	f	t	2018-05-23 20:52:24.131263+00
+113	pbkdf2_sha256$36000$NZgiz0ahz4Nc$GiY//O+llTJ4AlvyEZJpvuCGWosHiv8gVsVpINj2F3E=	\N	f	mcheung10@g.ucla.edu	Matthew	Cheung	mcheung10@g.ucla.edu	f	t	2018-05-23 20:57:34.646219+00
+112	pbkdf2_sha256$36000$Rl9bhzYdrf1r$kCUPxaeQpZ9oZeWldWYoNRagnJw9dmLkd3ZkbIjymhw=	\N	f	lawrencechen98@g.ucla.edu	Lawrence	Chen	lawrencechen98@g.ucla.edu	f	t	2018-05-23 20:56:55.493523+00
+114	pbkdf2_sha256$36000$VttB7C7clRVb$BVXxPt7XUsq15GRjDK6Dfiz7BP5JO+9FWPgMuqSqXvQ=	\N	f	mrachamallu@g.ucla.edu	Meera	Rachamallu	mrachamallu@g.ucla.edu	f	t	2018-05-23 21:04:11.174257+00
+115	pbkdf2_sha256$36000$sL8QEXzruiMX$6S3B8h50Bnpr317LfUIX/O1m/VmL9Sj3+8fvIOiS3PQ=	\N	f	ayushp@g.ucla.edu	Ayush	Patel	ayushp@g.ucla.edu	f	t	2018-05-23 21:04:20.495713+00
+116	pbkdf2_sha256$36000$8IF13Y97gOxr$+z+rSwENf35wZ4jpZXYbKsitSjo6ylJ2SBnP9NN6SI4=	\N	f	zahrahajee712@g.ucla.edu			zahrahajee712@g.ucla.edu	f	t	2018-05-23 21:20:43.648739+00
+117	pbkdf2_sha256$36000$pbooIzzDFS1V$izze+bgU4vAWVYsAFWFaEJ5yzF+n1cHiDpBDwsIKZNs=	\N	f	arianoosha7@g.ucla.edu			arianoosha7@g.ucla.edu	f	t	2018-05-23 21:23:16.833806+00
+118	pbkdf2_sha256$36000$awDBK7YrPtT5$h0zQiF8S/Rr/7bPsLiq8AKdQzBnbXk3A7OXVK8H7/m8=	\N	f	abhattasali@g.ucla.edu			abhattasali@g.ucla.edu	f	t	2018-05-23 21:27:40.721941+00
+92	pbkdf2_sha256$36000$N9lcCbwnOgHl$tqu39EmyO8kmzC8vs8r2AxN343/FCIPFtd77EBsYFPE=	\N	f	ycyvonne@g.ucla.edu	Yvonne	Chen	ycyvonne@g.ucla.edu	f	t	2018-05-23 19:59:21.251993+00
+120	pbkdf2_sha256$36000$VQ7lwtlY5KJc$2JqyntyDcpWsSaBaJu1oLmiHhUUUInPT8YXrM3ifuUI=	\N	f	natebarrett98@g.ucla.edu	Nate	Barrett	natebarrett98@g.ucla.edu	f	t	2018-05-23 21:47:57.781914+00
 \.
 
 
@@ -1173,6 +1344,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 6	2018-02-28 04:04:27.055685+00	11	dinkarkhattar@ucla.edu	3		4	1
 7	2018-02-28 04:04:27.057371+00	10	marktai@ucla.edu	3		4	1
 8	2018-02-28 04:04:27.059133+00	6	test@marktai.com	3		4	1
+9	2018-05-24 02:45:55.419466+00	41	marktai@g.ucla.edu	2	[{"changed": {"fields": ["is_staff", "is_superuser"]}}]	4	1
 \.
 
 
@@ -1199,6 +1371,7 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 17	users	course
 18	messaging	message
 19	messaging	thread
+20	users	minor
 \.
 
 
@@ -1255,6 +1428,16 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 47	messaging	0002_auto_20180221_0446	2018-03-15 01:21:29.902833+00
 48	messaging	0003_message_sender	2018-03-15 01:21:29.931391+00
 49	messaging	0004_auto_20180305_2306	2018-03-15 01:21:29.963+00
+50	users	0022_profile_password_reset_code	2018-05-24 02:42:23.471484+00
+51	users	0023_auto_20180314_1346	2018-05-24 02:42:23.52182+00
+52	users	0024_auto_20180324_0125	2018-05-24 02:42:23.578436+00
+53	users	0025_auto_20180425_2214	2018-05-24 02:42:23.661138+00
+54	users	0026_auto_20180425_2215	2018-05-24 02:42:23.681126+00
+55	users	0027_auto_20180425_2217	2018-05-24 02:42:23.761564+00
+56	users	0028_auto_20180425_2223	2018-05-24 02:42:23.829954+00
+57	users	0029_auto_20180515_1045	2018-05-24 02:42:23.901906+00
+58	users	0030_auto_20180515_1053	2018-05-24 02:42:23.910803+00
+59	users	0031_auto_20180521_2123	2018-05-24 02:42:23.936375+00
 \.
 
 
@@ -1279,6 +1462,11 @@ sudn0j5y9hcvm848154l02g3dlgfh56g	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGM
 m2ysra04mhvqvhvwfxlzdfvjldq1lq12	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-03-21 03:37:45.707688+00
 6rnyegn38nax6178ykqe2b15z35ffnqh	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-05 03:14:03.210259+00
 757n8xgeueas2kjewoz4ypqvqhohuvuu	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-07 09:04:35.876935+00
+mhlie5xpxe2czznm5ls78ui39o7nkv3y	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-23 16:41:07.48588+00
+a9aoi2t3obdx7f895prr0mz2by0hmlf7	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-04-26 02:37:48.214206+00
+hjmq2veytlw10pv55wg3xon7lz9sw4j5	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-05-16 02:38:59.981784+00
+rl7f0onyalrq27dyml1pgk1b60tbub0c	YjU4ZWUyY2ZmMTQzODM3YmJkZjM5OWM5ZWU0Y2IwYzk0NGQzMzQ0Nzp7Il9hdXRoX3VzZXJfaWQiOiI0MSIsIl9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiODRlMmJkMDhlMzIzN2U4ZGNmODJkOWVkODAyYmVhM2ZlNDRjNGM1MCJ9	2018-06-07 02:56:11.024636+00
+t7319jvqpqknl8ytu435x5nuwjmzgp0r	Yzc0YWM5MzQyYjUxNDFmYWMwZDEwNjBmYTI4MjU5ZTQ0NGMzYmU4ZDp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIxYWI2N2M2NjUxZjI1YmQ0OWEzOTA4ZmE5M2M1YmNjNTk1Yjg1NzM3In0=	2018-06-07 03:05:08.357048+00
 \.
 
 
@@ -1323,6 +1511,8 @@ COPY email_requests_request (id, email_body, preferred_mentee_email, phone, date
 34	please teach me oh legendary one	lineaba@gmail.com		2018-03-15 02:15:22.719818+00	11	8
 35	sedfrjukol	lineaba@gmail.com		2018-03-15 02:39:31.317927+00	11	21
 36	Test for changing the sendgrid account on the deployed server. We have over 100 emails/day now!	alexlongerbeam@g.ucla.edu		2018-03-16 02:30:22.516091+00	22	8
+37	TEST	kunqian@g.ucla.edu		2018-04-12 03:57:08.652217+00	53	5
+38	hey whatsup	ycyvonne@g.ucla.edu		2018-05-23 21:32:42.69863+00	69	31
 \.
 
 
@@ -1452,6 +1642,107 @@ COPY oauth2_provider_accesstoken (id, token, expires, scope, application_id, use
 151	x9zZ5aMZYx1jzRhuExTSWeePquhsIt	2018-03-31 10:44:11.316625+00	read write groups	1	17	2018-03-31 00:44:11.316989+00	2018-03-31 00:44:11.317003+00
 152	ZsXA7PtGGXZoAzN5L30XQC0RlbUiIT	2018-03-31 10:44:11.327258+00	read write groups	1	17	2018-03-31 00:44:11.327497+00	2018-03-31 00:44:11.327511+00
 153	2UCNWNt2tJMQ74XOx1kYPbmttWG7jM	2018-03-31 10:44:24.282023+00	read write groups	1	17	2018-03-31 00:44:24.282352+00	2018-03-31 00:44:24.282366+00
+154	tIuXcdxJNwWf5bSU7iSRMody62FyXK	2018-04-04 14:44:31.210685+00	read write groups	1	32	2018-04-04 04:44:31.211262+00	2018-04-04 04:44:31.211278+00
+155	TDiMAtWrUcKO1CX26iYwV4QWxJf7Ez	2018-04-04 14:51:55.344887+00	read write groups	1	32	2018-04-04 04:51:55.345207+00	2018-04-04 04:51:55.345221+00
+156	TGfA3TiTHdtK4AdL3M5eT4znNfHFyx	2018-04-05 13:43:50.744407+00	read write groups	1	63	2018-04-05 03:43:50.744742+00	2018-04-05 03:43:50.744756+00
+157	AcUDr6zzRZyZcYNz6L9Nlt7ugtC298	2018-04-05 13:55:27.159905+00	read write groups	1	64	2018-04-05 03:55:27.160197+00	2018-04-05 03:55:27.160211+00
+158	IYtimWiDD8buqsHYhq5hdgoYQNV0fM	2018-04-05 13:59:19.685248+00	read write groups	1	47	2018-04-05 03:59:19.685609+00	2018-04-05 03:59:19.685624+00
+159	Rb7NPGD3t2mWbjS1WSyAIzYMtbtoWG	2018-04-07 15:07:41.067373+00	read write groups	1	16	2018-04-07 05:07:41.067704+00	2018-04-07 05:07:41.06772+00
+160	VROE2UdcMMNJxMC4mdSfaDr4EfpfMq	2018-04-09 14:03:26.450228+00	read write groups	1	32	2018-04-09 04:03:26.450568+00	2018-04-09 04:03:26.450583+00
+161	KiW2y1MdbZWZJZNnKxNiHvyi6WEmkM	2018-04-10 02:42:13.81168+00	read write groups	1	47	2018-04-09 16:42:13.812069+00	2018-04-09 16:42:13.812085+00
+162	QjaUszeBj2kTMoq8nemr3FhsNCVdOa	2018-04-10 09:05:25.757424+00	read write groups	1	17	2018-04-09 23:05:25.757798+00	2018-04-09 23:05:25.757814+00
+163	Bb5SGOTkiQpwbQnPbbRXPXkhyMoQAO	2018-04-10 09:29:13.558517+00	read write groups	1	17	2018-04-09 23:29:13.558936+00	2018-04-09 23:29:13.558952+00
+164	e53cpFBNCmNZfoDZwYGQydz5QNq6PX	2018-04-10 09:39:03.069108+00	read write groups	1	17	2018-04-09 23:39:03.069439+00	2018-04-09 23:39:03.069455+00
+165	Jg0Hgv5jRHIXO9kZfpkaRovlQQyjvP	2018-04-10 09:47:39.226775+00	read write groups	1	17	2018-04-09 23:47:39.227077+00	2018-04-09 23:47:39.227092+00
+166	kS3hCqmkiJrdYlfEjFzGSHj1qbG6OW	2018-04-12 06:56:40.507771+00	read write groups	1	47	2018-04-11 20:56:40.508137+00	2018-04-11 20:56:40.508151+00
+167	zOVgY3q2M3lphWcWeg7B2j4SlhUC7Y	2018-04-12 12:37:31.857459+00	read write groups	1	41	2018-04-12 02:37:31.857869+00	2018-04-12 02:37:31.857883+00
+168	KMT2fQD0YnNMyoAQAMLidEDYM9Abjl	2018-04-12 12:37:37.147407+00	read write groups	1	17	2018-04-12 02:37:37.147727+00	2018-04-12 02:37:37.147741+00
+169	WjNPO99WJogubzVKbZTxz2pDOkPDT9	2018-04-12 12:39:26.120565+00	read write groups	1	21	2018-04-12 02:39:26.120981+00	2018-04-12 02:39:26.120996+00
+170	PeVBG4ojk9WFxo6k7NSgZmRQAMqN00	2018-04-12 12:47:57.908087+00	read write groups	1	21	2018-04-12 02:47:57.908434+00	2018-04-12 02:47:57.908449+00
+171	i6ZTy1gNKLjcUh86DjHG68WWZWaILI	2018-04-12 13:56:35.715593+00	read write groups	1	64	2018-04-12 03:56:35.715983+00	2018-04-12 03:56:35.715997+00
+172	jPUTBN5CXFBb1Eg7bIHQJSUalvvAXw	2018-04-12 14:22:54.697136+00	read write groups	1	65	2018-04-12 04:22:54.697545+00	2018-04-12 04:22:54.697561+00
+173	J1vPMrf15ORIj0n7w7q4J9XmGQ9zFW	2018-04-12 15:16:37.363664+00	read write groups	1	16	2018-04-12 05:16:37.364025+00	2018-04-12 05:16:37.364053+00
+174	7ebxqA8kx76DNOXmRGAU1OHO08n7Hv	2018-04-14 09:23:32.86494+00	read write groups	1	21	2018-04-13 23:23:32.865314+00	2018-04-13 23:23:32.865329+00
+175	bfndgiXaxwa4JELkbADf4WMRl0deEs	2018-04-17 15:13:30.779959+00	read write groups	1	17	2018-04-17 05:13:30.78028+00	2018-04-17 05:13:30.780296+00
+176	1WAXWwkPlhzTGiVBJhEAG0hYRfPhol	2018-04-18 13:24:06.81649+00	read write groups	1	17	2018-04-18 03:24:06.816903+00	2018-04-18 03:24:06.816918+00
+177	n1kCpNwkUk9HjKSJmXIdRjwcJlYDQ5	2018-04-23 11:29:47.569557+00	read write groups	1	16	2018-04-23 01:29:47.569908+00	2018-04-23 01:29:47.569923+00
+178	wZ57Vv3Tvj1LGwyNqkJtr77J7lBOEA	2018-04-24 02:40:47.945644+00	read write groups	1	40	2018-04-23 16:40:47.945995+00	2018-04-23 16:40:47.946011+00
+179	dbwk7fT8Mo6brrSK4ctoZaJRILaYXN	2018-04-25 11:59:56.566171+00	read write groups	1	16	2018-04-25 01:59:56.566474+00	2018-04-25 01:59:56.566487+00
+180	m3eJfm4UOmr1uHqBfvz9lxf0nc7Mmq	2018-04-25 13:32:01.193012+00	read write groups	1	16	2018-04-25 03:32:01.19342+00	2018-04-25 03:32:01.193435+00
+181	h7Bn5Ww8vTeCGXqQlKvS00NEEdRczp	2018-05-01 07:59:33.083914+00	read write groups	1	40	2018-04-30 21:59:33.084242+00	2018-04-30 21:59:33.084257+00
+182	1PlPUSBUlI54aTQhEizQZGS51SjeJo	2018-05-01 11:34:04.74511+00	read write groups	1	40	2018-05-01 01:34:04.745418+00	2018-05-01 01:34:04.745433+00
+183	IqfAk0MJqZSxTInvS4AjpBxbKy3tl1	2018-05-01 16:11:49.292879+00	read write groups	1	21	2018-05-01 06:11:49.29321+00	2018-05-01 06:11:49.293226+00
+184	BQYBShVVmpd0u5DWrUf1wZEdZrnoQI	2018-05-04 00:52:20.554062+00	read write groups	1	16	2018-05-03 14:52:20.554451+00	2018-05-03 14:52:20.554466+00
+185	jSn9w0BgAJYdhCtmBmPHOUGGos4Air	2018-05-04 16:51:13.001111+00	read write groups	1	64	2018-05-04 06:51:13.001553+00	2018-05-04 06:51:13.001568+00
+186	W6kJbqPlkIlzqsgbyu4kAaYu1E5Igs	2018-05-04 17:00:03.497214+00	read write groups	1	66	2018-05-04 07:00:03.497684+00	2018-05-04 07:00:03.4977+00
+187	F3TM4Jd6JIkkogLOJ4iWz2woAxlHhR	2018-05-04 17:05:02.979317+00	read write groups	1	67	2018-05-04 07:05:02.97973+00	2018-05-04 07:05:02.979746+00
+188	Cwneo6DaU2VoSlUFw67c12kJFL6wgP	2018-05-11 01:47:42.316089+00	read write groups	1	16	2018-05-10 15:47:42.318816+00	2018-05-10 15:47:42.318851+00
+189	rLMY0uRmUmztIy4MfrQMsIqAVc9uGi	2018-05-16 12:34:42.060233+00	read write groups	1	16	2018-05-16 02:34:42.06061+00	2018-05-16 02:34:42.060626+00
+190	zruCSaFZVm3NR8MGWQVF0tUQTfmkCB	2018-05-16 12:36:04.58654+00	read write groups	1	17	2018-05-16 02:36:04.586874+00	2018-05-16 02:36:04.58689+00
+191	c3VFEK4wOzChGR6I7E5NudPjkME3Cw	2018-05-16 12:37:21.527685+00	read write groups	1	64	2018-05-16 02:37:21.527994+00	2018-05-16 02:37:21.52801+00
+192	ay3K1OIT2t8dZ4u1Pc9HfcX3vtdOgp	2018-05-19 05:06:13.770418+00	read write groups	1	47	2018-05-18 19:06:13.770762+00	2018-05-18 19:06:13.770776+00
+193	vHWAsjuo4S9tcDr163Z9k5j8eMOFGi	2018-05-22 03:49:43.810991+00	read write groups	1	17	2018-05-21 17:49:43.811291+00	2018-05-21 17:49:43.811305+00
+194	mlGbHG1P7c7rY4dnwQ1JYkhEFCaor5	2018-05-22 07:48:08.430948+00	read write groups	1	32	2018-05-21 21:48:08.431302+00	2018-05-21 21:48:08.431318+00
+195	nIgAwgoP5268d4vfTAtQxSsUpReYft	2018-05-22 16:49:45.224891+00	read write groups	1	76	2018-05-22 06:49:45.225239+00	2018-05-22 06:49:45.225255+00
+196	KBb25Tvr99BJOmLLgHAoX5nDmOLuDU	2018-05-24 02:45:10.024149+00	read write groups	1	77	2018-05-23 16:45:10.024438+00	2018-05-23 16:45:10.024452+00
+197	wCcR3F1CE8O3XUTolMY5KjZZggCVcR	2018-05-24 03:32:41.952061+00	read write groups	1	78	2018-05-23 17:32:41.952414+00	2018-05-23 17:32:41.95243+00
+198	ESLY2IO3YKLL4VquE533FrNSgJlu2v	2018-05-24 05:39:37.368507+00	read write groups	1	79	2018-05-23 19:39:37.368841+00	2018-05-23 19:39:37.368857+00
+199	COdc8UcLEPeDtSPZVgANwsIGQUrKLY	2018-05-24 05:43:06.078889+00	read write groups	1	80	2018-05-23 19:43:06.079232+00	2018-05-23 19:43:06.079247+00
+200	cdx7Cov9nR4FKXc0NXE7lnQ95JFyxU	2018-05-24 05:44:02.052582+00	read write groups	1	80	2018-05-23 19:44:02.052909+00	2018-05-23 19:44:02.052923+00
+201	DIxvFXy8KevsD6xAswmsxeiBLHBjXz	2018-05-24 05:44:23.584511+00	read write groups	1	81	2018-05-23 19:44:23.58483+00	2018-05-23 19:44:23.584844+00
+202	bczoGv5gKFpxswgTuAaZcez6PnMgsY	2018-05-24 05:45:23.138048+00	read write groups	1	82	2018-05-23 19:45:23.138356+00	2018-05-23 19:45:23.138371+00
+203	vZmW6lH6l1e0IA4Y6ymEYmMG4GrkyN	2018-05-24 05:46:22.594589+00	read write groups	1	82	2018-05-23 19:46:22.594917+00	2018-05-23 19:46:22.594933+00
+204	cazvB0uYteQgAuMUNBDRJFGBURJKrw	2018-05-24 05:51:49.485624+00	read write groups	1	82	2018-05-23 19:51:49.485915+00	2018-05-23 19:51:49.485928+00
+205	ZGPs9UjwtiKeESR9Ew6bDdrMPpekMJ	2018-05-24 05:54:56.937358+00	read write groups	1	83	2018-05-23 19:54:56.937698+00	2018-05-23 19:54:56.937713+00
+206	OYC5cubdSkymDOvFk9iG3XQNY1cRQu	2018-05-24 05:55:40.422283+00	read write groups	1	86	2018-05-23 19:55:40.422595+00	2018-05-23 19:55:40.422611+00
+207	yRanWKRKBgV3PmomPJ0jZ4uwFugvHe	2018-05-24 05:57:15.947667+00	read write groups	1	89	2018-05-23 19:57:15.94798+00	2018-05-23 19:57:15.947994+00
+208	ROQCOmACVdGQ7Hp2ANgqdqs20kWD92	2018-05-24 05:58:04.900757+00	read write groups	1	90	2018-05-23 19:58:04.901061+00	2018-05-23 19:58:04.901076+00
+209	0Bfr211OiXeE63h9PtsEbiCIpWRjnK	2018-05-24 05:58:20.350317+00	read write groups	1	91	2018-05-23 19:58:20.350608+00	2018-05-23 19:58:20.350622+00
+210	T49RJmFXoVRDaLR2XYFRoNKagHaHZn	2018-05-24 05:59:21.611115+00	read write groups	1	92	2018-05-23 19:59:21.611438+00	2018-05-23 19:59:21.611452+00
+211	yAmukGmHkt4TFBbywCu96maMOGlRLL	2018-05-24 06:00:08.325427+00	read write groups	1	92	2018-05-23 20:00:08.325793+00	2018-05-23 20:00:08.325808+00
+212	KdplHp7E0HVqwWQvuWOyj3fUcfs8KY	2018-05-24 06:00:31.01907+00	read write groups	1	93	2018-05-23 20:00:31.019393+00	2018-05-23 20:00:31.019409+00
+213	of2fO6hMCnHH79K15hw6UMgrHlYXMC	2018-05-24 06:03:47.329668+00	read write groups	1	94	2018-05-23 20:03:47.329953+00	2018-05-23 20:03:47.329967+00
+214	NHB8MKc41rlMrDJMHMRk0hh0DqoUqa	2018-05-24 06:05:21.033114+00	read write groups	1	95	2018-05-23 20:05:21.033524+00	2018-05-23 20:05:21.03354+00
+215	C6pzCdw5WAPIX3RfwNELKTqQk84kw9	2018-05-24 06:06:28.724897+00	read write groups	1	98	2018-05-23 20:06:28.725211+00	2018-05-23 20:06:28.725227+00
+216	XzBLIZOdYHq2rSw8vZGD4LqlVOfWTQ	2018-05-24 06:07:00.18534+00	read write groups	1	98	2018-05-23 20:07:00.185653+00	2018-05-23 20:07:00.185667+00
+217	GObh1c0J4bRbGJmDVBfqUp95v6lJNu	2018-05-24 06:11:47.480666+00	read write groups	1	91	2018-05-23 20:11:47.481067+00	2018-05-23 20:11:47.481083+00
+218	ce2yUNoae5GVXUhvYBw24SGXyEBJ9K	2018-05-24 06:20:20.925291+00	read write groups	1	99	2018-05-23 20:20:20.925722+00	2018-05-23 20:20:20.925737+00
+219	g9UmhnWEDuZr4d2Vgv7UADm51B3RTE	2018-05-24 06:21:26.628652+00	read write groups	1	99	2018-05-23 20:21:26.629011+00	2018-05-23 20:21:26.629026+00
+220	Nb8fAx9296Vn1LXUJBsvs2i4mX3rHH	2018-05-24 06:22:05.617928+00	read write groups	1	99	2018-05-23 20:22:05.618251+00	2018-05-23 20:22:05.618266+00
+221	YL02SPbOh7nM8xmbyxtM5VJAOiaq9i	2018-05-24 06:26:17.075006+00	read write groups	1	100	2018-05-23 20:26:17.075362+00	2018-05-23 20:26:17.075377+00
+222	URwmDfXIU4RuU5WkDFObWIPlQMCRUc	2018-05-24 06:27:11.657056+00	read write groups	1	100	2018-05-23 20:27:11.657486+00	2018-05-23 20:27:11.657505+00
+223	bLKm7fkhyusMGl34SnpHkzo8jeuX6n	2018-05-24 06:40:20.195164+00	read write groups	1	102	2018-05-23 20:40:20.195502+00	2018-05-23 20:40:20.195518+00
+224	BDVp1ZNUaDlcevGWJOcogwFHNEdENk	2018-05-24 06:43:50.095273+00	read write groups	1	103	2018-05-23 20:43:50.095617+00	2018-05-23 20:43:50.095632+00
+225	2gLY39mDHhtudUakn9Spi6pHZ4YlOx	2018-05-24 06:45:42.497253+00	read write groups	1	103	2018-05-23 20:45:42.497583+00	2018-05-23 20:45:42.497599+00
+226	dwW41L4me5VsAKDvvXBoHtNajI922v	2018-05-24 06:47:25.167652+00	read write groups	1	104	2018-05-23 20:47:25.168+00	2018-05-23 20:47:25.168023+00
+227	temH7JNnRMVxgek7vp0jTKcFefvmLn	2018-05-24 06:50:50.181746+00	read write groups	1	105	2018-05-23 20:50:50.182074+00	2018-05-23 20:50:50.18209+00
+228	BJQcleCAHyU5PchwivlEBXrEvUW0qA	2018-05-24 06:51:38.112207+00	read write groups	1	106	2018-05-23 20:51:38.112575+00	2018-05-23 20:51:38.112592+00
+229	dyJvgFvPAfALP9KjBAyvBKpNz3leZ4	2018-05-24 06:51:38.589835+00	read write groups	1	105	2018-05-23 20:51:38.59016+00	2018-05-23 20:51:38.590174+00
+230	aeItnx4zSMoHMXCi1CS0XFBO1DyUp8	2018-05-24 06:52:23.270386+00	read write groups	1	107	2018-05-23 20:52:23.2707+00	2018-05-23 20:52:23.270716+00
+231	6vcUpXNjZrtIdIghXoMOTbcrNxU23j	2018-05-24 06:52:24.483137+00	read write groups	1	108	2018-05-23 20:52:24.483483+00	2018-05-23 20:52:24.483498+00
+232	zU7P7TnzfnwwNo3pr9H9vbMZzguAmj	2018-05-24 06:54:52.189351+00	read write groups	1	109	2018-05-23 20:54:52.1897+00	2018-05-23 20:54:52.189715+00
+233	83nhaAOH08rJA3V1imvGTVAKRoynRN	2018-05-24 06:55:32.616108+00	read write groups	1	110	2018-05-23 20:55:32.616417+00	2018-05-23 20:55:32.616432+00
+234	FkQMyXL2VisKBgcCnNxCJcgmmagL0s	2018-05-24 06:55:46.998948+00	read write groups	1	111	2018-05-23 20:55:46.999286+00	2018-05-23 20:55:46.999302+00
+235	fnXnRs1Yf4iHklZ4dfGeffKhRDoHYv	2018-05-24 06:56:16.141175+00	read write groups	1	110	2018-05-23 20:56:16.141544+00	2018-05-23 20:56:16.141561+00
+236	MlG11thwRPQHpEOXl3ZbDs59rK3qQE	2018-05-24 06:56:25.362846+00	read write groups	1	108	2018-05-23 20:56:25.363183+00	2018-05-23 20:56:25.363198+00
+237	SlBzJzo0MgQgTpZC373VbNG9AmIlVv	2018-05-24 06:56:55.854722+00	read write groups	1	112	2018-05-23 20:56:55.855089+00	2018-05-23 20:56:55.855105+00
+238	tXWg1BMmX5Td6Ae08QZ5EsoOs6PWsl	2018-05-24 06:57:34.99053+00	read write groups	1	113	2018-05-23 20:57:34.990842+00	2018-05-23 20:57:34.990857+00
+239	0SYpz3xvugtQcArww9DT2XWzHpXhXt	2018-05-24 06:58:16.50753+00	read write groups	1	113	2018-05-23 20:58:16.50785+00	2018-05-23 20:58:16.507865+00
+240	aLLZOCt8lQuT0VD10xjYnHOX6Q5PVj	2018-05-24 06:59:21.920147+00	read write groups	1	112	2018-05-23 20:59:21.920528+00	2018-05-23 20:59:21.920543+00
+241	u3LqFpfz21fWTjd0KtYM5jIZZvUgVK	2018-05-24 07:04:11.593586+00	read write groups	1	114	2018-05-23 21:04:11.593927+00	2018-05-23 21:04:11.593941+00
+242	k6GbgmjAyiQ4Oh4JYE5Aeep9jKO8ze	2018-05-24 07:04:21.013904+00	read write groups	1	115	2018-05-23 21:04:21.014198+00	2018-05-23 21:04:21.014213+00
+243	0cIYZlnauBH4KLY4kuvRv5aIhpHjqQ	2018-05-24 07:05:03.33926+00	read write groups	1	115	2018-05-23 21:05:03.339631+00	2018-05-23 21:05:03.339646+00
+244	3iMW5A94nkIX2uG88yIMnhMRE0WimX	2018-05-24 07:17:21.032858+00	read write groups	1	103	2018-05-23 21:17:21.033182+00	2018-05-23 21:17:21.033196+00
+245	6Dn8WaDzz6nDS6qNFzHYVFSv6EHWw9	2018-05-24 07:20:44.006153+00	read write groups	1	116	2018-05-23 21:20:44.006486+00	2018-05-23 21:20:44.006515+00
+246	jX5YENxRxXNajaMbPVj6BXyW6nyrDO	2018-05-24 07:23:17.422278+00	read write groups	1	117	2018-05-23 21:23:17.42262+00	2018-05-23 21:23:17.422635+00
+247	Oh9esQ0OWuIHqXCYxur4JPPMHPC2dv	2018-05-24 07:27:41.091394+00	read write groups	1	118	2018-05-23 21:27:41.091709+00	2018-05-23 21:27:41.091725+00
+248	N879te5YiIb4jUl7ySsMeuVxY1nmyu	2018-05-24 07:31:46.030829+00	read write groups	1	92	2018-05-23 21:31:46.031167+00	2018-05-23 21:31:46.03118+00
+249	sHixWe0mWNNW0z3RFztHGyRZzG1Bhi	2018-05-24 07:40:30.650725+00	read write groups	1	119	2018-05-23 21:40:30.651081+00	2018-05-23 21:40:30.651095+00
+250	MgDLVwlvadEmJg7xqlkCgcjoYyGDGW	2018-05-24 07:47:58.15233+00	read write groups	1	120	2018-05-23 21:47:58.152649+00	2018-05-23 21:47:58.152665+00
+251	rhnTimn3AUykQpLeTxbP2FXDjkiwm9	2018-05-24 08:24:01.684287+00	read write groups	1	105	2018-05-23 22:24:01.684683+00	2018-05-23 22:24:01.684699+00
+252	zQdOcgTXsH1E8U5Bz9cpaVR2p9WrZk	2018-05-24 12:43:37.41697+00	read write groups	1	41	2018-05-24 02:43:37.417559+00	2018-05-24 02:43:37.417576+00
+253	zmdCPakFvy4V03TE5o3rnA0EVU6ocb	2018-05-24 12:43:58.222505+00	read write groups	1	47	2018-05-24 02:43:58.222821+00	2018-05-24 02:43:58.222835+00
+254	ZVh6N1C3XsQuotP9ymxZj4fpMUMMGH	2018-05-24 12:44:22.650559+00	read write groups	1	16	2018-05-24 02:44:22.650961+00	2018-05-24 02:44:22.650977+00
 \.
 
 
@@ -1582,6 +1873,107 @@ COPY oauth2_provider_refreshtoken (id, token, access_token_id, application_id, u
 151	56dZx7suXCpis2CoHCmTLQcaNy5nDt	151	1	17	2018-03-31 00:44:11.318618+00	2018-03-31 00:44:11.318637+00
 152	GN6KWFZE09nM7fViRtDsLn2Gy35T8U	152	1	17	2018-03-31 00:44:11.328473+00	2018-03-31 00:44:11.328492+00
 153	1xqEyhbofoOSy26qS9OvJTTIwm7T0o	153	1	17	2018-03-31 00:44:24.283397+00	2018-03-31 00:44:24.283416+00
+154	3z5ZPWbeQBuS499Luhha6FjhpFu0JQ	154	1	32	2018-04-04 04:44:31.213747+00	2018-04-04 04:44:31.213766+00
+155	ZzEk54X4vgthx1hWQDcnTOJjRjpKJJ	155	1	32	2018-04-04 04:51:55.346234+00	2018-04-04 04:51:55.346253+00
+156	5VFKzMfaRMXeosTt8uV7ZbcZOnzjnL	156	1	63	2018-04-05 03:43:50.745841+00	2018-04-05 03:43:50.74586+00
+157	1RuRJ20jiRaBH9KtuvOKySm8vF7C3W	157	1	64	2018-04-05 03:55:27.161139+00	2018-04-05 03:55:27.161157+00
+158	MgCZwEBz4ToBFrELE57BmP8QL3nzR9	158	1	47	2018-04-05 03:59:19.686629+00	2018-04-05 03:59:19.686648+00
+159	vDBtwGpTLz9wMaZU5ScY6gXnggAOfJ	159	1	16	2018-04-07 05:07:41.070689+00	2018-04-07 05:07:41.070709+00
+160	i4HidspPh9b0jgeDCwq0jvOGwHbYgw	160	1	32	2018-04-09 04:03:26.455988+00	2018-04-09 04:03:26.456006+00
+161	rSDLDEBYlLzoF77xhMMiwyGoefu1nv	161	1	47	2018-04-09 16:42:13.813258+00	2018-04-09 16:42:13.813278+00
+162	JT9cV1JrO4nsSOKkiIsadQ3NpLFe8Y	162	1	17	2018-04-09 23:05:25.758866+00	2018-04-09 23:05:25.758885+00
+163	G41mllOsmgHNqsvibjnEOTDQJeAeJ2	163	1	17	2018-04-09 23:29:13.560223+00	2018-04-09 23:29:13.560242+00
+164	9Jva5o5RjeFEJtPIveEYcfSoftwhZ9	164	1	17	2018-04-09 23:39:03.070487+00	2018-04-09 23:39:03.070506+00
+165	V7cSvX79IRo0iwaYqwkKJRl5IXD6N8	165	1	17	2018-04-09 23:47:39.228027+00	2018-04-09 23:47:39.228045+00
+166	8O3f9AbGWdlx5HlGxH13t2XL1tG4xJ	166	1	47	2018-04-11 20:56:40.514336+00	2018-04-11 20:56:40.514353+00
+167	al1H7YLe8uzcf8aPb4kwHqszJm6gxe	167	1	41	2018-04-12 02:37:31.859099+00	2018-04-12 02:37:31.85912+00
+168	pJFqQZBrl7FlMGyZo6KPhU1LpBpQx6	168	1	17	2018-04-12 02:37:37.148699+00	2018-04-12 02:37:37.148717+00
+169	3sQDc71dZJVRXKZfXUjGlr1K5bpUWF	169	1	21	2018-04-12 02:39:26.122246+00	2018-04-12 02:39:26.122264+00
+170	pNxX7IpxmP1Dp36qlgb0ndgDqgmDGf	170	1	21	2018-04-12 02:47:57.909434+00	2018-04-12 02:47:57.909454+00
+171	6bzA1klUAcEJVNWzrJ9KEAJuZk1QEe	171	1	64	2018-04-12 03:56:35.717937+00	2018-04-12 03:56:35.717955+00
+172	zl3mfFTc2LFdSvM2RAVQxPLA9df593	172	1	65	2018-04-12 04:22:54.698734+00	2018-04-12 04:22:54.698754+00
+173	om6P3YWLzHjI77iD5z20Z1JGOflaPn	173	1	16	2018-04-12 05:16:37.365147+00	2018-04-12 05:16:37.365167+00
+174	CljVjiTtbO7l4hRnFaqmdtuIQJVcxo	174	1	21	2018-04-13 23:23:32.866352+00	2018-04-13 23:23:32.86637+00
+175	Fi9winpTmpaIHoM0L6RSvQje0RV7MC	175	1	17	2018-04-17 05:13:30.781324+00	2018-04-17 05:13:30.781344+00
+176	J1Mc8fCa73dowxbPqcLmDFlJOj56J3	176	1	17	2018-04-18 03:24:06.81977+00	2018-04-18 03:24:06.819789+00
+177	ejbUGJ7C2ZGOpWU6wVe1J9yMgCfUOD	177	1	16	2018-04-23 01:29:47.577793+00	2018-04-23 01:29:47.577813+00
+178	z7CgSWrwKTpChBwdxGeClSG03GUtQE	178	1	40	2018-04-23 16:40:47.948152+00	2018-04-23 16:40:47.948172+00
+179	qqWzxNixqzBQmok9CBSqpIaankngGE	179	1	16	2018-04-25 01:59:56.568664+00	2018-04-25 01:59:56.568683+00
+180	dXBDyeNdoOCn4wMwyaSuMql3mqD1c5	180	1	16	2018-04-25 03:32:01.195222+00	2018-04-25 03:32:01.195242+00
+181	AOAI9s2F6IkTyF9F4YQ8rgEFy2sfyG	181	1	40	2018-04-30 21:59:33.0853+00	2018-04-30 21:59:33.085345+00
+182	hUOLKSmrIfaRRS7GE3ff5WXukcKZ4j	182	1	40	2018-05-01 01:34:04.746489+00	2018-05-01 01:34:04.746508+00
+183	NgL9s366XyZwJANnUiYq36xgc5QXSR	183	1	21	2018-05-01 06:11:49.295646+00	2018-05-01 06:11:49.295665+00
+184	IzYg8yTzpUCq7DrZ7KUNbHn1bY5v2p	184	1	16	2018-05-03 14:52:20.557405+00	2018-05-03 14:52:20.557424+00
+185	Nmv00jbEEFVz13zv8y9n1ADFPrwz6H	185	1	64	2018-05-04 06:51:13.007077+00	2018-05-04 06:51:13.007102+00
+186	Ueg5NllQg5aK3vsTNF1Lvj8MRT4B3t	186	1	66	2018-05-04 07:00:03.500199+00	2018-05-04 07:00:03.500222+00
+187	PqcWJJbb32NjrBhL2NYjopeyzSGFzC	187	1	67	2018-05-04 07:05:02.982563+00	2018-05-04 07:05:02.982581+00
+188	BEG3G908NrWxcD4mVL23b05OIL6nNI	188	1	16	2018-05-10 15:47:42.324297+00	2018-05-10 15:47:42.324316+00
+189	UhQKYECMwhpR0tLHTIZrgVPGdghHRg	189	1	16	2018-05-16 02:34:42.065105+00	2018-05-16 02:34:42.065124+00
+190	5DJkXodRMrVmCGRcusVLMx2848cPyK	190	1	17	2018-05-16 02:36:04.587876+00	2018-05-16 02:36:04.587896+00
+191	nNfzM4E8x2vgSLZSAKBEmiaobFMEK3	191	1	64	2018-05-16 02:37:21.528997+00	2018-05-16 02:37:21.529017+00
+192	V0d0dKE40uGErIRBoqBzwIBVvtLG9a	192	1	47	2018-05-18 19:06:13.77463+00	2018-05-18 19:06:13.774662+00
+193	iSdQm2lyp1fR9zs9u3asqELByMYv7R	193	1	17	2018-05-21 17:49:43.81509+00	2018-05-21 17:49:43.815109+00
+194	kBtGvMVsBIdJ4qPo7Q6D7VWl0lDNQj	194	1	32	2018-05-21 21:48:08.434827+00	2018-05-21 21:48:08.434848+00
+195	4uu9GjIDTJ9KDtgy4vt571fKy0ctcY	195	1	76	2018-05-22 06:49:45.232149+00	2018-05-22 06:49:45.23218+00
+196	amPiDBKDNmotJl1qif6n3H9OuR3kns	196	1	77	2018-05-23 16:45:10.028561+00	2018-05-23 16:45:10.028581+00
+197	YhJgWCUS7A8VJRyCgBWAi4qrrlSH1l	197	1	78	2018-05-23 17:32:41.95356+00	2018-05-23 17:32:41.953579+00
+198	oMIRiibIeNH6oY16P23Hi5VjyDHspg	198	1	79	2018-05-23 19:39:37.371222+00	2018-05-23 19:39:37.371241+00
+199	S2OvBvW330escXHJpWkruxzjDHFavE	199	1	80	2018-05-23 19:43:06.082735+00	2018-05-23 19:43:06.082754+00
+200	Pt3GuzlBz2f2pDYymrqBnqFWmvoOtU	200	1	80	2018-05-23 19:44:02.053959+00	2018-05-23 19:44:02.053978+00
+201	63wtFWh2nb0YiwVsenvlDffwhHcfeO	201	1	81	2018-05-23 19:44:23.585817+00	2018-05-23 19:44:23.585835+00
+202	tonURSzzs1m2bVt1NTNjpDs9r2n8yT	202	1	82	2018-05-23 19:45:23.13935+00	2018-05-23 19:45:23.139369+00
+203	7KwchKK9u6ZjJs8l66eGp1IIQVW4Yw	203	1	82	2018-05-23 19:46:22.59672+00	2018-05-23 19:46:22.596739+00
+204	dxG7ZtKil40YaIsA118Wt84wezVHVa	204	1	82	2018-05-23 19:51:49.48898+00	2018-05-23 19:51:49.488999+00
+205	q1O8MOnfD5yrB9S6TiOJcOIp6d8Ig7	205	1	83	2018-05-23 19:54:56.938811+00	2018-05-23 19:54:56.938829+00
+206	BdsyJdUMAcGp3OU0FKsGkChucdukWC	206	1	86	2018-05-23 19:55:40.423606+00	2018-05-23 19:55:40.423626+00
+207	eSMgJZNjsv3zpL4BJjn7aISXiYX11q	207	1	89	2018-05-23 19:57:15.950106+00	2018-05-23 19:57:15.950124+00
+208	fv9SOrweGVveqXLkW8IlbC4RgdDOV7	208	1	90	2018-05-23 19:58:04.902022+00	2018-05-23 19:58:04.902041+00
+209	63hezdQYPm8WULNarsPYeFmPRfMDFo	209	1	91	2018-05-23 19:58:20.351584+00	2018-05-23 19:58:20.351602+00
+210	xJs9MtkNeAxq6NFvjzd9d0eEjk2iiv	210	1	92	2018-05-23 19:59:21.612439+00	2018-05-23 19:59:21.612457+00
+211	jacJS3puSRj63dNoeyIj1dGD6h5ey5	211	1	92	2018-05-23 20:00:08.326893+00	2018-05-23 20:00:08.326913+00
+212	gYvDXEScOcShozXMGlcKD0hPF9Q5sR	212	1	93	2018-05-23 20:00:31.020408+00	2018-05-23 20:00:31.020428+00
+213	vvRf5VYgnQRR9hHk3HyvfDjVlEFpIg	213	1	94	2018-05-23 20:03:47.333975+00	2018-05-23 20:03:47.333993+00
+214	OWd0SUamzqm76PHTYpK6oR8B6e1aQT	214	1	95	2018-05-23 20:05:21.034733+00	2018-05-23 20:05:21.034753+00
+215	ujdY05VFdpIiwk6tDZKy7nMGj3NZyo	215	1	98	2018-05-23 20:06:28.728034+00	2018-05-23 20:06:28.728053+00
+216	AS2iLaH91HRaDVc8dACCk2Ke6u27KS	216	1	98	2018-05-23 20:07:00.186635+00	2018-05-23 20:07:00.186653+00
+217	LNTZVIpt5x1tPbxWPSfiR8PU3KOu2v	217	1	91	2018-05-23 20:11:47.483936+00	2018-05-23 20:11:47.483955+00
+218	90tVyIvzN5U7wgEykFjRxc5MKHZiST	218	1	99	2018-05-23 20:20:20.93012+00	2018-05-23 20:20:20.93014+00
+219	MqjfSSG3cM5wXMBMQGgxTis7EUBCHy	219	1	99	2018-05-23 20:21:26.631971+00	2018-05-23 20:21:26.63199+00
+220	YwSjcNATdRNGgZnc6Hoi7xI0cUpAAT	220	1	99	2018-05-23 20:22:05.619243+00	2018-05-23 20:22:05.619263+00
+221	vSJIYbsE4cRnj2FcXRI98x4huwv7c3	221	1	100	2018-05-23 20:26:17.0789+00	2018-05-23 20:26:17.07892+00
+222	tZJCRTkNY0wT7ldT162w9nBzPcHsud	222	1	100	2018-05-23 20:27:11.659081+00	2018-05-23 20:27:11.659101+00
+223	d27p0zpl53KX8hid3qkqP4l2LBpiMF	223	1	102	2018-05-23 20:40:20.198698+00	2018-05-23 20:40:20.198717+00
+224	XsMLgVaVrxVOBsa1aHN3GSInC1ZCpt	224	1	103	2018-05-23 20:43:50.098461+00	2018-05-23 20:43:50.098481+00
+225	pjtaTITHSj9lBSH74rX6sZmkWfh6qY	225	1	103	2018-05-23 20:45:42.498592+00	2018-05-23 20:45:42.498612+00
+226	SHA2mw1LXXs1g4VBD0rXLTUu0b2ouW	226	1	104	2018-05-23 20:47:25.170265+00	2018-05-23 20:47:25.170284+00
+227	b3g29OqgmPGTZjjxwnviy3M7VlREnu	227	1	105	2018-05-23 20:50:50.183108+00	2018-05-23 20:50:50.183126+00
+228	TOEEsfuq3SYHqnUESIujdn74GZASkh	228	1	106	2018-05-23 20:51:38.114767+00	2018-05-23 20:51:38.114785+00
+229	E88B1HPR0PbanVwk2GmhP8i3a2b5W7	229	1	105	2018-05-23 20:51:38.591193+00	2018-05-23 20:51:38.591212+00
+230	bcHM6oplDSV07TzWEGxTVc5tBUxXAU	230	1	107	2018-05-23 20:52:23.271693+00	2018-05-23 20:52:23.271711+00
+231	QKVLcpwb2jI2DGpUKM7ysGEWkiyeCo	231	1	108	2018-05-23 20:52:24.484597+00	2018-05-23 20:52:24.484616+00
+232	FrV0L3uuQ2MOxE3huhm1P1slCE0aqF	232	1	109	2018-05-23 20:54:52.191397+00	2018-05-23 20:54:52.191416+00
+233	0df2OTfXp60jUMC9RcaRSrGlceah0Q	233	1	110	2018-05-23 20:55:32.621595+00	2018-05-23 20:55:32.621614+00
+234	SUEN3xBg2CRPsRR6nBqZaaNq8Ji1GN	234	1	111	2018-05-23 20:55:47.001003+00	2018-05-23 20:55:47.001021+00
+235	5ag3bk2d40FZe13Tk0fa4K5a3LNaiv	235	1	110	2018-05-23 20:56:16.143233+00	2018-05-23 20:56:16.143254+00
+236	IdWgXsNJcPLjdS8E53RfIT33LfJVBq	236	1	108	2018-05-23 20:56:25.36422+00	2018-05-23 20:56:25.364239+00
+237	eQ0fQgpBs9IqGX4eVMYjq6hUd3aggL	237	1	112	2018-05-23 20:56:55.856212+00	2018-05-23 20:56:55.856232+00
+238	nhZHp034WTb28oEGxFekZdX8NXut63	238	1	113	2018-05-23 20:57:34.991919+00	2018-05-23 20:57:34.991939+00
+239	Q4FbEabgA28Gvp8rI6jJ47C7IT6EeL	239	1	113	2018-05-23 20:58:16.508886+00	2018-05-23 20:58:16.508906+00
+240	QKq57h4t1JqQbz9cGfFqEPwtAv5RWT	240	1	112	2018-05-23 20:59:21.921646+00	2018-05-23 20:59:21.921679+00
+241	DIOVFTv65nXCoAUlQqefaE0cdY5zYE	241	1	114	2018-05-23 21:04:11.596142+00	2018-05-23 21:04:11.59616+00
+242	GHfgkcmGn01xEmNfK6ReFpmyGaq4i7	242	1	115	2018-05-23 21:04:21.015179+00	2018-05-23 21:04:21.015198+00
+243	O2Tgg8Qs55zziPBvEMjTEnDp3m2rTx	243	1	115	2018-05-23 21:05:03.340741+00	2018-05-23 21:05:03.340761+00
+244	e5OuE3CesmL5uuWJV6REZcviGOlgxy	244	1	103	2018-05-23 21:17:21.037025+00	2018-05-23 21:17:21.037044+00
+245	dXhSFSaj2OKqMBTpyBfq9vBIMr3Szp	245	1	116	2018-05-23 21:20:44.007533+00	2018-05-23 21:20:44.007552+00
+246	fVEtfby1QTRNLKA5v6FKC2REDEzluN	246	1	117	2018-05-23 21:23:17.425846+00	2018-05-23 21:23:17.425865+00
+247	YLkHHwTeAOTciQPEgTCrVSS110A0mc	247	1	118	2018-05-23 21:27:41.093272+00	2018-05-23 21:27:41.09329+00
+248	vookWR2h89KRhbaGaOrMweb4nkP5ax	248	1	92	2018-05-23 21:31:46.033428+00	2018-05-23 21:31:46.033447+00
+249	xyLVVVPEghJbjMSzBZmMJ9A1wKUVZx	249	1	119	2018-05-23 21:40:30.653757+00	2018-05-23 21:40:30.653775+00
+250	dZCIY20McUZmctc2ibpT3eyF8kz0uh	250	1	120	2018-05-23 21:47:58.154742+00	2018-05-23 21:47:58.154763+00
+251	LTMgtGeJ8CnwF32wxS4Q457O7eUsRc	251	1	105	2018-05-23 22:24:01.687513+00	2018-05-23 22:24:01.687532+00
+252	iSIb9SSF19RI3V23fJdOpqpGXm5pbq	252	1	41	2018-05-24 02:43:37.428338+00	2018-05-24 02:43:37.428357+00
+253	0kg2bFWOG0UHzmG1TmHgqZnV3I8Zro	253	1	47	2018-05-24 02:43:58.223789+00	2018-05-24 02:43:58.223807+00
+254	vT2pmoG0XqEngRADJtdnAMPHDjW2KQ	254	1	16	2018-05-24 02:44:22.652404+00	2018-05-24 02:44:22.652423+00
 \.
 
 
@@ -1679,6 +2071,66 @@ COPY users_course (id, name) FROM stdin;
 87	Philosophy 31 - symbolic logic
 88	Psych 100A - Psychological statistics
 89	Psych 85 - Intro to Cognitive Science
+90	lsdkkl2
+91	kasf
+92	lksnf
+93	sakfjnsd
+94	sdl.kfndfn
+95	sd;vfkndcv
+96	sdjbnc
+97	akl;jdsfc
+98	phil127a
+99	phil138
+100	phil8
+101	comm113
+102	CS 131
+103	cs118
+104	cs143
+105	Hist 1A
+106	Hist 1C
+107	Hist 116B
+108	Hist 139A
+109	Hist 115
+110	Hist 129A
+111	Hist 140A
+112	Biology
+113	Chemistry
+114	Physics
+115	Math 31A
+116	Math 31B
+117	Math 32A
+118	PIC 10A
+119	Hist 20
+120	Italian 46
+121	Philosophy 31
+122	Philosophy 7
+123	EngComp 3
+124	Math 33A
+125	Math 32AH, 32B, 33AB, 61, 115A, 116, 131AB, 180
+126	PIC 10AB
+127	Physics 4AL
+128	Chemistry 20L
+129	Physics 1A
+130	Physics 1B
+131	Physics 1C
+132	Chemistry 20A
+133	Chemistry 20B
+134	Math 32B
+135	MECH&AE 82
+136	MECH&AE 103
+137	MECH&AE 105A
+138	CEE M20
+139	CEE 91
+140	CEE 102
+141	CEE 108
+142	CEE 103
+143	CEE 110
+144	MSE 104
+145	AUD 30
+146	CEE 1
+147	CEE 180
+148	EPS SCI 15
+149	CS31
 \.
 
 
@@ -1864,29 +2316,47 @@ COPY users_major (id, name) FROM stdin;
 -- Data for Name: users_mentor; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY users_mentor (id, bio, major_id, profile_id, active, clubs, cons, gpa, pros) FROM stdin;
-9		\N	16	t			0.00	
-13		92	21	t			0.00	
-14		161	23	t			0.00	
-20	adfsfsdafasdfaf	92	30	t			0.00	
-19		20	28	t			0.00	
-15	Major in Ethnomusicology, concentration in World Music. Minor in Music Industry and possibly VAPAE (Visual and Performing Arts Education). With this combination, I aim to work in non-profit arts organizations, in areas of music education, festival/camp programming, event planning, and/or arts development.\n\nI'm happy to answer questions about both the major and the possible career paths! See my LinkedIn for relevant work experience: https://www.linkedin.com/in/laurajane2696/	59	24	t			0.00	
-18	I am awesome	118	27	t			0.00	
-11	I survive on coffee and tea	168	18	t			0.00	
-16	I am a second year Computational and Systems Biology Major, which means I have taken a lot of math, chem, physics and life science. I was admitted as a biochem major but changed to math/applied science before switching to CASB after "major shopping" around bit so I have lots of knowledge about quite a few majors. I'm here to help those like me who had a hard time choosing a major and found the counseling staff less than helpful!	31	25	t			0.00	
-12		119	20	t			0.00	
-17	Hello world	100	26	t			0.00	
-26		34	49	t			0.00	
-22		106	36	t			0.00	
-28	I am  a 32 year old non traditional student. I transferred to UCLA from San Francisco city College.  I originally was a film major but changed to linguistics.  While taking prerequisites at my community college I took a computer science class and found I really enjoyed the coursework.  This is when I decided to add the CS portion of my degree. \n\nOutside of schoolwork I enjoy staying fit and recently comleted UCLAs ironbruin sprint triathlon.  I am a member of the running club and the environmental student network.  I hope to go to graduate school for something related to computer science and urban/transportation planning.	92	51	t			0.00	
-5	My name is Linea, I am majoring in Linguistics. I would love to meet with you, if you would like to hear about my love for linguistics, and I'll try and answer any question you might have! I am an exchange student from Denmark, studying in Sweden, and currently enjoying L.A. Also, I am the PM for BQuest. If you have any questions or comments about our platform, please feel free to reach out to us at bquest.ucla@gmail.com	100	11	t			0.00	
-27		35	50	t			0.00	
-6	I can code, somewhat.	35	14	t			0.00	
-8	I'm a second year CS major working at DevX on the BQuest team!	35	10	t			0.00	
-24	HMU I'm friendly	117	38	t			0.00	
-23		34	37	f			0.00	
-21	Hi. I know some things	35	31	t			0.00	
-25	Hi	35	48	t			0.00	
+COPY users_mentor (id, bio, profile_id, active, clubs, cons, gpa, pros) FROM stdin;
+9		16	t			0.00	
+13		21	t			0.00	
+14		23	t			0.00	
+20	adfsfsdafasdfaf	30	t			0.00	
+19		28	t			0.00	
+15	Major in Ethnomusicology, concentration in World Music. Minor in Music Industry and possibly VAPAE (Visual and Performing Arts Education). With this combination, I aim to work in non-profit arts organizations, in areas of music education, festival/camp programming, event planning, and/or arts development.\n\nI'm happy to answer questions about both the major and the possible career paths! See my LinkedIn for relevant work experience: https://www.linkedin.com/in/laurajane2696/	24	t			0.00	
+18	I am awesome	27	t			0.00	
+11	I survive on coffee and tea	18	t			0.00	
+16	I am a second year Computational and Systems Biology Major, which means I have taken a lot of math, chem, physics and life science. I was admitted as a biochem major but changed to math/applied science before switching to CASB after "major shopping" around bit so I have lots of knowledge about quite a few majors. I'm here to help those like me who had a hard time choosing a major and found the counseling staff less than helpful!	25	t			0.00	
+12		20	t			0.00	
+17	Hello world	26	t			0.00	
+26		49	t			0.00	
+22		36	t			0.00	
+28	I am  a 32 year old non traditional student. I transferred to UCLA from San Francisco city College.  I originally was a film major but changed to linguistics.  While taking prerequisites at my community college I took a computer science class and found I really enjoyed the coursework.  This is when I decided to add the CS portion of my degree. \n\nOutside of schoolwork I enjoy staying fit and recently comleted UCLAs ironbruin sprint triathlon.  I am a member of the running club and the environmental student network.  I hope to go to graduate school for something related to computer science and urban/transportation planning.	51	t			0.00	
+27		50	t			0.00	
+24	HMU I'm friendly	38	t			0.00	
+25	Hi	48	t			0.00	
+30	Hi I'm a game programmer	52	t			0.00	
+34		59	t			0.00	
+5	My name is Linea, I am majoring in Linguistics. I would love to meet with you, if you would like to hear about my love for linguistics, and I'll try and answer any question you might have! I am an exchange student from Denmark, studying in Sweden, and currently enjoying L.A. Also, I am the PM for BQuest. If you have any questions or comments about our platform, please feel free to reach out to us at bquest.ucla@gmail.com	11	t			0.00	
+46		69	t			0.00	
+40		84	t			0.00	
+23	I code things.	37	t			0.00	
+35	Hi! I'm just finishing up my second year at UCLA, and I will be graduating next year with a BA in history. I really enjoy history and I'm happy to help out anyone who's curious about the major.	60	t			0.00	
+6	I can code, somewhat.	14	t			0.00	
+31	Fourth year CS major going to Uber for full time Software Engineering. Hit me up with any questions about CS and UCLA in general :)	54	t			0.00	
+32		55	t			0.00	
+36	Understanding the ecological and evolutionary background of how we function as humans and how we interact with the environment around us is something of my expertise	63	t			0.00	
+29		53	f			0.00	
+33		57	t			0.00	
+41	Ask me about majoring in Math or Philosophy!	82	t			0.00	
+37	I declared Engineering as a 1st year and would love to help anyone thinking of moving into the Engineering school or my own discipline.	68	t			0.00	
+38	Looking to help incoming students!	74	t			0.00	
+42		86	t			0.00	
+44	DevX	89	t			0.00	
+43		87	t			0.00	
+45	Looking to help incoming CS students! :)	77	t			0.00	
+39	Hi I'm a junior studying civil engineering and am very involved in the American Society of Civil Engineers chapter at UCLA!	79	t			0.00	
+8	I'm a second year CS major working at DevX on the BQuest team!	10	t			0.00	
+21	Hi. I know some things	31	t			0.00	
 \.
 
 
@@ -1905,17 +2375,6 @@ COPY users_mentor_courses (id, mentor_id, course_id) FROM stdin;
 29	18	23
 107	20	59
 108	20	60
-113	6	1
-114	6	2
-115	6	3
-116	6	61
-117	6	4
-118	5	13
-119	5	14
-120	5	11
-121	5	10
-122	5	9
-123	5	12
 124	8	8
 125	8	52
 126	8	4
@@ -1941,6 +2400,99 @@ COPY users_mentor_courses (id, mentor_id, course_id) FROM stdin;
 159	28	87
 160	28	88
 161	28	89
+186	5	101
+187	5	9
+188	5	98
+189	5	99
+190	5	13
+191	5	100
+192	5	14
+193	5	11
+194	5	10
+195	5	12
+196	21	102
+197	6	4
+198	6	1
+199	6	2
+200	6	3
+201	6	61
+202	6	103
+203	6	104
+204	35	105
+205	35	106
+206	35	107
+207	35	108
+208	35	109
+209	35	110
+210	35	111
+211	36	112
+212	36	113
+213	36	114
+214	41	115
+215	41	116
+216	41	117
+217	41	118
+218	41	119
+219	41	120
+220	41	121
+221	41	122
+222	41	123
+223	41	124
+224	43	125
+225	43	126
+226	43	65
+227	39	127
+228	39	128
+229	39	129
+230	39	130
+231	39	131
+232	39	132
+233	39	133
+234	39	117
+235	39	134
+236	39	124
+237	39	135
+238	39	136
+239	39	137
+240	39	138
+241	39	139
+242	39	140
+243	39	141
+244	39	142
+245	39	143
+246	39	144
+247	39	145
+248	39	146
+249	39	147
+250	39	148
+251	23	149
+\.
+
+
+--
+-- Data for Name: users_mentor_major; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users_mentor_major (id, mentor_id, major_id) FROM stdin;
+1	8	35
+3	21	35
+4	23	34
+\.
+
+
+--
+-- Data for Name: users_mentor_minor; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users_mentor_minor (id, mentor_id, minor_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users_minor; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users_minor (id, name) FROM stdin;
 \.
 
 
@@ -1948,38 +2500,81 @@ COPY users_mentor_courses (id, mentor_id, course_id) FROM stdin;
 -- Data for Name: users_profile; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY users_profile (id, user_id, verification_code, verified, picture, year, phone_number, notifications_enabled) FROM stdin;
-11	17	JS0N8RHF03	t	profile_pictures/wug2.jpg	3rd		t
-14	21	AZQHFZQGKO	t	profile_pictures/default_pic.jpg	2nd		t
-28	38	2OI026CV6E	t	profile_pictures/default_pic.jpg	4th		t
-29	39	N1S4GT544M	f	profile_pictures/default_pic.jpg	1st		t
-30	40	BRS2BNF57C	t	profile_pictures/clock_flat.png	3rd		t
-31	41	PCVMU2GZQR	t	profile_pictures/mark-tai.png	4th		t
-10	16	G5DHT63DOV	t	profile_pictures/profile_JFmaNuY.JPG	2nd		t
-16	24	ZM5S5KSM0J	t	profile_pictures/default_pic.jpg	2nd		t
-18	28	63LT69K0Z6	t	profile_pictures/daily_bruin_photo_Mc4cL0B.jpg	2nd		t
-19	29	323RO01O0H	f	profile_pictures/default_pic.jpg	1st		t
-20	30	AHZZRRF02K	t	profile_pictures/default_pic.jpg	4th		t
-21	31	AJ8VVF1FEZ	t	profile_pictures/default_pic.jpg	3rd		t
-22	32	V94GPF08DQ	t	profile_pictures/default_pic.jpg	2nd		t
-23	33	C82W8EK3BQ	t	profile_pictures/default_pic.jpg	3rd		t
-24	34	JN9TA6QP77	t	profile_pictures/default_pic.jpg	3rd		t
-25	35	5R1JU0XYC1	t	profile_pictures/default_pic.jpg	2nd		t
-26	36	SKQ2DQJL26	t	profile_pictures/default_pic.jpg	4th		t
-27	37	1VRUNJRQGP	t	profile_pictures/portrait.jpg	3rd		t
-32	42	SSJUASG1B0	f	profile_pictures/default_pic.jpg	1st		t
-33	43	N7K40EA2NE	f	profile_pictures/default_pic.jpg	1st		t
-34	44	UHBXFI5I4U	f	profile_pictures/default_pic.jpg	1st		t
-35	45	VMCTR6O53U	f	profile_pictures/default_pic.jpg	1st		t
-36	46	49AQ5NXP2M	t	profile_pictures/default_pic.jpg	3rd		t
-37	47	ED3FE2HQSO	t	profile_pictures/default_pic.jpg	3rd		t
-38	48	PJ59758MZF	t	profile_pictures/Photo_on_3-1-18_at_9.31_PM.jpg	2nd		t
-39	49	AZJ013GY8Q	f	profile_pictures/default_pic.jpg	1st		t
-43	53	3Q0IYMRFK6	f	profile_pictures/default_pic.jpg	1st		t
-48	59	F5BEOUYBA6	t	profile_pictures/default_pic.jpg	2nd		t
-49	60	SVJTVW5JZA	t	profile_pictures/17E6F50F-A36E-4C6C-AC3B-394F09ABA31D.jpeg	2nd		t
-50	61	IUCG9WFO8U	t	profile_pictures/default_pic.jpg	2nd		t
-51	62	H8DA9FNDAY	t	profile_pictures/default_pic.jpg	4th		t
+COPY users_profile (id, user_id, verification_code, verified, picture, year, phone_number, notifications_enabled, password_reset_code) FROM stdin;
+11	17	JS0N8RHF03	t	profile_pictures/wug2.jpg	3rd		t	\N
+28	38	2OI026CV6E	t	profile_pictures/default_pic.jpg	4th		t	\N
+29	39	N1S4GT544M	f	profile_pictures/default_pic.jpg	1st		t	\N
+30	40	BRS2BNF57C	t	profile_pictures/clock_flat.png	3rd		t	\N
+31	41	PCVMU2GZQR	t	profile_pictures/mark-tai.png	4th		t	\N
+10	16	G5DHT63DOV	t	profile_pictures/profile_JFmaNuY.JPG	2nd		t	\N
+16	24	ZM5S5KSM0J	t	profile_pictures/default_pic.jpg	2nd		t	\N
+18	28	63LT69K0Z6	t	profile_pictures/daily_bruin_photo_Mc4cL0B.jpg	2nd		t	\N
+19	29	323RO01O0H	f	profile_pictures/default_pic.jpg	1st		t	\N
+20	30	AHZZRRF02K	t	profile_pictures/default_pic.jpg	4th		t	\N
+21	31	AJ8VVF1FEZ	t	profile_pictures/default_pic.jpg	3rd		t	\N
+23	33	C82W8EK3BQ	t	profile_pictures/default_pic.jpg	3rd		t	\N
+24	34	JN9TA6QP77	t	profile_pictures/default_pic.jpg	3rd		t	\N
+25	35	5R1JU0XYC1	t	profile_pictures/default_pic.jpg	2nd		t	\N
+26	36	SKQ2DQJL26	t	profile_pictures/default_pic.jpg	4th		t	\N
+27	37	1VRUNJRQGP	t	profile_pictures/portrait.jpg	3rd		t	\N
+32	42	SSJUASG1B0	f	profile_pictures/default_pic.jpg	1st		t	\N
+33	43	N7K40EA2NE	f	profile_pictures/default_pic.jpg	1st		t	\N
+34	44	UHBXFI5I4U	f	profile_pictures/default_pic.jpg	1st		t	\N
+35	45	VMCTR6O53U	f	profile_pictures/default_pic.jpg	1st		t	\N
+36	46	49AQ5NXP2M	t	profile_pictures/default_pic.jpg	3rd		t	\N
+38	48	PJ59758MZF	t	profile_pictures/Photo_on_3-1-18_at_9.31_PM.jpg	2nd		t	\N
+39	49	AZJ013GY8Q	f	profile_pictures/default_pic.jpg	1st		t	\N
+43	53	3Q0IYMRFK6	f	profile_pictures/default_pic.jpg	1st		t	\N
+48	59	F5BEOUYBA6	t	profile_pictures/default_pic.jpg	2nd		t	\N
+49	60	SVJTVW5JZA	t	profile_pictures/17E6F50F-A36E-4C6C-AC3B-394F09ABA31D.jpeg	2nd		t	\N
+50	61	IUCG9WFO8U	t	profile_pictures/default_pic.jpg	2nd		t	\N
+51	62	H8DA9FNDAY	t	profile_pictures/default_pic.jpg	4th		t	\N
+22	32	V94GPF08DQ	t	profile_pictures/prof.jpg	2nd		t	\N
+70	93	0KP5ACXPWJ	f	profile_pictures/default_pic.jpg	1st		t	\N
+71	94	0L8W6TFPFL	f	profile_pictures/default_pic.jpg	1st		t	\N
+52	63	ZQ9EQES1EH	t	profile_pictures/default_pic.jpg	1st		t	\N
+37	47	ED3FE2HQSO	t	profile_pictures/IMG_3980.JPG	3rd		t	\N
+72	95	PJZCRNHNP7	f	profile_pictures/default_pic.jpg	1st		t	\N
+73	98	ICC6YQ41DY	t	profile_pictures/default_pic.jpg	3rd		t	\N
+94	120	X7B7GZY0C2	t	profile_pictures/default_pic.jpg	2nd		t	\N
+68	91	A1A4PGDB66	t	profile_pictures/default_pic.jpg	4th		t	\N
+54	65	S62P8WRJQW	t	profile_pictures/27628602_10212811580777752_7616272270474259902_o.jpg	4th		t	\N
+14	21	AZQHFZQGKO	t	profile_pictures/default_pic.jpg	2nd		t	\N
+55	66	ZNYVOMX5WO	f	profile_pictures/default_pic.jpg	1st		t	\N
+56	67	W48AMORCRR	f	profile_pictures/default_pic.jpg	1st		t	\N
+88	114	UV0ORZFDRD	t	profile_pictures/default_pic.jpg	2nd		t	\N
+53	64	EIW6TNMSGJ	t	profile_pictures/default_pic.jpg	3rd		t	\N
+74	99	7DV0XGSU5R	t	profile_pictures/default_pic.jpg	2nd		t	\N
+57	76	X4M85UPU6T	t	profile_pictures/default_pic.jpg	2nd		t	\N
+58	77	OSNV1YI5S6	t	profile_pictures/default_pic.jpg	1st		t	\N
+59	78	QTKEGKK5GW	t	profile_pictures/default_pic.jpg	2nd		t	\N
+84	110	88BT1FIGAT	t	profile_pictures/default_pic.jpg	2nd		t	\N
+75	100	IYSXKCFD0K	t	profile_pictures/default_pic.jpg	3rd		t	\N
+60	79	UKDWWXSI2E	t	profile_pictures/default_pic.jpg	3rd		t	\N
+61	80	RRJ97XHDC0	t	profile_pictures/default_pic.jpg	1st		t	\N
+62	81	2X28602TLB	f	profile_pictures/default_pic.jpg	1st		t	\N
+76	102	EVKJSIPCYX	t	profile_pictures/default_pic.jpg	2nd		t	\N
+63	82	PNABG3OY6X	t	profile_pictures/default_pic.jpg	3rd		t	\N
+64	83	0W7EXJESG7	f	profile_pictures/default_pic.jpg	1st		t	\N
+65	86	RNR0JDR7TN	f	profile_pictures/default_pic.jpg	1st		t	\N
+66	89	1BDZEPV0T8	f	profile_pictures/default_pic.jpg	1st		t	\N
+67	90	1895JKHM9M	f	profile_pictures/default_pic.jpg	1st		t	\N
+82	108	MJK6FZPU3Q	t	profile_pictures/default_pic.jpg	1st		t	\N
+77	103	KY0040JRFJ	t	profile_pictures/default_pic.jpg	1st		t	\N
+78	104	ELMDD62OSV	f	profile_pictures/default_pic.jpg	1st		t	\N
+80	106	N47P0QEFD7	f	profile_pictures/default_pic.jpg	1st		t	\N
+89	115	64JU13ORZY	t	profile_pictures/default_pic.jpg	2nd		t	\N
+81	107	HPH0MI91GX	f	profile_pictures/default_pic.jpg	1st		t	\N
+83	109	0052ZZB6B9	f	profile_pictures/default_pic.jpg	1st		t	\N
+85	111	I2DD3YYH3S	f	profile_pictures/default_pic.jpg	1st		t	\N
+90	116	14C1O5TRKP	f	profile_pictures/default_pic.jpg	1st		t	\N
+87	113	EFBAFLSCJV	t	profile_pictures/default_pic.jpg	2nd		t	\N
+91	117	SSTUYL53Y6	f	profile_pictures/default_pic.jpg	1st		t	\N
+86	112	AXLTC3X4HX	t	profile_pictures/default_pic.jpg	2nd		t	\N
+92	118	4E8V3N6KCU	f	profile_pictures/default_pic.jpg	1st		t	\N
+79	105	LEP979DFCR	t	profile_pictures/default_pic.jpg	3rd		t	\N
+69	92	GIWVND3H73	t	profile_pictures/default_pic.jpg	2nd		t	\N
+93	119	J1303DNPEH	f	profile_pictures/default_pic.jpg	1st		t	\N
 \.
 
 
@@ -2001,7 +2596,7 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 55, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 58, true);
 
 
 --
@@ -2015,7 +2610,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 62, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 120, true);
 
 
 --
@@ -2036,28 +2631,28 @@ SELECT pg_catalog.setval('corsheaders_corsmodel_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 8, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 9, true);
 
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 19, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 20, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 49, true);
+SELECT pg_catalog.setval('django_migrations_id_seq', 59, true);
 
 
 --
 -- Name: email_requests_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('email_requests_request_id_seq', 36, true);
+SELECT pg_catalog.setval('email_requests_request_id_seq', 38, true);
 
 
 --
@@ -2078,7 +2673,7 @@ SELECT pg_catalog.setval('messaging_thread_id_seq', 1, false);
 -- Name: oauth2_provider_accesstoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 153, true);
+SELECT pg_catalog.setval('oauth2_provider_accesstoken_id_seq', 254, true);
 
 
 --
@@ -2099,14 +2694,14 @@ SELECT pg_catalog.setval('oauth2_provider_grant_id_seq', 1, false);
 -- Name: oauth2_provider_refreshtoken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 153, true);
+SELECT pg_catalog.setval('oauth2_provider_refreshtoken_id_seq', 254, true);
 
 
 --
 -- Name: users_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_classes_id_seq', 89, true);
+SELECT pg_catalog.setval('users_classes_id_seq', 149, true);
 
 
 --
@@ -2120,21 +2715,42 @@ SELECT pg_catalog.setval('users_major_id_seq', 171, true);
 -- Name: users_mentor_classes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_mentor_classes_id_seq', 161, true);
+SELECT pg_catalog.setval('users_mentor_classes_id_seq', 251, true);
 
 
 --
 -- Name: users_mentor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_mentor_id_seq', 28, true);
+SELECT pg_catalog.setval('users_mentor_id_seq', 46, true);
+
+
+--
+-- Name: users_mentor_major_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_mentor_major_id_seq', 4, true);
+
+
+--
+-- Name: users_mentor_minor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_mentor_minor_id_seq', 1, false);
+
+
+--
+-- Name: users_minor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_minor_id_seq', 1, false);
 
 
 --
 -- Name: users_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_profile_id_seq', 51, true);
+SELECT pg_catalog.setval('users_profile_id_seq', 94, true);
 
 
 --
@@ -2410,11 +3026,51 @@ ALTER TABLE ONLY users_mentor_courses
 
 
 --
+-- Name: users_mentor_major users_mentor_major_mentor_id_major_id_862a0c38_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_major
+    ADD CONSTRAINT users_mentor_major_mentor_id_major_id_862a0c38_uniq UNIQUE (mentor_id, major_id);
+
+
+--
+-- Name: users_mentor_major users_mentor_major_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_major
+    ADD CONSTRAINT users_mentor_major_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_mentor_minor users_mentor_minor_mentor_id_minor_id_8d23563c_uniq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_minor
+    ADD CONSTRAINT users_mentor_minor_mentor_id_minor_id_8d23563c_uniq UNIQUE (mentor_id, minor_id);
+
+
+--
+-- Name: users_mentor_minor users_mentor_minor_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_minor
+    ADD CONSTRAINT users_mentor_minor_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: users_mentor users_mentor_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY users_mentor
     ADD CONSTRAINT users_mentor_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_minor users_minor_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_minor
+    ADD CONSTRAINT users_minor_pkey PRIMARY KEY (id);
 
 
 --
@@ -2672,10 +3328,31 @@ CREATE INDEX users_mentor_classes_mentor_id_ab38907c ON users_mentor_courses USI
 
 
 --
--- Name: users_mentor_major_id_0cd7cb9f; Type: INDEX; Schema: public; Owner: postgres
+-- Name: users_mentor_major_major_id_b4f010d6; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX users_mentor_major_id_0cd7cb9f ON users_mentor USING btree (major_id);
+CREATE INDEX users_mentor_major_major_id_b4f010d6 ON users_mentor_major USING btree (major_id);
+
+
+--
+-- Name: users_mentor_major_mentor_id_91a1ef0b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_mentor_major_mentor_id_91a1ef0b ON users_mentor_major USING btree (mentor_id);
+
+
+--
+-- Name: users_mentor_minor_mentor_id_8ba826dd; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_mentor_minor_mentor_id_8ba826dd ON users_mentor_minor USING btree (mentor_id);
+
+
+--
+-- Name: users_mentor_minor_minor_id_8b872568; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX users_mentor_minor_minor_id_8b872568 ON users_mentor_minor USING btree (minor_id);
 
 
 --
@@ -2886,11 +3563,35 @@ ALTER TABLE ONLY users_mentor_courses
 
 
 --
--- Name: users_mentor users_mentor_major_id_0cd7cb9f_fk_users_major_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users_mentor_major users_mentor_major_major_id_b4f010d6_fk_users_major_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY users_mentor
-    ADD CONSTRAINT users_mentor_major_id_0cd7cb9f_fk_users_major_id FOREIGN KEY (major_id) REFERENCES users_major(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY users_mentor_major
+    ADD CONSTRAINT users_mentor_major_major_id_b4f010d6_fk_users_major_id FOREIGN KEY (major_id) REFERENCES users_major(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_mentor_major users_mentor_major_mentor_id_91a1ef0b_fk_users_mentor_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_major
+    ADD CONSTRAINT users_mentor_major_mentor_id_91a1ef0b_fk_users_mentor_id FOREIGN KEY (mentor_id) REFERENCES users_mentor(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_mentor_minor users_mentor_minor_mentor_id_8ba826dd_fk_users_mentor_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_minor
+    ADD CONSTRAINT users_mentor_minor_mentor_id_8ba826dd_fk_users_mentor_id FOREIGN KEY (mentor_id) REFERENCES users_mentor(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: users_mentor_minor users_mentor_minor_minor_id_8b872568_fk_users_minor_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users_mentor_minor
+    ADD CONSTRAINT users_mentor_minor_minor_id_8b872568_fk_users_minor_id FOREIGN KEY (minor_id) REFERENCES users_minor(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
