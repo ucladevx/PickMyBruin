@@ -151,6 +151,8 @@ class QueryBlogsTest(APITestCase):
         self.blog = blogfactory.BlogFactory()
         self.blog1 = blogfactory.BlogFactory()
         self.blog2 = blogfactory.BlogFactory()
+        self.blog.title = 'TestQueryTitle'
+        self.blog.save()
 
     def tearDown(self):
         Profile.objects.all().delete()
@@ -179,7 +181,8 @@ class QueryBlogsTest(APITestCase):
         resp = self.client.get(
                 self.get_url,
                 data={
-                    'query': self.blog.title,
+                    'query': 'Test',
                     },
                 )
+        self.assertTrue(resp.data['results'][0]['title'] == self.blog.title)
 
