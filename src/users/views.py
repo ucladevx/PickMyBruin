@@ -322,9 +322,6 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
             mentor.active = True
         mentor.save()
 
-<<<<<<< HEAD
-        return Response(MentorSerializer(mentor).data)
-=======
         return Response(MentorSerializer(mentor).data)
 
 class ReportUser(APIView):
@@ -355,4 +352,3 @@ class ReportUser(APIView):
             raise ValidationError({'sendgrid_status_code': response.status_code})
         return HttpResponse(status=200)
         
->>>>>>> origin/master
