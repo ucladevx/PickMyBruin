@@ -35,25 +35,25 @@ def websockets_notify_user(user):
 
 # Create your views here.
 
-class ReadMessageView(generics.UpdateAPIView):
+class ReadThreadView(generics.UpdateAPIView):
     """
-    View for marking a specified message as read
+    View for marking a specified thread as read
     """
-    serializer_class = MessageSerializer
+    serializer_class = OwnThreadSerializer
 
     def patch(self, request, *args, **kwargs):
-        message_id = int(self.kwargs['message_id'])
-        message = get_object_or_404(Message, id=message_id)
+        thread_id = int(self.kwargs['thread_id'])
+        thread = get_object_or_404(Thread, id=thread_id)
+        unread_messages = Message.objects.filter(Q(thread=thread) & Q(unread=True))
 
-        message.unread = False
-
-        message.save()
+        unread_messages.update(unread=False)
 
         my_profile = get_object_or_404(Profile, user=self.request.user)
-        other_user = message.thread.get_other_user(my_profile)
+        other_user = thread.get_other_user(my_profile)
         websockets_notify_user(other_user)
 
-        return Response(MessageSerializer(message).data)
+        return Response(OwnThreadSerializer(thread, context = {'request': self.request}).data)
+      
 
 
 class CheckHistoryView(APIView):

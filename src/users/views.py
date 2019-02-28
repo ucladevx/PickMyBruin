@@ -17,11 +17,14 @@ from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Greatest
 
-from .models import Profile, Major, Mentor, Course
+
+from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
     UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
-    MentorSerializer, CourseSerializer,
+    MinorSerializer, MentorSerializer, CourseSerializer,
 )
 
 import sendgrid
@@ -60,6 +63,12 @@ class MajorViewSet(viewsets.ModelViewSet):
     queryset = Major.objects.all()
     serializer_class = MajorSerializer
 
+class MinorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows minors to be viewed or edited.
+    """
+    queryset = Minor.objects.all()
+    serializer_class = MinorSerializer
 
 class CourseViewSet(viewsets.ModelViewSet):
     """
@@ -217,7 +226,6 @@ class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return get_object_or_404(Profile, user=self.request.user)
 
-
 class MentorsSearchView(generics.ListAPIView):
     """
     View for finding a mentor by major, year
@@ -229,6 +237,7 @@ class MentorsSearchView(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
 
+<<<<<<< HEAD
         major = 'all'
         year = 'all'
         
@@ -248,16 +257,66 @@ class MentorsSearchView(generics.ListAPIView):
         queryset = queryset.filter(q)
         
         
+=======
+        trans_dict = {
+            'first' : '1st', 
+            'second' : '2nd',
+            'third' : '3rd', 
+            'fourth' : '4th',
+            'freshman' : '1st', 
+            'sophomore' : '2nd',
+            'junior' : '3rd', 
+            'senior' : '4th',
+            'cs' : 'computer science',
+            'computer science' : 'CS',
+        }  
+
+        major_dict = {
+
+                'cs' : 'computer science',
+                'bio' : 'biology'
+        }
+
+        if 'query' in self.request.GET:
+            query = self.request.GET['query']
+            query = query.split(' ')
+
+            for item in query:
+                item_alias = trans_dict.get(item.lower(),item)
+                queryset = queryset.annotate( 
+                    similarity=Greatest(
+                        TrigramSimilarity('major__name', item),
+                        TrigramSimilarity('bio', item),
+                        TrigramSimilarity('profile__year', item),
+                        TrigramSimilarity('profile__user__first_name', item),
+                        TrigramSimilarity('profile__user__last_name', item),
+                        TrigramSimilarity('minor__name', item),
+                        TrigramSimilarity('profile__year', item),
+                        TrigramSimilarity('courses__name', item),
+                        TrigramSimilarity('major__name', item_alias),
+                        TrigramSimilarity('bio', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('profile__user__first_name', item_alias),
+                        TrigramSimilarity('profile__user__last_name', item_alias),
+                        TrigramSimilarity('minor__name', item_alias),
+                        TrigramSimilarity('profile__year', item_alias),
+                        TrigramSimilarity('courses__name', item_alias),
+                    )
+                ).filter(similarity__gte=0.10).order_by('-similarity')
+
+                
+
+>>>>>>> origin/master
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
-            if isinstance(num_random, int):
+            if num_random.isdigit():
                 num_random = int(num_random)
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-
+            
         return queryset
-
+    
 
 class MentorView(generics.RetrieveAPIView):
     """
@@ -288,4 +347,37 @@ class OwnMentorView(generics.RetrieveUpdateDestroyAPIView):
             mentor.active = True
         mentor.save()
 
+<<<<<<< HEAD
         return Response(MentorSerializer(mentor).data)
+=======
+        return Response(MentorSerializer(mentor).data)
+
+class ReportUser(APIView):
+    def post (self, request):
+        email = self.request.user.email
+
+        reported_id = int(request.data['reported_id'])
+        reason = request.data['reason']
+        reported_profile = get_object_or_404(Profile, id=reported_id)
+        
+        message = 'User {} {} ({}) has reported {} {} ({}) for the following reason:\n{}'.format(
+            self.request.user.first_name,
+            self.request.user.last_name,
+            self.request.user.email,
+            reported_profile.user.first_name,
+            reported_profile.user.last_name,
+            reported_profile.user.email,
+            reason)
+        from_email =  Email(email)
+        to_email = Email('bquest.ucla@gmail.com')
+        subject = '[URGENT] BQuest Reported User'
+        content = Content('text/html', message)
+        mail = Mail(from_email, subject, to_email, content)
+
+        sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        if not (200 <= response.status_code < 300):
+            raise ValidationError({'sendgrid_status_code': response.status_code})
+        return HttpResponse(status=200)
+        
+>>>>>>> origin/master

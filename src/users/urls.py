@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^verify_link/?$', views.ResendVerifyUser.as_view(), name='verify_link'),
     url(r'^password/?$', views.PasswordReset.as_view(), name='password_reset'),
     url(r'^password_link/?$', views.SendPasswordReset.as_view(), name='password_reset_link'),
+    url(r'^report_user/?$', views.ReportUser.as_view(), name='report_user'),
 ]
