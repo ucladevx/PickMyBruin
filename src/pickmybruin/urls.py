@@ -7,7 +7,6 @@ admin.autodiscover()
 
 from users.urls import router as users_router
 
-
 router = routers.DefaultRouter()
 
 router.registry.extend(users_router.registry)
@@ -20,4 +19,5 @@ urlpatterns = [
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^requests/', include('email_requests.urls', namespace='email_requests')),
     url(r'^messaging/', include('messaging.urls', namespace='messaging')),
+    url(r'', include('blog.urls', namespace='blog')),
 ]
