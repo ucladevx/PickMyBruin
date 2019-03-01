@@ -406,7 +406,10 @@ Simplified tree diagram
   ```
 
 ### Create blogpost
-  - username@ucla.edu
+  ![Create Blog Post Postman Screenshot](s3://bequest-dev/media/admin_files/createpost.png)
+  - <username>@ucla.edu
+  - Make sure to include the proper username after blog, in this example the
+    username is "test"
 
   POST /blog/<USER_NAME>/
   ```
@@ -448,6 +451,7 @@ Simplified tree diagram
   ```
 
 ### Retrieve blogpost by id
+  ![Create Blog Post By ID Postman Screenshot](s3://bequest-dev/media/admin_files/getblogid.png)
   GET /blog/<BLOG_ID>/
 
   returns 
@@ -529,6 +533,8 @@ Simplified tree diagram
 - if no query is given, it defaults to return all (all params are optional)
 - checks title and body for Trigram Simularity
 - case insentitive
+
+  ![Query Blog Post Postman Screenshot](s3://bequest-dev/media/admin_files/queryblogs.png)
 
   returns   
   ```
