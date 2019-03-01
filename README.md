@@ -407,7 +407,7 @@ Simplified tree diagram
 
 ### Create blogpost
   ![Create Blog Post Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/createpost.png)
-  - <username>@ucla.edu
+  - USERNAME@ucla.edu
   - Make sure to include the proper username after blog, in this example the
     username is "test"
 
