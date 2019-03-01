@@ -5,7 +5,7 @@ clean:
 build: 
 	docker build -t pickmybruin/backend .	
 
-run: 
+run: activate_db 
 	-pkill docker-compose
 	docker-compose up
 
