@@ -51,6 +51,7 @@ class CUDBlogPostTest(APITestCase):
                 'body' : 'test body',
                 'test.png' : img,
                 'anonymous' : False,
+                'published' : True,
                 }
 
         resp = self.client.post(
@@ -68,7 +69,8 @@ class CUDBlogPostTest(APITestCase):
         blog_params = {
                 'title' : 'updated title',
                 'body' : 'updated body',
-                'anonymous' : False
+                'anonymous' : False,
+                'published' : True,
                 }
         resp = self.client.patch(
                 update_url,
@@ -141,6 +143,16 @@ class RetrieveBlogPostTest(APITestCase):
 
         self.assertTrue(resp.data['anonymous'])
 
+    def test_unpublished_post(self):
+        create_url = reverse('blog:RUD', kwargs={'blog_id':self.blog.id})
+        self.blog.published = False
+        self.blog.save()
+        resp = self.client.get(
+                create_url
+                )
+
+        self.assertTrue(resp.status_code==404)
+
 #Test for query name and number
 class QueryBlogsTest(APITestCase):
     get_url = reverse('blog:blogs')
@@ -151,6 +163,8 @@ class QueryBlogsTest(APITestCase):
         self.blog = blogfactory.BlogFactory()
         self.blog1 = blogfactory.BlogFactory()
         self.blog2 = blogfactory.BlogFactory()
+        self.blog2.published = False
+        self.blog2.save()
         self.blog.title = 'TestQueryTitle'
         self.blog.save()
 
@@ -163,8 +177,9 @@ class QueryBlogsTest(APITestCase):
         resp = self.client.get(
                 self.get_url
                 )
+        print(resp.data['count'])
 
-        self.assertTrue(resp.data['count'] == 3)
+        self.assertTrue(resp.data['count'] == 2)
 
     def test_get_single_post(self):
 
@@ -173,11 +188,12 @@ class QueryBlogsTest(APITestCase):
                 data={
                     'num' : 1,
                     },
-
                 )
+
         self.assertTrue(resp.data['count'] == 1)
 
     def test_get_title_post(self):
+
         resp = self.client.get(
                 self.get_url,
                 data={
@@ -185,4 +201,5 @@ class QueryBlogsTest(APITestCase):
                     },
                 )
         self.assertTrue(resp.data['results'][0]['title'] == self.blog.title)
+
 

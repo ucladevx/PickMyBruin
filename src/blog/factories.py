@@ -10,6 +10,7 @@ class BlogFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('sentence',nb_words=4)
     body = fake.text()
     anonymous = False
+    published = True
 
 class AnonymousBlogFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -17,5 +18,6 @@ class AnonymousBlogFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('sentence',nb_words=4)
     body = fake.text()
     anonymous = True
+    published = True
 
 

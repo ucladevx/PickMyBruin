@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
 from django.conf import settings
+from django.http import Http404
 
 
 
@@ -54,7 +55,7 @@ class CreateBlogView(generics.CreateAPIView):
             return Response(BlogPostSerializer(new_blog).data,status=200)
         else:
             return Response(status=400)
-            
+
 #View that implements retrieve update and destroy
 class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogPostSerializer
@@ -64,7 +65,7 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
         if not blog.published:
-            return None
+            raise Http404()
         return blog
 
     def update(self,request,*args,**kwargs):
@@ -99,12 +100,6 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
             blog.save()
 
             #Cycles through keys in files for multiple image upload
-            '''
-            regex = r"\[im[^\]]*\](.*?)\[/im\]"
-            print('WORKING WORKING')
-            for match in re.finditer(regex, request.data['body']):
-                print(match)
-            '''
 
             return Response(BlogPostSerializer(blog).data)
         else:
@@ -121,19 +116,20 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
             return Response(status=200)
         else:
             return Response(status=400)
-#
 
 #Return all Blog Posts or any number, 10, 20 , 50 random blogs
 class BlogView(generics.ListAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
 
-
+#Filters queryset excluding unpublished posts
     def filter_queryset(self, queryset):
+
+        queryset = queryset.exclude(published=False)
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
-            queryset = queryset.filter(published=True)
 
             for item in query:
                 queryset = queryset.annotate(
