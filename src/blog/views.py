@@ -53,6 +53,7 @@ class CreateBlogView(generics.CreateAPIView):
             return Response(BlogPostSerializer(new_blog).data,status=200)
         else:
             return Response(status=400)
+            
 #View that implements retrieve update and destroy
 class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogPostSerializer
