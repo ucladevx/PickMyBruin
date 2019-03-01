@@ -38,6 +38,7 @@ class CreateBlogView(generics.CreateAPIView):
                         user = self.request.user,
                         body=request.data['body'],
                         anonymous=request.data['anonymous'],
+                        published=request.data['published'],
                     )
             #Cycles through keys in files for multiple image upload
             for key in request.FILES:
@@ -60,7 +61,10 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
 
     #Gets specific blog by id
     def get_object(self):
-        return get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        if not blog.published:
+            return None
+        return blog
 
     def update(self,request,*args,**kwargs):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
@@ -71,6 +75,8 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
                 blog.body=request.data['body']
             if 'anonymous' in request.data:
                 blog.anonymous=request.data['anonymous']
+            if 'published' in request.data:
+                blog.published=request.data['published']
 
             imageset = blog.images.all()
 
@@ -126,6 +132,7 @@ class BlogView(generics.ListAPIView):
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
+            queryset = queryset.filter(published=True)
 
             for item in query:
                 queryset = queryset.annotate(

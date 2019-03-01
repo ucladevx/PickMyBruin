@@ -21,8 +21,8 @@ class BlogPost(models.Model):
             on_delete=models.CASCADE, null=True, blank=True)
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
-    created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)
     anonymous = models.BooleanField(default=False)
 
     class Meta:
