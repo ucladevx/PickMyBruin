@@ -405,13 +405,11 @@ Simplified tree diagram
       }
   ```
 
-### Create blogpost
-  ![Create Blog Post Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/createpost.png)
-  - USERNAME@ucla.edu
-  - Make sure to include the proper username after blog, in this example the
-    username is "test"
+### Create Blog Post
+  POST /blogs/<USER_NAME>/
+    - Make sure to include the proper username after blog (USERNAME@ucla.edu)
 
-  POST /blog/<USER_NAME>/
+  
   ```
       {
           "title": <TITLE>,
@@ -451,8 +449,7 @@ Simplified tree diagram
   ```
 
 ### Retrieve blogpost by id
-  ![Create Blog Post By ID Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/getblogid.png)
-  GET /blog/<BLOG_ID>/
+  GET /blogs/id/<BLOG_ID>/
 
   returns 
   ```
@@ -480,30 +477,30 @@ Simplified tree diagram
  } 
   ```
 ### Delete blogpost by id
-    DELETE /blog/<BLOG_ID>/
+  DELETE /blogs/id/<BLOG_ID>/
 
-    returns
+  returns
     ```
     HTTP_RESPONSE_200_OK
     ```
 
 ### Patch blogpost by id
 
-    PATCH /blog/<BLOG_ID>/
+  PATCH /blogs/id/<BLOG_ID>/
   ```
-      {
-          "title": <UPDATED_TITLE>,
-          "body": <UPDATED_BODY>,
-          "images": [IMAGE1.ID, IMAGE2.ID,...]
-          "anonymous" : BOOLEAN
-          <FILENAME>:<NEW_FILE>,
-          <FILE...
-          .
-          .
-      }
+    {
+        "title": <UPDATED_TITLE>,
+        "body": <UPDATED_BODY>,
+        "images": [IMAGE1.ID, IMAGE2.ID,...]
+        "anonymous" : BOOLEAN
+        <FILENAME>:<NEW_FILE>,
+        <FILE...
+        .
+        .
+    }
   ```
-  returns 
-  ```
+returns
+```
   {
     "id": BLOG.ID,
     "author": "FIRST_NAME + LAST_NAME,
@@ -521,20 +518,18 @@ Simplified tree diagram
         .
         .
     ],
- 
     "publish": time.publish,
     "created": time.publish,
     "updated": time.current, 
     "anonymous": BOOLEAN,
 } 
-  ```
+```
+
 ### Search for Blog Posts 
   GET /blogs/?query=<STRING>&num=<INT>
 - if no query is given, it defaults to return all (all params are optional)
 - checks title and body for Trigram Simularity
 - case insentitive
-
-  ![Query Blog Post Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/queryblogs.png)
 
   returns   
   ```
@@ -552,7 +547,7 @@ Simplified tree diagram
 ## AWS Cronjobs
 
 ### Update year field 
-  0 0 15 9 * python src/manage.py populate_tables
+  (not implemented)
 
 ## Current Database Schema (Will probably be outdated soon)
 
