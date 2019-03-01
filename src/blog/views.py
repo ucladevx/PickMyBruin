@@ -17,8 +17,6 @@ from django.db.models.functions import Greatest
 from django.conf import settings
 from django.http import Http404
 
-
-
 #Source Files
 from .models import BlogPost, BlogPicture
 from .serializers import *
