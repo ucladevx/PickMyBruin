@@ -47,7 +47,6 @@ class BlogPicture(models.Model):
 
     #delete S3 reference
     def delete(self):
-        #pictureid = str(self.picture).split('/')[1]
         pictureid = "media/" + str(self.picture)
         session = boto3.Session(
             aws_access_key_id=keys.AWS_ACCESS_KEY_ID,
