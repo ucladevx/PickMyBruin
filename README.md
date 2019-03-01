@@ -406,7 +406,7 @@ Simplified tree diagram
   ```
 
 ### Create blogpost
-  ![Create Blog Post Postman Screenshot](s3://bequest-dev/media/admin_files/createpost.png)
+  ![Create Blog Post Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/createpost.png)
   - <username>@ucla.edu
   - Make sure to include the proper username after blog, in this example the
     username is "test"
@@ -451,7 +451,7 @@ Simplified tree diagram
   ```
 
 ### Retrieve blogpost by id
-  ![Create Blog Post By ID Postman Screenshot](s3://bequest-dev/media/admin_files/getblogid.png)
+  ![Create Blog Post By ID Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/getblogid.png)
   GET /blog/<BLOG_ID>/
 
   returns 
@@ -534,7 +534,7 @@ Simplified tree diagram
 - checks title and body for Trigram Simularity
 - case insentitive
 
-  ![Query Blog Post Postman Screenshot](s3://bequest-dev/media/admin_files/queryblogs.png)
+  ![Query Blog Post Postman Screenshot](https://s3-us-west-2.amazonaws.com/bequest-dev/media/admin_files/queryblogs.png)
 
   returns   
   ```
