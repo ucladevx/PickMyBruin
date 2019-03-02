@@ -51,7 +51,7 @@ class CUDBlogPostTest(APITestCase):
                 'body' : 'test body',
                 'test.png' : img,
                 'anonymous' : False,
-                'published' : True,
+                'publish' : True,
                 }
 
         resp = self.client.post(
@@ -70,7 +70,7 @@ class CUDBlogPostTest(APITestCase):
                 'title' : 'updated title',
                 'body' : 'updated body',
                 'anonymous' : False,
-                'published' : True,
+                'publish' : True,
                 }
         resp = self.client.patch(
                 update_url,

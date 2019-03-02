@@ -16,6 +16,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
 from django.conf import settings
 from django.http import Http404
+from django.utils import timezone
 
 #Source Files
 from .models import BlogPost, BlogPicture
@@ -32,13 +33,18 @@ class CreateBlogView(generics.CreateAPIView):
         if(self.request.user.profile.get_username() == username):
             new_blog = BlogPost.objects.create(
                         title=request.data['title'],
-                        author=self.request.user.first_name + ' ' +
-                        request.user.last_name,
+                        author=self.request.user.first_name + ' ' + request.user.last_name,
                         user = self.request.user,
                         body=request.data['body'],
                         anonymous=request.data['anonymous'],
-                        published=request.data['published'],
+                        publish=request.data['publish'],
                     )
+
+            if new_blog.publish:
+                new_blog.published = timezone.now()
+            else:
+                new_blog.published = None
+
             #Cycles through keys in files for multiple image upload
             for key in request.FILES:
                 picture = BlogPicture.objects.create(
@@ -46,9 +52,9 @@ class CreateBlogView(generics.CreateAPIView):
                             blog = new_blog,
                             picture = request.FILES[key],
                         )
-                print(picture.picture)
                 picture.save()
             new_blog.save()
+
 
             return Response(BlogPostSerializer(new_blog).data,status=200)
         else:
@@ -75,8 +81,9 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
                 blog.body=request.data['body']
             if 'anonymous' in request.data:
                 blog.anonymous=request.data['anonymous']
-            if 'published' in request.data:
-                blog.published=request.data['published']
+            if 'publish' in request.data:
+                blog.publish=request.data['publish']
+                blog.published = timezone.now()
 
             imageset = blog.images.all()
 

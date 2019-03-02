@@ -415,7 +415,7 @@ Simplified tree diagram
           "title": <TITLE>,
           "body": <BODY>,
           "anonymous":<BOOLEAN>
-          "published":<BOOLEAN>
+          "publish":<BOOLEAN>
           <FILENAME>:<FILE>,
           <FILE...
           .
@@ -441,11 +441,11 @@ Simplified tree diagram
         .
         .
     ],
-    "publish": time.current,
+    "published": time.current,
     "created": time.current,
     "updated": time.current, 
     "anonymous": BOOLEAN,
-    "published": BOOLEAN,
+    "publish": BOOLEAN,
  } 
  
   ```
@@ -472,11 +472,11 @@ Simplified tree diagram
         .
         .
     ],
-    "publish": time.current,
+    "published": time.current,
     "created": time.current,
     "updated": time.current, 
     "anonymous": BOOLEAN,
-    "published": BOOLEAN,
+    "publish": BOOLEAN,
  } 
   ```
 ### Delete blogpost by id
@@ -496,7 +496,7 @@ Simplified tree diagram
         "body": <UPDATED_BODY>,
         "images": [IMAGE1.ID, IMAGE2.ID,...]
         "anonymous" : BOOLEAN,
-        "published" : BOOLEAN,
+        "publish" : BOOLEAN,
         <FILENAME>:<NEW_FILE>,
         <FILE...
         .
@@ -522,11 +522,11 @@ returns
         .
         .
     ],
-    "publish": time.publish,
-    "created": time.publish,
+    "published": time.publish,
+    "created": time.created,
     "updated": time.current, 
     "anonymous": BOOLEAN,
-    "published": BOOLEAN,
+    "publish": BOOLEAN,
 } 
 ```
 
