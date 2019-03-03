@@ -3,7 +3,6 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 #Source files
 from users.models import Profile
@@ -20,9 +19,9 @@ class BlogPost(models.Model):
     author = models.CharField(max_length=60)
     user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE, null=True, blank=True)
     body = models.TextField()
-    created = models.DateTimeField(default=timezone.now)
-    published = models.DateTimeField(default=None,null=True,blank=True)
-    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True,null=True,blank=True,editable=False)
+    published = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    updated = models.DateTimeField(auto_now=True,editable=False)
     publish = models.BooleanField(default=False)
     anonymous = models.BooleanField(default=False)
 

@@ -42,8 +42,6 @@ class CreateBlogView(generics.CreateAPIView):
 
             if new_blog.publish:
                 new_blog.published = timezone.now()
-            else:
-                new_blog.published = None
 
             #Cycles through keys in files for multiple image upload
             for key in request.FILES:
@@ -68,7 +66,7 @@ class RUDBlogView(generics.RetrieveUpdateDestroyAPIView):
     #Gets specific blog by id
     def get_object(self):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
-        if not blog.published:
+        if not blog.publish:
             raise Http404()
         return blog
 
@@ -130,7 +128,7 @@ class BlogView(generics.ListAPIView):
 #Filters queryset excluding unpublished posts
     def filter_queryset(self, queryset):
 
-        queryset = queryset.exclude(published=False)
+        queryset = queryset.exclude(publish=False)
 
         if 'query' in self.request.GET:
             query = self.request.GET['query']

@@ -145,14 +145,13 @@ class RetrieveBlogPostTest(APITestCase):
 
     def test_unpublished_post(self):
         create_url = reverse('blog:RUD', kwargs={'blog_id':self.blog.id})
-        self.blog.published = False
+        self.blog.publish = False
         self.blog.save()
         resp = self.client.get(
                 create_url
                 )
 
         self.assertTrue(resp.status_code==404)
-
 #Test for query name and number
 class QueryBlogsTest(APITestCase):
     get_url = reverse('blog:blogs')
@@ -163,7 +162,7 @@ class QueryBlogsTest(APITestCase):
         self.blog = blogfactory.BlogFactory()
         self.blog1 = blogfactory.BlogFactory()
         self.blog2 = blogfactory.BlogFactory()
-        self.blog2.published = False
+        self.blog2.publish = False
         self.blog2.save()
         self.blog.title = 'TestQueryTitle'
         self.blog.save()
@@ -177,7 +176,6 @@ class QueryBlogsTest(APITestCase):
         resp = self.client.get(
                 self.get_url
                 )
-        print(resp.data['count'])
 
         self.assertTrue(resp.data['count'] == 2)
 
@@ -201,5 +199,4 @@ class QueryBlogsTest(APITestCase):
                     },
                 )
         self.assertTrue(resp.data['results'][0]['title'] == self.blog.title)
-
 
