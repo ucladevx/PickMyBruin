@@ -79,7 +79,7 @@ class CreateUserTest(APITestCase):
             self.create_url,
             data=user_params,
         )
-        
+
         resp = self.client.post(
             self.create_url,
             data=user_params_2,

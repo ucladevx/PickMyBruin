@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'users',
     'email_requests',
     'messaging',
+    'blog',
 )
 
 AUTHENTICATION_BACKENDS = (

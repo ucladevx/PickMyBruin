@@ -55,6 +55,10 @@ class Profile(models.Model):
     def __str__(self):
         return str(self.user)
 
+    #extract "Username"
+    def get_username(self):
+        return self.user.email.split('@')[0]
+
 class Major(models.Model):
     name = models.CharField(max_length=100, null=False)
 
