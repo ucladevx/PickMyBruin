@@ -235,7 +235,7 @@ class MentorsSearchView(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
-
+        #queryset_list = []
         trans_dict = {
             'first' : '1st', 
             'second' : '2nd',
@@ -255,34 +255,69 @@ class MentorsSearchView(generics.ListAPIView):
                 'bio' : 'biology'
         }
 
+        filter_name = False
+        filter_major = False
+        filter_bio = False        
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
+            
+            if 'name' in self.request.GET:
+                filter_name = self.request.GET['name']
+            if 'major' in self.request.GET:
+                filter_major = self.request.GET['major']
+            if 'bio' in self.request.GET:
+                filter_bio = self.request.GET['bio']
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                queryset = queryset.annotate( 
-                    similarity=Greatest(
-                        TrigramSimilarity('major__name', item),
-                        TrigramSimilarity('bio', item),
-                        TrigramSimilarity('profile__year', item),
-                        TrigramSimilarity('profile__user__first_name', item),
-                        TrigramSimilarity('profile__user__last_name', item),
-                        TrigramSimilarity('minor__name', item),
-                        TrigramSimilarity('profile__year', item),
-                        TrigramSimilarity('courses__name', item),
-                        TrigramSimilarity('major__name', item_alias),
-                        TrigramSimilarity('bio', item_alias),
-                        TrigramSimilarity('profile__year', item_alias),
-                        TrigramSimilarity('profile__user__first_name', item_alias),
-                        TrigramSimilarity('profile__user__last_name', item_alias),
-                        TrigramSimilarity('minor__name', item_alias),
-                        TrigramSimilarity('profile__year', item_alias),
-                        TrigramSimilarity('courses__name', item_alias),
-                    )
-                ).filter(similarity__gte=0.10).order_by('-similarity')
+                queryset_name = Mentor.objects.none()
+                queryset_major = Mentor.objects.none()
+                queryset_bio = Mentor.objects.none()
+                print(item)
 
-                
+                if filter_name:
+                    print("filter_name is true")
+                if filter_major:
+                    print("filter_major is true")
+                if filter_bio:
+                    print("filter_bio is true")
+
+                if filter_name==False and filter_major==False and filter_bio==False:
+                    filter_name = True
+                    filter_major = True
+                    filter_bio = True
+
+                if filter_name:
+                    queryset_name = queryset.annotate(
+                        similarity=Greatest(
+                            TrigramSimilarity('profile__user__first_name', item),
+                            TrigramSimilarity('profile__user__last_name', item),
+                            TrigramSimilarity('profile__user__first_name', item_alias),
+                            TrigramSimilarity('profile__user__last_name', item_alias)
+                        )
+                    ).filter(similarity__gte=0.10).order_by('-similarity')
+                if filter_major:
+                    queryset_major = queryset.annotate(
+                        similarity=Greatest(
+                            TrigramSimilarity('major__name', item),
+                            TrigramSimilarity('major__name', item_alias)
+                        )
+                    ).filter(similarity__gte=0.10).order_by('-similarity')
+                if filter_bio:
+                    queryset_bio = queryset.annotate(
+                        similarity=Greatest(
+                            TrigramSimilarity('bio', item_alias),
+                            TrigramSimilarity('bio', item_alias)
+                        )
+                    ).filter(similarity__gte=0.10).order_by('-similarity')
+
+                queryset = queryset_name | queryset_major | queryset_bio
+
+                # filter_name = False
+                # filter_major = False
+                # filter_bio = False                
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
