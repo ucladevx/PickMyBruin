@@ -19,7 +19,7 @@ from django.http import Http404
 from django.utils import timezone
 
 #Source Files
-from .models import BlogPost, BlogPicture
+from .models import BlogPost, BlogPicture, Comment
 from .serializers import *
 
 
@@ -148,3 +148,27 @@ class BlogView(generics.ListAPIView):
 
         return queryset
 
+class CreateCommentView(generics.CreateAPIView):
+    #serializer_class = CommentSerializer
+
+    def post(self, request, username):
+        '''
+        blog = queryset.objects.get(id=int(self.request.GET['blog']))
+
+
+        if(self.request.user.profile.get_username() == username and blog != None):
+            new_comment = Comment.objects.create(
+                        user = self.request.user,
+                        blog = blog,
+                        body = self.request.GET['body'],
+                    )
+
+            new_comment.save()
+
+
+            return Response(CommentSerializer(new_comment).data,status=200)
+        else:
+            return Response(status=400)
+
+        '''
+        return Response(status=200)

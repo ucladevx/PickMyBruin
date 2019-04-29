@@ -58,15 +58,19 @@ class BlogPicture(models.Model):
         s3.Object(settings.AWS_STORAGE_BUCKET_NAME, pictureid).delete()
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, related_name='user',
-            on_delete=models.CASCADE, null=True, blank=True)
-    blog = models.ForeignKey(BlogPost, related_name='blog',
-            on_delete=models.CASECADE)
+    """
+    Model for comments
+    """
+
+    user = models.ForeignKey(User, related_name='commentuser', on_delete=models.CASCADE, null=True, blank=True)
+    blog = models.ForeignKey(BlogPost, related_name='blog', on_delete=models.CASCADE)
     body = models.TextField()
     likes = models.ManyToManyField(User)
 
-    class Meta:
-        ordering = ('-likes,',)
 
     def __str__(self):
         return self.body
+
+    @property
+    def getLikes(self):
+        return self.likes.all.count

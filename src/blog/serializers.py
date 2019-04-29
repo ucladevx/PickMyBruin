@@ -1,4 +1,3 @@
-
 #Django Files
 from django.contrib.auth.models import User
 
@@ -6,7 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 #Source files
-from .models import BlogPost, BlogPicture
+from .models import BlogPost, BlogPicture, Comment
 
 
 class BlogPictureSerializer(serializers.ModelSerializer):
@@ -14,6 +13,13 @@ class BlogPictureSerializer(serializers.ModelSerializer):
         model = BlogPicture
         fields = ('id','filename','blog', 'picture')
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        likes = serializers.ReadOnlyField(read_only=True,source='getLikes')
+        fields = ('id', 'commentuser', 'blog', 'body')
+        read_only_fields = ('likes')
 
 
 class BlogPostSerializer(serializers.ModelSerializer):

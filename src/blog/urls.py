@@ -8,4 +8,5 @@ urlpatterns = [
                 name="createview"),
             url(r'^blogs/?$', views.BlogView.as_view(), name='blogs'),
             url(r'^blogs/id/(?P<blog_id>[0-9]+)/?$', views.RUDBlogView.as_view(), name='RUD'),
+            url(r'^blogs/comment/?$', views.CreateCommentView.as_view(), name='comment'),
         ]
