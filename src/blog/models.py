@@ -62,10 +62,12 @@ class Comment(models.Model):
     Model for comments
     """
 
+    comment = models.ForeignKey('self', related_name='comments', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, related_name='commentuser', on_delete=models.CASCADE, null=True, blank=True)
-    blog = models.ForeignKey(BlogPost, related_name='blog', on_delete=models.CASCADE)
+    author = models.CharField(max_length=60)
+    blog = models.ForeignKey(BlogPost, related_name='commentblog', on_delete=models.CASCADE)
     body = models.TextField()
-    likes = models.ManyToManyField(User)
+    likes = models.ManyToManyField(User, blank=True)
 
 
     def __str__(self):
@@ -73,4 +75,5 @@ class Comment(models.Model):
 
     @property
     def getLikes(self):
-        return self.likes.all.count
+        return self.likes.count()
+

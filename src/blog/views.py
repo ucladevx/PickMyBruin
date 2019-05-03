@@ -148,27 +148,24 @@ class BlogView(generics.ListAPIView):
 
         return queryset
 
+#Check if comment has type=post, type=comment
 class CreateCommentView(generics.CreateAPIView):
-    #serializer_class = CommentSerializer
+    serializer_class = CommentSerializer
+    queryset = BlogPost.objects.all()
 
-    def post(self, request, username):
-        '''
-        blog = queryset.objects.get(id=int(self.request.GET['blog']))
+    def post(self, request):
+        if(
+            blogpost = self.queryset.get(id=int(self.request.data['blog']))
 
-
-        if(self.request.user.profile.get_username() == username and blog != None):
-            new_comment = Comment.objects.create(
-                        user = self.request.user,
-                        blog = blog,
-                        body = self.request.GET['body'],
-                    )
-
-            new_comment.save()
-
-
-            return Response(CommentSerializer(new_comment).data,status=200)
+            if(blogpost != None):
+                new_comment = Comment.objects.create(
+                            user = self.request.user,
+                            author=self.request.user.first_name + ' ' + request.user.last_name,
+                            blog = blogpost,
+                            body = self.request.data['body'],
+                        )
+                new_comment.save()
+                return Response(CommentSerializer(new_comment).data,status=200)
         else:
             return Response(status=400)
 
-        '''
-        return Response(status=200)

@@ -7,19 +7,10 @@ from rest_framework import serializers
 #Source files
 from .models import BlogPost, BlogPicture, Comment
 
-
 class BlogPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPicture
         fields = ('id','filename','blog', 'picture')
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        likes = serializers.ReadOnlyField(read_only=True,source='getLikes')
-        fields = ('id', 'commentuser', 'blog', 'body')
-        read_only_fields = ('likes')
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -28,6 +19,20 @@ class BlogPostSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = ('id','author','user','body','title','images','publish','anonymous','created','published','updated')
         read_only_fields = ('id','anonymous','created','updated')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    likes = serializers.IntegerField(source='getLikes')
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'user','author', 'blog', 'body','likes','comments')
+
+
+    def get_fields(self):
+        fields = super(CommentSerializer, self).get_fields()
+        fields['comments'] = CommentSerializer(many=True)
+        return fields
 
 
 
