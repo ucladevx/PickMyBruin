@@ -65,7 +65,7 @@ class Comment(models.Model):
     comment = models.ForeignKey('self', related_name='comments', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, related_name='commentuser', on_delete=models.CASCADE, null=True, blank=True)
     author = models.CharField(max_length=60)
-    blog = models.ForeignKey(BlogPost, related_name='commentblog', on_delete=models.CASCADE)
+    blog = models.ForeignKey(BlogPost, related_name='commentblog', null=True, blank=True,on_delete=models.CASCADE)
     body = models.TextField()
     likes = models.ManyToManyField(User, blank=True)
 

@@ -154,8 +154,8 @@ class CreateCommentView(generics.CreateAPIView):
     queryset = BlogPost.objects.all()
 
     def post(self, request):
-        if(
-            blogpost = self.queryset.get(id=int(self.request.data['blog']))
+        if(self.request.data['type'] == 'post'):
+            blogpost = self.queryset.get(id=int(self.request.data['id']))
 
             if(blogpost != None):
                 new_comment = Comment.objects.create(
@@ -166,6 +166,64 @@ class CreateCommentView(generics.CreateAPIView):
                         )
                 new_comment.save()
                 return Response(CommentSerializer(new_comment).data,status=200)
+            else:
+                return Response(status=400)
+
+        elif(self.request.data['type'] == 'comment'):
+            commentpost = Comment.objects.all().get(id=int(self.request.data['id']))
+
+            if(commentpost != None):
+                new_comment = Comment.objects.create(
+                        user = self.request.user,
+                        author=self.request.user.first_name + ' ' + request.user.last_name,
+                        comment = commentpost,
+                        body = self.request.data['body'],
+                    )
+
+                new_comment.save()
+
+                return Response(CommentSerializer(new_comment).data,status=200)
+            else:
+                return Response(status=400)
         else:
             return Response(status=400)
 
+class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def get_object(self):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        return comment
+
+    def update(self,request,*args,**kwargs):
+        comment = get_object_or_404(BlogPost, id=int(self.kwargs['comment_id']))
+        if(self.request.user == blog.user):
+            if 'body' in request.data:
+                comment.body=request.data['body']
+            comment.save()
+
+
+            return Response(CommentSerializer(comment).data)
+        else:
+            return Response(status=400)
+
+    def delete(self,request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        if(self.request.user == comment.user):
+            self.queryset.filter(id=self.kwargs['blog_id']).delete()
+
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+#Work on likes and dislikes
+
+class UpdateLikesView(Generics.UpdateAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=int(self.request.data['id']))
+
+        
