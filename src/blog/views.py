@@ -219,11 +219,20 @@ class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
 
 #Work on likes and dislikes
 
-class UpdateLikesView(Generics.UpdateAPIView):
+class UpdateLikesView(generics.UpdateAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
     def update(self, request, *args, **kwargs):
         comment = get_object_or_404(Comment, id=int(self.request.data['id']))
 
-        
+        if(comment.likes.filter(id = self.request.user.id).exists()):
+            comment.likes.remove(self.request.user)
+        else:
+            comment.likes.add(self.request.user)
+
+
+        return Response(CommentSerializer(comment).data, status=200)
+
+
+
