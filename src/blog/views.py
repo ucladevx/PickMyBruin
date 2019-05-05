@@ -217,7 +217,15 @@ class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
         else:
             return Response(status=400)
 
-#Work on likes and dislikes
+
+#Retrieve a blogs comments
+class BlogCommentsView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def get_queryset(self):
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        return blog.commentblog.all()
 
 class UpdateLikesView(generics.UpdateAPIView):
     serializer_class = CommentSerializer
