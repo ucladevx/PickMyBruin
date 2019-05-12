@@ -223,9 +223,15 @@ class BlogCommentsView(generics.ListAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
+    def get_serializer_context(self):
+        context = super(BlogCommentsView, self).get_serializer_context()
+        context.update({'depth' : 3})
+        return context
+
     def get_queryset(self):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
         return blog.commentblog.all()
+
 
 class UpdateLikesView(generics.UpdateAPIView):
     serializer_class = CommentSerializer
@@ -240,7 +246,7 @@ class UpdateLikesView(generics.UpdateAPIView):
             comment.likes.add(self.request.user)
 
 
-        return Response(CommentSerializer(comment).data, status=200)
+        return Response(CommentSerializer(comment, context={depth:1}).data, status=200)
 
 
 

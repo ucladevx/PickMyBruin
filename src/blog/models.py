@@ -77,3 +77,18 @@ class Comment(models.Model):
     def getLikes(self):
         return self.likes.count()
 
+    @property
+    def getCommentCount(self):
+        return self.comment.comments.count()
+
+    @property
+    def getUser(self):
+        return self.user.id
+
+    @property
+    def getBlog(self):
+        if(self.blog != None):
+            return self.blog.id
+        else:
+            return 0
+
