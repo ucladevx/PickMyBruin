@@ -32,13 +32,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         fields = super(CommentSerializer, self).get_fields()
-        print(self.context.get('depth'))
-        if(self.context.get('depth') is None):
+        if(self.context.get('depth') is None or self.context.get('depth') == 0):
             fields['comments'] = serializers.IntegerField(source='getCommentCount')
             return fields
         elif (self.context.get('depth') > 0):
             self.context['depth'] = self.context['depth'] - 1
             fields['comments'] = CommentSerializer(many=True)
             return fields
+        else:
+            return fields
+
 
 

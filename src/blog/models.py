@@ -79,7 +79,10 @@ class Comment(models.Model):
 
     @property
     def getCommentCount(self):
-        return self.comment.comments.count()
+        if(self.comment != None):
+            return self.comment.comments.count()
+        else:
+            return 0
 
     @property
     def getUser(self):

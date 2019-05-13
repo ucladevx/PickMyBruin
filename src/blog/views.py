@@ -188,9 +188,17 @@ class CreateCommentView(generics.CreateAPIView):
         else:
             return Response(status=400)
 
+#Retrieve, update, destroy comment
 class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+
+    def get_serializer_context(self):
+        context = super(RUDCommentView, self).get_serializer_context()
+        if 'depth' in self.request.GET:
+            context['depth'] = int(self.request.GET['depth'])
+        return context
+
 
     def get_object(self):
         comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
@@ -225,17 +233,26 @@ class BlogCommentsView(generics.ListAPIView):
 
     def get_serializer_context(self):
         context = super(BlogCommentsView, self).get_serializer_context()
-        context.update({'depth' : 3})
+        if 'depth' in self.request.GET:
+            context['depth'] = int(self.request.GET['depth'])
         return context
+
+
 
     def get_queryset(self):
         blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
-        return blog.commentblog.all()
+        queryset = blog.commentblog.all()
+        if 'num' in self.request.GET:
+            num = int(self.request.GET['num'])
+            queryset = queryset.all()[:num]
+        return queryset
 
-
+#Increment or decrement likes
 class UpdateLikesView(generics.UpdateAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+
+
 
     def update(self, request, *args, **kwargs):
         comment = get_object_or_404(Comment, id=int(self.request.data['id']))
@@ -246,7 +263,7 @@ class UpdateLikesView(generics.UpdateAPIView):
             comment.likes.add(self.request.user)
 
 
-        return Response(CommentSerializer(comment, context={depth:1}).data, status=200)
+        return Response(CommentSerializer(comment).data, status=200)
 
 
 

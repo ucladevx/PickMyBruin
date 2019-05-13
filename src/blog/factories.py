@@ -23,4 +23,10 @@ class AnonymousBlogFactory(factory.django.DjangoModelFactory):
     publish = True
     published = timezone.now()
 
+class CommentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Comment
+
+    body = fake.text()
+    blog = BlogFactory()
 
