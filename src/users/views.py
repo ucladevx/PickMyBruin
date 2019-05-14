@@ -235,7 +235,6 @@ class MentorsSearchView(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         queryset = queryset.exclude(profile__user=self.request.user) 
-        #queryset_list = []
         trans_dict = {
             'first' : '1st', 
             'second' : '2nd',
@@ -254,21 +253,35 @@ class MentorsSearchView(generics.ListAPIView):
                 'cs' : 'computer science',
                 'bio' : 'biology'
         }
+        
+        """
+        For filtering results by name, major, bio
+        An example URL passed would look like this:
+
+        localhost:8000/mentors/?query=cs&name=True&major=True
+
+        """
 
         filter_name = False
         filter_major = False
-        filter_bio = False        
+        filter_bio = False
+
+        def is_true(var):
+            if var == "true" or var == "True":
+                return True
+            return False
+
 
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
-            
+
             if 'name' in self.request.GET:
-                filter_name = self.request.GET['name']
+                filter_name = is_true(self.request.GET['name'])
             if 'major' in self.request.GET:
-                filter_major = self.request.GET['major']
+                filter_major = is_true(self.request.GET['major'])
             if 'bio' in self.request.GET:
-                filter_bio = self.request.GET['bio']
+                filter_bio = is_true(self.request.GET['bio'])
 
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
@@ -284,11 +297,13 @@ class MentorsSearchView(generics.ListAPIView):
                 if filter_bio:
                     print("filter_bio is true")
 
+                #if no filters are checked, all filters are on by default
                 if filter_name==False and filter_major==False and filter_bio==False:
                     filter_name = True
                     filter_major = True
                     filter_bio = True
 
+                #if name filter is checked
                 if filter_name:
                     queryset_name = queryset.annotate(
                         similarity=Greatest(
@@ -298,6 +313,7 @@ class MentorsSearchView(generics.ListAPIView):
                             TrigramSimilarity('profile__user__last_name', item_alias)
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
+                #if major filter is checked
                 if filter_major:
                     queryset_major = queryset.annotate(
                         similarity=Greatest(
@@ -305,6 +321,7 @@ class MentorsSearchView(generics.ListAPIView):
                             TrigramSimilarity('major__name', item_alias)
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
+                #if bio filter is checked
                 if filter_bio:
                     queryset_bio = queryset.annotate(
                         similarity=Greatest(
@@ -313,12 +330,8 @@ class MentorsSearchView(generics.ListAPIView):
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
 
-                queryset = queryset_name | queryset_major | queryset_bio
-
-                # filter_name = False
-                # filter_major = False
-                # filter_bio = False                
-
+                queryset = queryset_name | queryset_major | queryset_bio             
+                
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
             if num_random.isdigit():
