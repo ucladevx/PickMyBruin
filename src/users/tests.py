@@ -447,7 +447,7 @@ class MentorsSearchWithFiltersTest(APITestCase):
     """
     Tests:
 
-    1. Check that basic filtering works
+    1. Check that basic filtering works (3)
     2. Check that query works without any filterings checked
     3. Check that no duplicates are returned by multiple filters
     4. Check that the query is returned sorted by match % with multiple filters
@@ -457,31 +457,63 @@ class MentorsSearchWithFiltersTest(APITestCase):
         self.major = factories.MajorFactory(name='MATH')
         self.mentor = factories.MentorFactory(major=[self.major])
 
-        self.user1 = factories.UserFactory(first_name='Apple', last_name='Acai')
-        self.major1 = factories.MajorFactory(name='ANTH')
+        self.user1 = factories.UserFactory(first_name='first_name_1', last_name='first_name_2')
+        self.major1 = factories.MajorFactory(name='Jackpot')
         self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
         self.mentor1 = factories.MentorFactory(major=[self.major1], minor=[self.minor1], 
                 courses=[self.courses1], profile=self.profile1)
-
-        self.user2 = factories.UserFactory(first_name='Banana', last_name="Berry")
-        self.major2 = factories.MajorFactory(name='BIO')
+        
+        self.user2 = factories.UserFactory(first_name="Jackpot")
+        self.major2 = factories.MajorFactory(name='major_sample_1')
         self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user2)
         self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
 
-        self.user3 = factories.UserFactory(firstname="CrispApple")
-        self.major3 = factories.MajorFactory(name='CHEM')
+        self.user3 = factories.UserFactory(firstname="first_name_2")
+        self.major3 = factories.MajorFactory(name='major_sample_2')
         self.profile3 = factories.ProfileFactory(year=Profile.SOPHOMORE)
         self.mentor3 = factories.MentorFactory(major=[self.major3], profile=self.profile3)
+        self.mentor3.bio = "Jackpot"
 
-        self.user4 = factories.UserFactory(first_name='Bandana', last_name="Brown")
-        self.profile4 = factories.ProfileFactory(year=Profile.SENIOR)
-        self.mentor4 = factories.MentorFactory(major=[self.major2],Profile=self.profile4)
 
+        #self.user4 = factories.UserFactory(first_name='Bandana', last_name="Brown")
+        #self.profile4 = factories.ProfileFactory(year=Profile.SENIOR)
+        #self.mentor4 = factories.MentorFactory(major=[self.major2],Profile=self.profile4)
 
         self.client.force_authenticate(user=self.mentor.profile.user)
 
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+        
+        Profile.objects.all().delete()
+    """
+    def test_random_with_no_args(self):
+        resp = self.client.get(
+            self.mentors_search_url,
+            data={
+                'random': '',
+            },
+        )
+        self.assertEqual(resp.data['count'], 3)
 
+
+        self.assertEqual(resp.data['count'], 3)
+        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
+        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
+        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
+    """
     
+    def test_name_filter(self):
+        resp = self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query': 'Jackpot',
+                'major': 'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],1)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile1.id)
+
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
