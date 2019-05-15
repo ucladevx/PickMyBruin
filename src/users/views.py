@@ -266,11 +266,11 @@ class MentorsSearchView(generics.ListAPIView):
         filter_major = False
         filter_bio = False
 
+        #compares string(passed from URL) to boolean
         def is_true(var):
             if var == "true" or var == "True":
                 return True
             return False
-
 
         if 'query' in self.request.GET:
             query = self.request.GET['query']
@@ -288,7 +288,7 @@ class MentorsSearchView(generics.ListAPIView):
                 queryset_name = Mentor.objects.none()
                 queryset_major = Mentor.objects.none()
                 queryset_bio = Mentor.objects.none()
-                print(item)
+                print("\n\n\n\n\n\n", item)
 
                 if filter_name:
                     print("filter_name is true")
@@ -331,7 +331,7 @@ class MentorsSearchView(generics.ListAPIView):
                     ).filter(similarity__gte=0.10).order_by('-similarity')
 
                 queryset = queryset_name | queryset_major | queryset_bio             
-                
+
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
             if num_random.isdigit():

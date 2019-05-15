@@ -442,6 +442,47 @@ class MentorsSearchTest(APITestCase):
         )
         self.assertEqual(resp.data['count'], 3)
 
+class MentorsSearchWithFiltersTest(APITestCase):
+    mentors_search_filter_url = reverse('users:mentors_search')
+    """
+    Tests:
+
+    1. Check that basic filtering works
+    2. Check that query works without any filterings checked
+    3. Check that no duplicates are returned by multiple filters
+    4. Check that the query is returned sorted by match % with multiple filters
+    5. Check that checking all filters = checking no filters
+    """
+    def setUp(self):
+        self.major = factories.MajorFactory(name='MATH')
+        self.mentor = factories.MentorFactory(major=[self.major])
+
+        self.user1 = factories.UserFactory(first_name='Apple', last_name='Acai')
+        self.major1 = factories.MajorFactory(name='ANTH')
+        self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
+        self.mentor1 = factories.MentorFactory(major=[self.major1], minor=[self.minor1], 
+                courses=[self.courses1], profile=self.profile1)
+
+        self.user2 = factories.UserFactory(first_name='Banana', last_name="Berry")
+        self.major2 = factories.MajorFactory(name='BIO')
+        self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user2)
+        self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
+
+        self.user3 = factories.UserFactory(firstname="CrispApple")
+        self.major3 = factories.MajorFactory(name='CHEM')
+        self.profile3 = factories.ProfileFactory(year=Profile.SOPHOMORE)
+        self.mentor3 = factories.MentorFactory(major=[self.major3], profile=self.profile3)
+
+        self.user4 = factories.UserFactory(first_name='Bandana', last_name="Brown")
+        self.profile4 = factories.ProfileFactory(year=Profile.SENIOR)
+        self.mentor4 = factories.MentorFactory(major=[self.major2],Profile=self.profile4)
+
+
+        self.client.force_authenticate(user=self.mentor.profile.user)
+
+
+    
+
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
     def setUp(self):
