@@ -29,4 +29,6 @@ class CommentFactory(factory.django.DjangoModelFactory):
 
     body = fake.text()
     blog = BlogFactory()
+    published = timezone.now()
+    author = factory.Faker('first_name')
 

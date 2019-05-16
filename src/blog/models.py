@@ -30,6 +30,13 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
+    @property
+    def getComments(self):
+        if(self.commentblog != None):
+            return self.commentblog.all().count()
+        else:
+            return 0
+
 
 class BlogPicture(models.Model):
     """
@@ -68,7 +75,7 @@ class Comment(models.Model):
     blog = models.ForeignKey(BlogPost, related_name='commentblog', null=True, blank=True,on_delete=models.CASCADE)
     body = models.TextField()
     likes = models.ManyToManyField(User, blank=True)
-
+    published = models.DateTimeField(auto_now_add=True,null=True,blank=True)
 
     def __str__(self):
         return self.body
@@ -78,15 +85,11 @@ class Comment(models.Model):
         return self.likes.count()
 
     @property
-    def getCommentCount(self):
-        if(self.comment != None):
-            return self.comment.comments.count()
-        else:
-            return 0
-
-    @property
     def getUser(self):
-        return self.user.id
+        if(self.user != None):
+            return self.user.id
+        else:
+            return None
 
     @property
     def getBlog(self):

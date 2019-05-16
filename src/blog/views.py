@@ -154,7 +154,7 @@ class CreateCommentView(generics.CreateAPIView):
     queryset = BlogPost.objects.all()
 
     def post(self, request):
-        if(self.request.data['type'] == 'post'):
+        if(self.request.data['type'] == 'blog'):
             blogpost = self.queryset.get(id=int(self.request.data['id']))
 
             if(blogpost != None):
@@ -205,8 +205,8 @@ class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
         return comment
 
     def update(self,request,*args,**kwargs):
-        comment = get_object_or_404(BlogPost, id=int(self.kwargs['comment_id']))
-        if(self.request.user == blog.user):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        if(self.request.user == comment.user):
             if 'body' in request.data:
                 comment.body=request.data['body']
             comment.save()
@@ -219,7 +219,7 @@ class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self,request, *args, **kwargs):
         comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
         if(self.request.user == comment.user):
-            self.queryset.filter(id=self.kwargs['blog_id']).delete()
+            self.queryset.filter(id=self.kwargs['comment_id']).delete()
 
             return Response(status=200)
         else:
@@ -248,14 +248,14 @@ class BlogCommentsView(generics.ListAPIView):
         return queryset
 
 #Increment or decrement likes
-class UpdateLikesView(generics.UpdateAPIView):
+class UpdateCommentLikesView(generics.UpdateAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
 
 
     def update(self, request, *args, **kwargs):
-        comment = get_object_or_404(Comment, id=int(self.request.data['id']))
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
 
         if(comment.likes.filter(id = self.request.user.id).exists()):
             comment.likes.remove(self.request.user)

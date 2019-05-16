@@ -14,10 +14,11 @@ class BlogPictureSerializer(serializers.ModelSerializer):
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
+    comments = serializers.IntegerField(source='getComments')
     images = BlogPictureSerializer(many=True)
     class Meta:
         model = BlogPost
-        fields = ('id','author','user','body','title','images','publish','anonymous','created','published','updated')
+        fields = ('id','author','user','body','title','images','publish','anonymous','created','published','updated','comments')
         read_only_fields = ('id','anonymous','created','updated')
 
 
@@ -28,12 +29,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'user','author', 'blog', 'body','likes','comments')
+        fields = ('id', 'user','author', 'blog','published','body','likes','comments')
 
     def get_fields(self):
         fields = super(CommentSerializer, self).get_fields()
         if(self.context.get('depth') is None or self.context.get('depth') == 0):
-            fields['comments'] = serializers.IntegerField(source='getCommentCount')
             return fields
         elif (self.context.get('depth') > 0):
             self.context['depth'] = self.context['depth'] - 1
