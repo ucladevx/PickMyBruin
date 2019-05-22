@@ -341,7 +341,7 @@ class CommentLikesTest(APITestCase):
         BlogPost.objects.all().delete()
         Comment.objects.all().delete()
 
-    def test_create_comment(self):
+    def test_like_comment(self):
         self.get_url = reverse('blog:commentlikes',kwargs={'comment_id':self.comment.id})
         resp = self.client.patch(
             self.get_url,

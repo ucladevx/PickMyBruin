@@ -446,6 +446,8 @@ Simplified tree diagram
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
+
  } 
  
   ```
@@ -477,6 +479,8 @@ Simplified tree diagram
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
+
  } 
   ```
 ### Delete blogpost by id
@@ -527,6 +531,7 @@ returns
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
 } 
 ```
 
@@ -657,8 +662,9 @@ returns
 ```
 ### Get comments from blog
   GET /blogs/id/<BLOG_ID>/comments/?num=<INT>&depth=<INT>
-- If not depth is given, defaults to 0, surface level query
+- If depth is not given, defaults to 0, surface level query
 - If num not given, default to return all
+- Typically set num from GET blog endpoint, user comment integer to set num
 
   returns   
   ```
