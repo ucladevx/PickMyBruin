@@ -26,6 +26,7 @@ class CommentSerializer(serializers.ModelSerializer):
     likes = serializers.IntegerField(source='getLikes')
     user = serializers.IntegerField(source='getUser')
     blog = serializers.IntegerField(source='getBlog')
+    comments = serializers.IntegerField(source='getComments')
 
     class Meta:
         model = Comment

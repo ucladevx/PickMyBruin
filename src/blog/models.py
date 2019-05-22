@@ -75,7 +75,7 @@ class Comment(models.Model):
     blog = models.ForeignKey(BlogPost, related_name='commentblog', null=True, blank=True,on_delete=models.CASCADE)
     body = models.TextField()
     likes = models.ManyToManyField(User, blank=True)
-    published = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    published = models.DateTimeField(auto_now=True,editable=False)
 
     def __str__(self):
         return self.body
@@ -92,9 +92,16 @@ class Comment(models.Model):
             return None
 
     @property
+    def getComments(self):
+        if(self.comments != None):
+            return self.comments.all().count()
+        else:
+            return 0
+
+    @property
     def getBlog(self):
         if(self.blog != None):
             return self.blog.id
         else:
-            return 0
+            return None 
 

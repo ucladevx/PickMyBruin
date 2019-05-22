@@ -548,6 +548,147 @@ returns
       }
   ```
 
+
+### Create Comment 
+  POST /blogs/comment/
+
+  Enter blog or comment id to associate created comment with blog or comment.
+  Enter type <STRING> either 'blog' or 'post'
+  Comments are connected like a single-directional tree with a blog root node.
+
+  ```
+      {
+          "id": <BLOG_ID OR COMMENT_ID>,
+          "body": <BODY>,
+          "type":<'blog' OR 'post'>
+          .
+          .
+      }
+  ```
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "blog": BLOG_ID,
+    "published" : TIME.CURRENT(),
+    "likes" : NUM_LIKES,
+    "comments" : NUM_COMMENTS,
+        .
+        .
+        .
+    ],
+ } 
+ 
+### Retrieve comment by id
+  GET /blogs/comment/id/<COMMENT_ID>/?depth=<INT>
+  
+  Depth is a parameter that sets the depth of the traversal if there are more
+  nodes. Default is 0.
+  For traversal, will give array of comments. At end of root will give num
+  comments. 
+
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "published": time.current,
+    "likes" : NUM_LIKES,
+    "comments" : NUM_COMMENTS or
+    [
+          {
+            "id": COMMENT.ID,
+            "author": "FIRST_NAME + LAST_NAME,
+            "user": USER.ID,
+            "body": BODY,
+            "published": time.current,
+            "likes" : NUM_LIKES,
+            "comments" : NUM_COMMENTS or
+            [
+                ... 
+            ]
+           },
+           {
+                ...
+           }
+    ]
+  }        
+  ```
+### Delete comment by id
+  DELETE /blogs/comment/id/<COMMENT_ID>/
+
+  returns
+    ```
+    HTTP_RESPONSE_200_OK
+    ```
+
+### Patch comment by id
+
+  PATCH /blogs/comment/id/<COMMENT_ID>/
+  ```
+    {
+        "id": COMMENT_ID,
+        "user": USER_ID,
+        "author": FIRST_NAME + LAST_NAME,
+        "blog": BLOG_ID or null,
+        "published": TIMEZONE.NOW()
+        "body": "New updated blog",
+        "likes": NUM_LIKES,
+        "comments": NUM_COMMENTS 
+    }
+  ```
+returns
+```
+    {
+        "id": COMMENT.ID,
+        "author": "FIRST_NAME + LAST_NAME,
+        "user": USER.ID,
+        "body": UPDATED_BODY,
+        "blog": BLOG_ID or null,
+        "published": TIMEZONE.NOW()
+        "likes": NUM_LIKES,
+        "comments": NUM_COMMENTS 
+    } 
+```
+### Get comments from blog
+  GET /blogs/id/<BLOG_ID>/comments/?num=<INT>&depth=<INT>
+- If not depth is given, defaults to 0, surface level query
+- If num not given, default to return all
+
+  returns   
+  ```
+      {
+          "count": <NUMBER OF RESULTS>,
+          "next": null,
+          "previous": null,
+          "results": [
+              <COMMENTS> ... // /blogs/comment/id/<COMMENT_ID>/ format
+          ]
+      }
+  ```
+
+### Like comment
+ PATCH /blogs/comment/id/<COMMENT_ID>/likes/
+ - Will increment or decrement like counter by 1
+
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "published": time.current,
+    "likes" : NUM_LIKES +- 1,
+    "comments" : NUM_COMMENTS 
+  }        
+  ```
+
  
 ## AWS Cronjobs
 
