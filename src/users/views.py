@@ -31,6 +31,8 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
+from itertools import chain
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -275,33 +277,43 @@ class MentorsSearchView(generics.ListAPIView):
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
+            ct=0
 
             if 'name' in self.request.GET:
                 filter_name = is_true(self.request.GET['name'])
+                ct+=1
             if 'major' in self.request.GET:
                 filter_major = is_true(self.request.GET['major'])
+                ct+=1
             if 'bio' in self.request.GET:
                 filter_bio = is_true(self.request.GET['bio'])
+                ct+=1
 
             for item in query:
-                item_alias = trans_dict.get(item.lower(),item)
+                print(item)
+                if len(query) < 2:
+                    item_alias = trans_dict.get(item.lower(),item)
+                print("item alias: ", item_alias)
+                queryset_temp = Mentor.objects.none()
                 queryset_name = Mentor.objects.none()
                 queryset_major = Mentor.objects.none()
                 queryset_bio = Mentor.objects.none()
-                print("\n\n\n\n\n\n", item)
+                #print("\n\n\n\n\n\n", item)
 
-                if filter_name:
-                    print("filter_name is true")
-                if filter_major:
-                    print("filter_major is true")
-                if filter_bio:
-                    print("filter_bio is true")
+                # if filter_name:
+                #     print("filter_name is true")
+                # if filter_major:
+                #     print("filter_major is true")
+                # if filter_bio:
+                #     print("filter_bio is true")
 
                 #if no filters are checked, all filters are on by default
                 if filter_name==False and filter_major==False and filter_bio==False:
                     filter_name = True
                     filter_major = True
                     filter_bio = True
+                    ct=3
+
 
                 #if name filter is checked
                 if filter_name:
@@ -313,6 +325,7 @@ class MentorsSearchView(generics.ListAPIView):
                             TrigramSimilarity('profile__user__last_name', item_alias)
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
+                    queryset_temp = queryset_temp.union(queryset_name)
                 #if major filter is checked
                 if filter_major:
                     queryset_major = queryset.annotate(
@@ -321,16 +334,21 @@ class MentorsSearchView(generics.ListAPIView):
                             TrigramSimilarity('major__name', item_alias)
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
+                    queryset_temp = queryset_temp.union(queryset_major)
                 #if bio filter is checked
                 if filter_bio:
                     queryset_bio = queryset.annotate(
                         similarity=Greatest(
-                            TrigramSimilarity('bio', item_alias),
+                            TrigramSimilarity('bio', item),
                             TrigramSimilarity('bio', item_alias)
                         )
                     ).filter(similarity__gte=0.10).order_by('-similarity')
-
-                queryset = queryset_name | queryset_major | queryset_bio             
+                    queryset_temp = queryset_temp.union(queryset_bio)
+                
+            queryset = queryset_bio | queryset_major | queryset_name
+        
+        else:
+            return queryset
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -339,6 +357,13 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
+
+        else:
+            queryset = queryset_temp
+            if ct > 1:
+                queryset = queryset.order_by('-similarity')
+            for i in queryset:
+                print(i.similarity)
             
         return queryset
     
