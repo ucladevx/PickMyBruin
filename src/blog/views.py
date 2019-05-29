@@ -19,7 +19,7 @@ from django.http import Http404
 from django.utils import timezone
 
 #Source Files
-from .models import BlogPost, BlogPicture
+from .models import BlogPost, BlogPicture, Comment
 from .serializers import *
 
 
@@ -147,4 +147,123 @@ class BlogView(generics.ListAPIView):
             queryset = queryset.all()[:num]
 
         return queryset
+
+#Check if comment has type=post, type=comment
+class CreateCommentView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
+    queryset = BlogPost.objects.all()
+
+    def post(self, request):
+        if(self.request.data['type'] == 'blog'):
+            blogpost = self.queryset.get(id=int(self.request.data['id']))
+
+            if(blogpost != None):
+                new_comment = Comment.objects.create(
+                            user = self.request.user,
+                            author=self.request.user.first_name + ' ' + request.user.last_name,
+                            blog = blogpost,
+                            body = self.request.data['body'],
+                        )
+                new_comment.save()
+                return Response(CommentSerializer(new_comment).data,status=200)
+            else:
+                return Response(status=400)
+
+        elif(self.request.data['type'] == 'comment'):
+            commentpost = Comment.objects.all().get(id=int(self.request.data['id']))
+
+            if(commentpost != None):
+                new_comment = Comment.objects.create(
+                        user = self.request.user,
+                        author=self.request.user.first_name + ' ' + request.user.last_name,
+                        comment = commentpost,
+                        body = self.request.data['body'],
+                    )
+
+                new_comment.save()
+
+                return Response(CommentSerializer(new_comment).data,status=200)
+            else:
+                return Response(status=400)
+        else:
+            return Response(status=400)
+
+#Retrieve, update, destroy comment
+class RUDCommentView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def get_serializer_context(self):
+        context = super(RUDCommentView, self).get_serializer_context()
+        if 'depth' in self.request.GET:
+            context['depth'] = int(self.request.GET['depth'])
+        return context
+
+
+    def get_object(self):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        return comment
+
+    def update(self,request,*args,**kwargs):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        if(self.request.user == comment.user):
+            if 'body' in request.data:
+                comment.body=request.data['body']
+            comment.save()
+
+
+            return Response(CommentSerializer(comment).data)
+        else:
+            return Response(status=400)
+
+    def delete(self,request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+        if(self.request.user == comment.user):
+            self.queryset.filter(id=self.kwargs['comment_id']).delete()
+
+            return Response(status=200)
+        else:
+            return Response(status=400)
+
+
+#Retrieve a blogs comments
+class BlogCommentsView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def get_serializer_context(self):
+        context = super(BlogCommentsView, self).get_serializer_context()
+        if 'depth' in self.request.GET:
+            context['depth'] = int(self.request.GET['depth'])
+        return context
+
+
+
+    def get_queryset(self):
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+        queryset = blog.commentblog.all()
+        if 'num' in self.request.GET:
+            num = int(self.request.GET['num'])
+            queryset = queryset.all()[:num]
+        return queryset
+
+#Increment or decrement likes
+class UpdateCommentLikesView(generics.UpdateAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+
+
+    def update(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=int(self.kwargs['comment_id']))
+
+        if(comment.likes.filter(id = self.request.user.id).exists()):
+            comment.likes.remove(self.request.user)
+        else:
+            comment.likes.add(self.request.user)
+
+
+        return Response(CommentSerializer(comment).data, status=200)
+
+
 
