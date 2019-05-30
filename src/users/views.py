@@ -290,10 +290,9 @@ class MentorsSearchView(generics.ListAPIView):
                 ct+=1
 
             for item in query:
-                print(item)
-                if len(query) < 2:
-                    item_alias = trans_dict.get(item.lower(),item)
-                print("item alias: ", item_alias)
+                #print(item)
+                item_alias = trans_dict.get(item.lower(),item)
+                #print("item alias: ", item_alias)
                 queryset_temp = Mentor.objects.none()
                 queryset_name = Mentor.objects.none()
                 queryset_major = Mentor.objects.none()
@@ -362,8 +361,8 @@ class MentorsSearchView(generics.ListAPIView):
             queryset = queryset_temp
             if ct > 1:
                 queryset = queryset.order_by('-similarity')
-            for i in queryset:
-                print(i.similarity)
+            # for i in queryset:
+            #     print(i.similarity)
             
         return queryset
     

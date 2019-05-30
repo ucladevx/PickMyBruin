@@ -267,15 +267,17 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
-- if no query is given, it defaults to return all (all params are optional)
-- checks user's name, major, minor, courses, bio, and year for Trigram Simularity
+  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>&name=<BOOLEAN>&major=<BOOLEAN>&bio=<BOOLEAN>
+- if no query is given or no filters are checked, it defaults to return all (all params are optional)
+- checks user's name, major, and bio for Trigram Simularity (deprecated minor, courses, and year), and returns a sorted query based on similarity
 - random returns <NUM> number of applicable mentors in a random order
 - case insentitive
 - only returns active mentors, excluding self
-- search term aliases, i.e ('first' becomes "'first' OR '1st'"")
+- search term aliases, i.e ('cs' becomes 'computer science' and vice versa)
+- searching for multiple items allows more specific searches
+  - ex) cs Han returns mentors majoring in computer science with name of Han
 
-  returns   
+  returns
   ```
       {
           "count": <NUMBER OF RESULTS>,
@@ -286,6 +288,9 @@ Simplified tree diagram
           ]
       }
   ```
+
+- sample GET request:
+  GET /mentors/?query=computer science&major=True
 
 ### Report User
   POST /report_user/
