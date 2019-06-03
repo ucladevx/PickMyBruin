@@ -31,8 +31,6 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Substitution, Mail
 from pickmybruin.settings import USER_VERIFICATION_TEMPLATE, PASSWORD_RESET_TEMPLATE
 
-from itertools import chain
-
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -258,10 +256,9 @@ class MentorsSearchView(generics.ListAPIView):
         
         """
         For filtering results by name, major, bio
-        An example URL passed would look like this:
+        An example URL passed for testing would look like this:
 
         localhost:8000/mentors/?query=cs&name=True&major=True
-
         """
 
         filter_name = False
@@ -290,21 +287,11 @@ class MentorsSearchView(generics.ListAPIView):
                 ct+=1
 
             for item in query:
-                #print(item)
                 item_alias = trans_dict.get(item.lower(),item)
-                #print("item alias: ", item_alias)
                 queryset_temp = Mentor.objects.none()
                 queryset_name = Mentor.objects.none()
                 queryset_major = Mentor.objects.none()
                 queryset_bio = Mentor.objects.none()
-                #print("\n\n\n\n\n\n", item)
-
-                # if filter_name:
-                #     print("filter_name is true")
-                # if filter_major:
-                #     print("filter_major is true")
-                # if filter_bio:
-                #     print("filter_bio is true")
 
                 #if no filters are checked, all filters are on by default
                 if filter_name==False and filter_major==False and filter_bio==False:
@@ -312,7 +299,6 @@ class MentorsSearchView(generics.ListAPIView):
                     filter_major = True
                     filter_bio = True
                     ct=3
-
 
                 #if name filter is checked
                 if filter_name:
@@ -361,8 +347,6 @@ class MentorsSearchView(generics.ListAPIView):
             queryset = queryset_temp
             if ct > 1:
                 queryset = queryset.order_by('-similarity')
-            # for i in queryset:
-            #     print(i.similarity)
             
         return queryset
     
