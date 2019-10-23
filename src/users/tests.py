@@ -257,7 +257,6 @@ class MentorsSearchTest(APITestCase):
                 'query': 'Major',
             },
         )
-        print(resp)
         self.assertEqual(resp.data['count'], 3)
 
     def test_query_is_case_insensitive(self):
@@ -336,7 +335,6 @@ class MentorsSearchTest(APITestCase):
                 'query': 'Test Major',
             },
         )
-        print(resp)
         self.assertEqual(resp.data['count'], 3)
         
     def test_filter_by_none(self):
@@ -505,7 +503,6 @@ class MentorsSearchWithFiltersTest(APITestCase):
                 'major':'True',
             },
         )
-        print(resp)
         self.assertEqual(resp.data['count'],1)
 
     def test_sorting_with_multiple_filter(self):

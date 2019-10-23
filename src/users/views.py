@@ -253,13 +253,6 @@ class MentorsSearchView(generics.ListAPIView):
                 'cs' : 'computer science',
                 'bio' : 'biology'
         }
-        
-        """
-        For filtering results by name, major, bio
-        An example URL passed for testing would look like this:
-
-        localhost:8000/mentors/?query=cs&name=True&major=True
-        """
 
         filter_name = False
         filter_major = False
