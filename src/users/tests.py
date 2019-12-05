@@ -215,8 +215,6 @@ class OwnProfileViewTest(APITestCase):
 class MentorsSearchTest(APITestCase):
     mentors_search_url = reverse('users:mentors_search')
     def setUp(self):
-
-
         self.major = factories.MajorFactory(name='Test_Major0')
         self.mentor = factories.MentorFactory(major=[self.major])
 
@@ -228,7 +226,7 @@ class MentorsSearchTest(APITestCase):
         self.mentor1 = factories.MentorFactory(major=[self.major1], minor=[self.minor1], 
                 courses=[self.courses1], profile=self.profile1)
 
-        self.user2 = factories.UserFactory(first_name='third')
+        self.user2 = factories.UserFactory(first_name='third', last_name='sample')
         self.major2 = factories.MajorFactory(name='Test_Major2')
         self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user2)
         self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
@@ -259,11 +257,7 @@ class MentorsSearchTest(APITestCase):
                 'query': 'Major',
             },
         )
-
         self.assertEqual(resp.data['count'], 3)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
-        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
 
     def test_query_is_case_insensitive(self):
         resp = self.client.get(
@@ -273,15 +267,12 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 3)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
-        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
 
     def test_no_duplicates_in_queryset(self):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'query': '1',
+                'query': 'unique',
             },
         )
         self.assertEqual(resp.data['count'], 1)
@@ -316,51 +307,6 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 3)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile2.year)
-        self.assertEqual(resp.data['results'][2]['profile']['year'], self.profile3.year)
-    
-    def test_query_checks_years(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'query': '1st',
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-    
-    def test_query_checks_minors(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'query': 'Unique_Minor',
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-
-    def test_query_checks_courses(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'query': 'Unique_Course',
-            },
-        )
-        self.assertEqual(resp.data['count'], 1)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile1.year)
-
-
-    def test_query_handles_dictionary_aliases(self):
-        resp = self.client.get(
-            self.mentors_search_url,
-            data={
-                'query': 'second',
-            },
-        )
-        self.assertEqual(resp.data['count'], 2)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile2.year)
-        self.assertEqual(resp.data['results'][1]['profile']['year'], self.profile3.year)
 
     def test_query_aliases_do_not_exclude_original_query(self):
         resp = self.client.get(
@@ -386,11 +332,10 @@ class MentorsSearchTest(APITestCase):
         resp = self.client.get(
             self.mentors_search_url,
             data={
-                'query': '2 nd',
+                'query': 'Test Major',
             },
         )
-        self.assertEqual(resp.data['count'], 2)
-        self.assertEqual(resp.data['results'][0]['profile']['year'], self.profile3.year)
+        self.assertEqual(resp.data['count'], 3)
         
     def test_filter_by_none(self):
         resp = self.client.get(
@@ -441,6 +386,150 @@ class MentorsSearchTest(APITestCase):
             },
         )
         self.assertEqual(resp.data['count'], 3)
+
+class MentorsSearchWithFiltersTest(APITestCase):
+    mentors_search_filter_url = reverse('users:mentors_search')
+    def setUp(self):
+        self.major = factories.MajorFactory(name='MATH')
+        self.mentor = factories.MentorFactory(major=[self.major])
+
+        self.user1 = factories.UserFactory(first_name='first_name_1', last_name='last_name_1')
+        self.major1 = factories.MajorFactory(name='Jackpot')
+        self.profile1 = factories.ProfileFactory(year=Profile.FRESHMAN, user=self.user1)
+        self.mentor1 = factories.MentorFactory(major=[self.major1], profile=self.profile1)
+        
+        self.user2 = factories.UserFactory(first_name="Jackpot", last_name='last_name_2')
+        self.major2 = factories.MajorFactory(name='major_sample_1')
+        self.profile2 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user2)
+        self.mentor2 = factories.MentorFactory(major=[self.major2], profile=self.profile2)
+
+        self.user3 = factories.UserFactory(first_name='first_name_2', last_name='last_name_3')
+        self.major3 = factories.MajorFactory(name='major_sample_2')
+        self.profile3 = factories.ProfileFactory(year=Profile.SOPHOMORE, user=self.user3)
+        self.mentor3 = factories.MentorFactory(major=[self.major3], profile=self.profile3, bio="Jackpot")
+
+        self.user4 = factories.UserFactory(first_name='Sabbath', last_name='last_name_4')
+        self.major4 = factories.MajorFactory(name='Sabbath')
+        self.profile4 = factories.ProfileFactory(year=Profile.SOPHOMORE, user= self.user4)
+        self.mentor4 = factories.MentorFactory(major=[self.major4], profile=self.profile4)
+
+        self.user5 = factories.UserFactory(first_name='Baxxxx', last_name='last_name_5')
+        self.major5 = factories.MajorFactory(name='major_sample_3')
+        self.profile5 = factories.ProfileFactory(year=Profile.SOPHOMORE, user= self.user5)
+        self.mentor5 = factories.MentorFactory(major=[self.major5], profile=self.profile5)
+
+        self.user6 = factories.UserFactory(first_name='first_name_3', last_name='last_name_6')
+        self.major6 = factories.MajorFactory(name='Banana')
+        self.profile6 = factories.ProfileFactory(year=Profile.SOPHOMORE, user= self.user6)
+        self.mentor6 = factories.MentorFactory(major=[self.major6], profile=self.profile6)
+
+        self.user7 = factories.UserFactory(first_name='first_name_4', last_name='last_name_7')
+        self.major7 = factories.MajorFactory(name='major_sample_4')
+        self.profile7 = factories.ProfileFactory(year=Profile.SOPHOMORE, user= self.user7)
+        self.mentor7 = factories.MentorFactory(major=[self.major7], profile=self.profile7, bio="Banaxx")
+
+        self.user8 = factories.UserFactory(first_name='first_name_5', last_name='last_name_8')
+        self.major8 = factories.MajorFactory(name='computer science')
+        self.profile8 = factories.ProfileFactory(year=Profile.SENIOR, user=self.user8)
+        self.mentor8 = factories.MentorFactory(major=[self.major8], profile=self.profile8)
+
+        self.client.force_authenticate(user=self.mentor.profile.user)
+
+    def tearDown(self):
+        User.objects.all().delete()
+        Major.objects.all().delete()
+        Profile.objects.all().delete()
+    
+    def test_major_filter(self):
+        resp = self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query': 'Jackpot',
+                'major': 'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],1)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile1.id)
+
+    def test_name_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'Jackpot',
+                'name': 'True',
+            },
+        )
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile2.id)
+
+    def test_bio_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'Jackpot',
+                'bio':'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],1)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile3.id)
+
+    def test_no_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'Jackpot',
+            },
+        )
+        self.assertEqual(resp.data['count'],3)
+
+    def test_all_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'Jackpot',
+                'name':'True',
+                'major':'True',
+                'bio':'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],3)
+
+    def test_no_duplicates_with_multiple_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'Sabbath',
+                'name':'True',
+                'major':'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],1)
+
+    def test_sorting_with_multiple_filter(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'banana',
+                'name':'True',
+                'major':'True',
+                'bio':'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],3)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile6.id)
+        self.assertEqual(resp.data['results'][1]['profile']['id'], self.profile7.id)
+        self.assertEqual(resp.data['results'][2]['profile']['id'], self.profile5.id)
+
+    def test_dictionary_alias(self):
+        resp=self.client.get(
+            self.mentors_search_filter_url,
+            data={
+                'query':'cs',
+                'major':'True',
+            },
+        )
+        self.assertEqual(resp.data['count'],1)
+        self.assertEqual(resp.data['results'][0]['profile']['id'], self.profile8.id)
 
 class MentorsUpdateTest(APITestCase):
     mentors_update_url = reverse('users:mentors_me')
