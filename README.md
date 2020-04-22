@@ -590,8 +590,8 @@ returns
         .
         .
     ],
- } 
- 
+  } 
+  ```
 ### Retrieve comment by id
   GET /blogs/comment/id/<COMMENT_ID>/?depth=<INT>
   
