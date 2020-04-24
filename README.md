@@ -570,7 +570,7 @@ returns
       {
           "id": <BLOG_ID OR COMMENT_ID>,
           "body": <BODY>,
-          "type":<'blog' OR 'post'>
+          "type":<'blog' OR 'comment'>
           .
           .
       }
@@ -590,8 +590,8 @@ returns
         .
         .
     ],
- } 
- 
+  } 
+  ```
 ### Retrieve comment by id
   GET /blogs/comment/id/<COMMENT_ID>/?depth=<INT>
   
