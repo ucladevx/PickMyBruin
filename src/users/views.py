@@ -378,8 +378,6 @@ class MentorsSearchView(generics.ListAPIView):
         else:
             if ct > 1:
                 queryset = queryset.order_by("-similarity")
-            for each in queryset.values():
-                print (each)
         return queryset
 
 
