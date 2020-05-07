@@ -15,7 +15,7 @@ from rest_framework.parsers import MultiPartParser
 from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
-from django.db.models import Q, Avg, F, Sum, When, Value
+from django.db.models import Q, F, Value
 from django.http import HttpResponse
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
