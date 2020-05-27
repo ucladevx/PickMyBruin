@@ -160,7 +160,7 @@ class CreateCommentView(generics.CreateAPIView):
             if(blogpost != None):
                 new_comment = Comment.objects.create(
                             user = self.request.user,
-                            author=self.request.user.first_name + ' ' + request.user.last_name,
+                            author=self.request.user.first_name + ' ' + self.request.user.last_name,
                             blog = blogpost,
                             body = self.request.data['body'],
                         )
@@ -175,7 +175,7 @@ class CreateCommentView(generics.CreateAPIView):
             if(commentpost != None):
                 new_comment = Comment.objects.create(
                         user = self.request.user,
-                        author=self.request.user.first_name + ' ' + request.user.last_name,
+                        author=self.request.user.first_name + ' ' + self.request.user.last_name,
                         comment = commentpost,
                         body = self.request.data['body'],
                     )
@@ -246,6 +246,25 @@ class BlogCommentsView(generics.ListAPIView):
             num = int(self.request.GET['num'])
             queryset = queryset.all()[:num]
         return queryset
+
+#Increment or decrement likes
+class UpdateBlogLikesView(generics.UpdateAPIView):
+    serializer_class = BlogPostSerializer
+    queryset = BlogPost.objects.all()
+
+
+
+    def update(self, request, *args, **kwargs):
+        blog = get_object_or_404(BlogPost, id=int(self.kwargs['blog_id']))
+
+        if(blog.likes.filter(id = self.request.user.id).exists()):
+            blog.likes.remove(self.request.user)
+        else:
+            blog.likes.add(self.request.user)
+
+
+        return Response(BlogPostSerializer(blog).data, status=200)
+
 
 #Increment or decrement likes
 class UpdateCommentLikesView(generics.UpdateAPIView):

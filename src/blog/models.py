@@ -24,6 +24,7 @@ class BlogPost(models.Model):
     updated = models.DateTimeField(auto_now=True,editable=False)
     publish = models.BooleanField(default=False)
     anonymous = models.BooleanField(default=False)
+    likes = models.ManyToManyField(User, blank=True)
 
     class Meta:
         ordering = ('-publish',)
@@ -36,6 +37,10 @@ class BlogPost(models.Model):
             return self.commentblog.all().count()
         else:
             return 0
+    
+    @property
+    def getLikes(self):
+        return self.likes.count()
 
 
 class BlogPicture(models.Model):

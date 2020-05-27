@@ -451,7 +451,8 @@ Simplified tree diagram
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
-    "comments" : NUM_COMMENTS
+    "comments" : NUM_COMMENTS,
+    "likes": NUM_OF_LIKES
 
  } 
  
@@ -484,7 +485,8 @@ Simplified tree diagram
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
-    "comments" : NUM_COMMENTS
+    "comments" : NUM_COMMENTS,
+    "likes": NUM_OF_LIKES
 
  } 
   ```
@@ -536,7 +538,8 @@ returns
     "updated": time.current, 
     "anonymous": BOOLEAN,
     "publish": BOOLEAN,
-    "comments" : NUM_COMMENTS
+    "comments" : NUM_COMMENTS,
+    "likes": NUM_OF_LIKES
 } 
 ```
 
@@ -558,12 +561,45 @@ returns
       }
   ```
 
+### Like a Blog Post 
+PATCH /blogs/id/<BLOG_ID>/likes/  
+like the post if the user hasn't liked this post yet. Cancel the like if the user has already liked the post.  
+returns
+```javascript
+{
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": UPDATED_BODY,
+    "title": UPDATED_TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "published": time.publish,
+    "created": time.created,
+    "updated": time.current, 
+    "anonymous": BOOLEAN,
+    "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS,
+    "likes": NUM_OF_LIKES
+}
+```
+  
+
 
 ### Create Comment 
   POST /blogs/comment/
 
   Enter blog or comment id to associate created comment with blog or comment.
-  Enter type <STRING> either 'blog' or 'post'
+  Enter type <STRING> either 'blog' or 'comment'
   Comments are connected like a single-directional tree with a blog root node.
 
   ```
