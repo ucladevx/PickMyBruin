@@ -15,10 +15,11 @@ class BlogPictureSerializer(serializers.ModelSerializer):
 
 class BlogPostSerializer(serializers.ModelSerializer):
     comments = serializers.IntegerField(source='getComments')
+    likes = serializers.IntegerField(source='getLikes')
     images = BlogPictureSerializer(many=True)
     class Meta:
         model = BlogPost
-        fields = ('id','author','user','body','title','images','publish','anonymous','created','published','updated','comments')
+        fields = ('id','author','user','body','title','images','publish','anonymous','created','published','updated','comments', 'likes')
         read_only_fields = ('id','anonymous','created','updated')
 
 
