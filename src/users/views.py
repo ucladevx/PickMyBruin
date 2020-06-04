@@ -15,7 +15,7 @@ from rest_framework.parsers import MultiPartParser
 from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
-from django.db.models import Q, Avg, F, Sum, When, Value
+from django.db.models import Q, F, Value
 from django.http import HttpResponse
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
@@ -232,8 +232,33 @@ class MentorsSearchView(generics.ListAPIView):
     queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
 
+    # a utility function used to rate each mentor profile by completion.
+    # returns a number, which is used to sort the mentor search result.
+    def calculate_profile_completion_index(self, profile):
+        # these are the default values we don't want to count
+        omitted_values = ["", [], "0.00", None]
+        # profile object is an object itself, we count its attribute separately
+        # every user has an id, it's not informative
+        omitted_keys = {"profile", "id"}
+
+        # get the data
+        full_profile = self.serializer_class(profile).data
+
+        filled = 0
+        # count the number of filled in fields in the user profile
+        for key, value in full_profile["profile"].items():
+            if value not in omitted_values and key not in omitted_keys:
+                filled += 1
+
+        # count the number of filled in fields in the mentor profile
+        for key, value in full_profile.items():
+            if value not in omitted_values and key not in omitted_keys:
+                filled += 1
+
+        return filled
+
     def filter_queryset(self, queryset):
-        # queryset = queryset.exclude(profile__user=self.request.user)
+        queryset = queryset.exclude(profile__user=self.request.user)
         trans_dict = {
             'first' : '1st',
             'second' : '2nd',
@@ -377,9 +402,12 @@ class MentorsSearchView(generics.ListAPIView):
 
         else:
             if ct > 1:
+                # sort by similarity
                 queryset = queryset.order_by("-similarity")
-            for each in queryset.values():
-                print (each)
+                # sort by profile completion
+                queryset = sorted(queryset,
+                    key=lambda each: self.calculate_profile_completion_index(each),
+                    reverse=True)
         return queryset
 
 
