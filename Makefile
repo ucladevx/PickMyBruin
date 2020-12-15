@@ -8,6 +8,7 @@ build:
 run: 
 	-pkill docker-compose
 	docker-compose up
+	make activate_db 
 
 restart:
 	docker-compose restart web

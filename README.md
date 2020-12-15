@@ -267,15 +267,17 @@ Simplified tree diagram
   ```
 
 ### Search for mentors
-  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>
-- if no query is given, it defaults to return all (all params are optional)
-- checks user's name, major, minor, courses, bio, and year for Trigram Simularity
+  GET /mentors/?query=<SPACE_SEPERATED_QUERY_STRINGS>&random=<NUM>&name=<BOOLEAN>&major=<BOOLEAN>&bio=<BOOLEAN>
+- if no query is given or no filters are checked, it defaults to return all (all params are optional)
+- checks user's name, major, and bio for Trigram Simularity (deprecated minor, courses, and year), and returns a sorted query based on similarity
 - random returns <NUM> number of applicable mentors in a random order
 - case insentitive
 - only returns active mentors, excluding self
-- search term aliases, i.e ('first' becomes "'first' OR '1st'"")
+- search term aliases, i.e ('cs' becomes 'computer science' and vice versa)
+- searching for multiple items allows more specific searches
+  - ex) cs Han returns mentors majoring in computer science with name of Han
 
-  returns   
+  returns
   ```
       {
           "count": <NUMBER OF RESULTS>,
@@ -286,6 +288,9 @@ Simplified tree diagram
           ]
       }
   ```
+
+- sample GET request:
+  GET /mentors/?query=computer science&major=True
 
 ### Report User
   POST /report_user/
@@ -404,10 +409,302 @@ Simplified tree diagram
           'exists': <True/False>
       }
   ```
+
+### Create Blog Post
+  POST /blogs/<USER_NAME>/
+    - Make sure to include the proper username after blog (USERNAME@ucla.edu)
+
+  
+  ```
+      {
+          "title": <TITLE>,
+          "body": <BODY>,
+          "anonymous":<BOOLEAN>
+          "publish":<BOOLEAN>
+          <FILENAME>:<FILE>,
+          <FILE...
+          .
+          .
+      }
+  ```
+  returns 
+  ```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "title": TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "published": time.current,
+    "created": time.current,
+    "updated": time.current, 
+    "anonymous": BOOLEAN,
+    "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
+
+ } 
+ 
+  ```
+
+### Retrieve blogpost by id
+  GET /blogs/id/<BLOG_ID>/
+
+  returns 
+  ```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "title": TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "published": time.current,
+    "created": time.current,
+    "updated": time.current, 
+    "anonymous": BOOLEAN,
+    "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
+
+ } 
+  ```
+### Delete blogpost by id
+  DELETE /blogs/id/<BLOG_ID>/
+
+  returns
+    ```
+    HTTP_RESPONSE_200_OK
+    ```
+
+### Patch blogpost by id
+
+  PATCH /blogs/id/<BLOG_ID>/
+  ```
+    {
+        "title": <UPDATED_TITLE>,
+        "body": <UPDATED_BODY>,
+        "images": [IMAGE1.ID, IMAGE2.ID,...]
+        "anonymous" : BOOLEAN,
+        "publish" : BOOLEAN,
+        <FILENAME>:<NEW_FILE>,
+        <FILE...
+        .
+        .
+    }
+  ```
+returns
+```
+  {
+    "id": BLOG.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": UPDATED_BODY,
+    "title": UPDATED_TITLE,
+    "images": [
+        {
+            "id": IMAGE.ID,
+            "filename": FILENAME,
+            "blog": BLOG.ID,
+            "picture": FILEURL,
+        },
+        .
+        .
+        .
+    ],
+    "published": time.publish,
+    "created": time.created,
+    "updated": time.current, 
+    "anonymous": BOOLEAN,
+    "publish": BOOLEAN,
+    "comments" : NUM_COMMENTS
+} 
+```
+
+### Search for Blog Posts 
+  GET /blogs/?query=<STRING>&num=<INT>
+- if no query is given, it defaults to return all (all params are optional)
+- checks title and body for Trigram Simularity
+- case insentitive
+
+  returns   
+  ```
+      {
+          "count": <NUMBER OF RESULTS>,
+          "next": null,
+          "previous": null,
+          "results": [
+              <BLOG_POST> ... // blogs/<blog_id>/ format
+          ]
+      }
+  ```
+
+
+### Create Comment 
+  POST /blogs/comment/
+
+  Enter blog or comment id to associate created comment with blog or comment.
+  Enter type <STRING> either 'blog' or 'post'
+  Comments are connected like a single-directional tree with a blog root node.
+
+  ```
+      {
+          "id": <BLOG_ID OR COMMENT_ID>,
+          "body": <BODY>,
+          "type":<'blog' OR 'comment'>
+          .
+          .
+      }
+  ```
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "blog": BLOG_ID,
+    "published" : TIME.CURRENT(),
+    "likes" : NUM_LIKES,
+    "comments" : NUM_COMMENTS,
+        .
+        .
+        .
+    ],
+  } 
+  ```
+### Retrieve comment by id
+  GET /blogs/comment/id/<COMMENT_ID>/?depth=<INT>
+  
+  Depth is a parameter that sets the depth of the traversal if there are more
+  nodes. Default is 0.
+  For traversal, will give array of comments. At end of root will give num
+  comments. 
+
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "published": time.current,
+    "likes" : NUM_LIKES,
+    "comments" : NUM_COMMENTS or
+    [
+          {
+            "id": COMMENT.ID,
+            "author": "FIRST_NAME + LAST_NAME,
+            "user": USER.ID,
+            "body": BODY,
+            "published": time.current,
+            "likes" : NUM_LIKES,
+            "comments" : NUM_COMMENTS or
+            [
+                ... 
+            ]
+           },
+           {
+                ...
+           }
+    ]
+  }        
+  ```
+### Delete comment by id
+  DELETE /blogs/comment/id/<COMMENT_ID>/
+
+  returns
+    ```
+    HTTP_RESPONSE_200_OK
+    ```
+
+### Patch comment by id
+
+  PATCH /blogs/comment/id/<COMMENT_ID>/
+  ```
+    {
+        "id": COMMENT_ID,
+        "user": USER_ID,
+        "author": FIRST_NAME + LAST_NAME,
+        "blog": BLOG_ID or null,
+        "published": TIMEZONE.NOW()
+        "body": "New updated blog",
+        "likes": NUM_LIKES,
+        "comments": NUM_COMMENTS 
+    }
+  ```
+returns
+```
+    {
+        "id": COMMENT.ID,
+        "author": "FIRST_NAME + LAST_NAME,
+        "user": USER.ID,
+        "body": UPDATED_BODY,
+        "blog": BLOG_ID or null,
+        "published": TIMEZONE.NOW()
+        "likes": NUM_LIKES,
+        "comments": NUM_COMMENTS 
+    } 
+```
+### Get comments from blog
+  GET /blogs/id/<BLOG_ID>/comments/?num=<INT>&depth=<INT>
+- If depth is not given, defaults to 0, surface level query
+- If num not given, default to return all
+- Typically set num from GET blog endpoint, user comment integer to set num
+
+  returns   
+  ```
+      {
+          "count": <NUMBER OF RESULTS>,
+          "next": null,
+          "previous": null,
+          "results": [
+              <COMMENTS> ... // /blogs/comment/id/<COMMENT_ID>/ format
+          ]
+      }
+  ```
+
+### Like comment
+ PATCH /blogs/comment/id/<COMMENT_ID>/likes/
+ - Will increment or decrement like counter by 1
+
+  returns 
+  ```
+  {
+    "id": COMMENT.ID,
+    "author": "FIRST_NAME + LAST_NAME,
+    "user": USER.ID,
+    "body": BODY,
+    "published": time.current,
+    "likes" : NUM_LIKES +- 1,
+    "comments" : NUM_COMMENTS 
+  }        
+  ```
+
+ 
 ## AWS Cronjobs
 
 ### Update year field 
-  0 0 15 9 * python src/manage.py populate_tables
+  (not implemented)
 
 ## Current Database Schema (Will probably be outdated soon)
 

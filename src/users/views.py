@@ -15,7 +15,7 @@ from rest_framework.parsers import MultiPartParser
 from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, F, Value
 from django.http import HttpResponse
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Greatest
@@ -23,7 +23,7 @@ from django.db.models.functions import Greatest
 
 from .models import Profile, Major, Minor, Mentor, Course
 from .serializers import (
-    UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer, 
+    UserSerializer, GroupSerializer, ProfileSerializer, MajorSerializer,
     MinorSerializer, MentorSerializer, CourseSerializer,
 )
 
@@ -52,7 +52,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     API endpoint that allows profiles to be viewed or edited.
     """
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer 
+    serializer_class = ProfileSerializer
 
 
 class MajorViewSet(viewsets.ModelViewSet):
@@ -90,7 +90,7 @@ class CreateUser(generics.CreateAPIView):
     API endpoint that allows a user to be created.
     """
     permission_classes = tuple()
-    
+
     @transaction.atomic
     def post(self, request):
         if User.objects.filter(email__iexact=request.data['email']).exists():
@@ -114,7 +114,7 @@ class CreateUser(generics.CreateAPIView):
         )
 
         new_profile.save()
-        
+
         url = 'https://bquest.ucladevx.com/verify?code='
         if settings.DEBUG:
             url = 'http://localhost:8000/verify?code='
@@ -145,7 +145,7 @@ class ResendVerifyUser(APIView):
         from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(email)
         subject = 'BQuest User Verification'
-        verification_link = url + verification_code 
+        verification_link = url + verification_code
         content = Content('text/html', 'N/A')
         mail = Mail(from_email, subject, to_email, content)
         mail.personalizations[0].add_substitution(Substitution('-link-', verification_link))
@@ -183,7 +183,7 @@ class SendPasswordReset(APIView):
         url = 'https://bquest.ucladevx.com/password'
         if settings.DEBUG:
             url = 'http://localhost:8000/password'
-        
+
         from_email =  Email('noreply@bquest.ucladevx.com')
         to_email = Email(email)
         subject = 'BQuest User Password Reset'
@@ -213,7 +213,7 @@ class PasswordReset(APIView):
         user.save()
         profile.save()
         return HttpResponse(status=200)
-        
+
 
 
 class OwnProfileView(generics.RetrieveUpdateDestroyAPIView):
@@ -232,22 +232,45 @@ class MentorsSearchView(generics.ListAPIView):
     queryset = Mentor.objects.all().filter(active=True)
     serializer_class = MentorSerializer
 
+    # a utility function used to rate each mentor profile by completion.
+    # returns a number, which is used to sort the mentor search result.
+    def calculate_profile_completion_index(self, profile):
+        # these are the default values we don't want to count
+        omitted_values = ["", [], "0.00", None]
+        # profile object is an object itself, we count its attribute separately
+        # every user has an id, it's not informative
+        omitted_keys = {"profile", "id"}
+
+        # get the data
+        full_profile = self.serializer_class(profile).data
+
+        filled = 0
+        # count the number of filled in fields in the user profile
+        for key, value in full_profile["profile"].items():
+            if value not in omitted_values and key not in omitted_keys:
+                filled += 1
+
+        # count the number of filled in fields in the mentor profile
+        for key, value in full_profile.items():
+            if value not in omitted_values and key not in omitted_keys:
+                filled += 1
+
+        return filled
 
     def filter_queryset(self, queryset):
-        queryset = queryset.exclude(profile__user=self.request.user) 
-
+        queryset = queryset.exclude(profile__user=self.request.user)
         trans_dict = {
-            'first' : '1st', 
+            'first' : '1st',
             'second' : '2nd',
-            'third' : '3rd', 
+            'third' : '3rd',
             'fourth' : '4th',
-            'freshman' : '1st', 
+            'freshman' : '1st',
             'sophomore' : '2nd',
-            'junior' : '3rd', 
+            'junior' : '3rd',
             'senior' : '4th',
             'cs' : 'computer science',
             'computer science' : 'CS',
-        }  
+        }
 
         major_dict = {
 
@@ -255,34 +278,119 @@ class MentorsSearchView(generics.ListAPIView):
                 'bio' : 'biology'
         }
 
+        filter_name = False
+        filter_major = False
+        filter_bio = False
+
+        #compares string(passed from URL) to boolean
+        def is_true(var):
+            if var == "true" or var == "True":
+                return True
+            return False
+
         if 'query' in self.request.GET:
             query = self.request.GET['query']
             query = query.split(' ')
+            ct=0
 
+            if 'name' in self.request.GET:
+                filter_name = is_true(self.request.GET['name'])
+                ct+=1
+            if 'major' in self.request.GET:
+                filter_major = is_true(self.request.GET['major'])
+                ct+=1
+            if 'bio' in self.request.GET:
+                filter_bio = is_true(self.request.GET['bio'])
+                ct+=1
+
+            #if no filters are checked, all filters are on by default
+            if filter_name==False and filter_major==False and filter_bio==False:
+                filter_name = True
+                filter_major = True
+                filter_bio = True
+                ct=3
+
+            # initialize the queryset for the similarity calculation
+            # similarity_name/bio/major: TrigramSimilarity between curr word
+            # and the mentor's name/bio/major
+            # similarity_name/bio/major_max: max TrigramSimilarity across all
+            # words compared with the mentor's name/bio/major
+            # similarity: the total TrigramSimilarity value between the query
+            # and the mentor's name&bio&major. Used to rank result
+            queryset = queryset.annotate(
+                similarity_name = Value(0),
+                similarity_name_max = Value(0),
+                similarity_major = Value(0),
+                similarity_major_max = Value(0),
+                similarity_bio = Value(0),
+                similarity_bio_max = Value(0),
+                similarity = Value(0)
+            )
+
+            # iterate over each word in the query
             for item in query:
                 item_alias = trans_dict.get(item.lower(),item)
-                queryset = queryset.annotate( 
-                    similarity=Greatest(
-                        TrigramSimilarity('major__name', item),
-                        TrigramSimilarity('bio', item),
-                        TrigramSimilarity('profile__year', item),
+
+                # Compare each query word to the user profile, major, and bio
+                queryset = queryset.annotate(
+                    similarity_name=Greatest(
                         TrigramSimilarity('profile__user__first_name', item),
                         TrigramSimilarity('profile__user__last_name', item),
-                        TrigramSimilarity('minor__name', item),
-                        TrigramSimilarity('profile__year', item),
-                        TrigramSimilarity('courses__name', item),
-                        TrigramSimilarity('major__name', item_alias),
-                        TrigramSimilarity('bio', item_alias),
-                        TrigramSimilarity('profile__year', item_alias),
                         TrigramSimilarity('profile__user__first_name', item_alias),
                         TrigramSimilarity('profile__user__last_name', item_alias),
-                        TrigramSimilarity('minor__name', item_alias),
-                        TrigramSimilarity('profile__year', item_alias),
-                        TrigramSimilarity('courses__name', item_alias),
+                        Value(0)    # Nones are super annoying, so we weed them out here like this
+                    ),
+                    similarity_major=Greatest(
+                        TrigramSimilarity('major__name', item),
+                        TrigramSimilarity('major__name', item_alias),
+                        Value(0)
+                    ),
+                    similarity_bio=Greatest(
+                        TrigramSimilarity('bio', item),
+                        TrigramSimilarity('bio', item_alias),
+                        Value(0)
                     )
-                ).filter(similarity__gte=0.10).order_by('-similarity')
+                )
 
-                
+                queryset = queryset.annotate(
+                    similarity_name_max = Greatest(
+                        F("similarity_name"),
+                        F("similarity_name_max")
+                    ),
+                    similarity_major_max = Greatest(
+                        F("similarity_major"),
+                        F("similarity_major_max")
+                    ),
+                    similarity_bio_max = Greatest(
+                        F("similarity_bio"),
+                        F("similarity_bio_max")
+                    ),
+                    similarity =
+                        F("similarity_name") +
+                        F("similarity_major") +
+                        F("similarity_bio") +
+                        F("similarity")
+                )
+
+
+            queryset_name = Mentor.objects.none()
+            queryset_major = Mentor.objects.none()
+            queryset_bio = Mentor.objects.none()
+            #if name filter is checked
+            if filter_name:
+                queryset_name = queryset.filter(similarity_name_max__gte=0.10)
+            #if major filter is checked
+            if filter_major:
+                queryset_major = queryset.filter(similarity_major_max__gte=0.10)
+                #if bio filter is checked
+            if filter_bio:
+                queryset_bio = queryset.filter(similarity_bio_max__gte=0.10)
+
+            # take the intersection of all three filtered querysets
+            queryset = queryset_name | queryset_major | queryset_bio
+
+        else:
+            return queryset
 
         if 'random' in self.request.GET:
             num_random = self.request.GET['random']
@@ -291,9 +399,17 @@ class MentorsSearchView(generics.ListAPIView):
             else:
                 num_random = queryset.count()
             queryset = queryset.order_by('?')[:num_random]
-            
+
+        else:
+            if ct > 1:
+                # sort by similarity
+                queryset = queryset.order_by("-similarity")
+                # sort by profile completion
+                queryset = sorted(queryset,
+                    key=lambda each: self.calculate_profile_completion_index(each),
+                    reverse=True)
         return queryset
-    
+
 
 class MentorView(generics.RetrieveAPIView):
     """
@@ -333,7 +449,7 @@ class ReportUser(APIView):
         reported_id = int(request.data['reported_id'])
         reason = request.data['reason']
         reported_profile = get_object_or_404(Profile, id=reported_id)
-        
+
         message = 'User {} {} ({}) has reported {} {} ({}) for the following reason:\n{}'.format(
             self.request.user.first_name,
             self.request.user.last_name,
@@ -353,4 +469,3 @@ class ReportUser(APIView):
         if not (200 <= response.status_code < 300):
             raise ValidationError({'sendgrid_status_code': response.status_code})
         return HttpResponse(status=200)
-        
